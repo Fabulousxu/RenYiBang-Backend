@@ -84,6 +84,27 @@
 			<artifactId>fastjson2</artifactId>
 			<version>2.0.49</version>
 		</dependency>
+		<!-- 引入ModuleApi模块依赖 -->
+		<dependency>
+			<groupId>com.renyibang</groupId>
+			<artifactId>FeignClient</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.transaction</groupId>
+			<artifactId>jakarta.transaction-api</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-jpa</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>6.5.2.Final</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
