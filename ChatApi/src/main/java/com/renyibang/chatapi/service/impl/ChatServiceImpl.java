@@ -8,6 +8,7 @@ import com.renyibang.chatapi.entity.Chat;
 import com.renyibang.chatapi.entity.Message;
 import com.renyibang.chatapi.service.ChatService;
 import com.renyibang.chatapi.util.ResponseUtil;
+import com.renyibang.feignclient.UserClient;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -22,6 +23,7 @@ public class ChatServiceImpl implements ChatService {
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
   @Autowired private ChatRepository chatRepository;
   @Autowired private MessageRepository messageRepository;
+  @Autowired private UserClient userClient;
 
   private static JSONObject getChatJson(Chat chat, long userId) {
     long chatterId = chat.getOfOwnerId() == userId ? chat.getChatterId() : chat.getOfOwnerId();
