@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChatRepository extends MongoRepository<Chat, String> {
-  List<Chat> findByOfOwnerIdOrChatterId(long ofOwnerId, long chatterId);
+  List<Chat> findByOfOwnerIdOrChatterIdOrderByLastMessageCreatedAtDesc(
+      long ofOwnerId, long chatterId);
 
   Optional<Chat> findByTypeAndOfIdAndChatterId(byte type, long ofId, long chatterId);
 }
