@@ -1,4 +1,4 @@
-package com.example.renyibang.util;
+package com.renyibang.orderapi.util;
 
 import com.alibaba.fastjson2.JSONObject;
 
