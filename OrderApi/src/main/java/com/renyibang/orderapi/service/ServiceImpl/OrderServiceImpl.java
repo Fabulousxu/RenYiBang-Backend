@@ -1,8 +1,8 @@
 package com.renyibang.orderapi.service.ServiceImpl;
 
-import com.renyibang.orderapi.client.ServiceClient;
-import com.renyibang.orderapi.client.TaskClient;
-import com.renyibang.orderapi.client.UserClient;
+import com.renyibang.feignclient.ServiceClient;
+import com.renyibang.feignclient.TaskClient;
+import com.renyibang.feignclient.UserClient;
 import com.renyibang.orderapi.dao.OrderDao;
 import com.renyibang.orderapi.dto.OrderDTO;
 import com.renyibang.orderapi.dto.ServiceDTO;
@@ -34,21 +34,21 @@ public class OrderServiceImpl implements OrderService {
     List<OrderDTO> orderDTOs = new ArrayList<>();
 
     // 向User module请求owner信息
-    UserDTO owner = userClient.getUserById(ownerId);
+    UserDTO owner = (UserDTO) userClient.getUserById(ownerId);
 
     for (Order order : orders) {
       OrderDTO orderDTO = new OrderDTO(order);
 
       //  向User module请求accessor信息
-      UserDTO accessor = userClient.getUserById(order.getAccessorId());
+      UserDTO accessor = (UserDTO) userClient.getUserById(order.getAccessorId());
 
       if (type == 0) {
         // 向Task module请求task信息
-        TaskDTO task = taskClient.getTaskById(order.getItemId());
+        TaskDTO task = (TaskDTO) taskClient.getTaskById(order.getItemId());
         orderDTO.setTask(task);
       } else {
         // 向Service module请求service信息
-        ServiceDTO service = serviceClient.getServiceById(order.getItemId());
+        ServiceDTO service = (ServiceDTO) serviceClient.getServiceById(order.getItemId());
         orderDTO.setService(service);
       }
 
@@ -66,21 +66,21 @@ public class OrderServiceImpl implements OrderService {
     List<OrderDTO> orderDTOs = new ArrayList<>();
 
     // 向User module请求accessor信息
-    UserDTO accessor = userClient.getUserById(accessorId);
+    UserDTO accessor = (UserDTO) userClient.getUserById(accessorId);
 
     for (Order order : orders) {
       OrderDTO orderDTO = new OrderDTO(order);
 
       //  向User module请求owner信息
-      UserDTO owner = userClient.getUserById(order.getOwnerId());
+      UserDTO owner = (UserDTO) userClient.getUserById(order.getOwnerId());
 
       if (type == 0) {
         // 向Task module请求task信息
-        TaskDTO task = taskClient.getTaskById(order.getItemId());
+        TaskDTO task = (TaskDTO) taskClient.getTaskById(order.getItemId());
         orderDTO.setTask(task);
       } else {
         // 向Service module请求service信息
-        ServiceDTO service = serviceClient.getServiceById(order.getItemId());
+        ServiceDTO service = (ServiceDTO) serviceClient.getServiceById(order.getItemId());
         orderDTO.setService(service);
       }
 
@@ -203,7 +203,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public void modifyUserBalance(long userId, long amount) {
     // 向User module请求用户信息
-    UserDTO user = userClient.getUserById(userId);
+    UserDTO user = (UserDTO) userClient.getUserById(userId);
     user.setBalance(user.getBalance() + amount);
     userClient.updateUser(user);
   }
@@ -211,18 +211,18 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public void mapOrderToOrderDTO(Order order, OrderDTO orderDTO) {
     //  向User module请求owner信息
-    UserDTO owner = userClient.getUserById(order.getOwnerId());
+    UserDTO owner = (UserDTO) userClient.getUserById(order.getOwnerId());
 
     //  向User module请求accessor信息
-    UserDTO accessor = userClient.getUserById(order.getAccessorId());
+    UserDTO accessor = (UserDTO) userClient.getUserById(order.getAccessorId());
 
     if (order.getType() == 0) {
       // 向Task module请求task信息
-      TaskDTO task = taskClient.getTaskById(order.getItemId());
+      TaskDTO task = (TaskDTO) taskClient.getTaskById(order.getItemId());
       orderDTO.setTask(task);
     } else {
       // 向Service module请求service信息
-      ServiceDTO service = serviceClient.getServiceById(order.getItemId());
+      ServiceDTO service = (ServiceDTO) serviceClient.getServiceById(order.getItemId());
       orderDTO.setService(service);
     }
 
