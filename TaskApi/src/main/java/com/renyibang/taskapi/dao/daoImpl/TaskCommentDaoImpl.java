@@ -128,13 +128,13 @@ public class TaskCommentDaoImpl implements TaskCommentDao {
                 return "任务不存在！";
             }
 
-            if(taskCommentRepository.existsByTaskAndCommenter_id(task, userId))
+            if(taskCommentRepository.existsByTaskAndCommenterId(task, userId))
             {
                 return "用户已经评论过该任务！";
             }
 
             TaskComment taskComment = new TaskComment();
-            taskComment.setCommenter_id(userId);
+            taskComment.setCommenterId(userId);
             taskComment.setTask(task);
             taskComment.setContent(content);
             taskComment.setCreatedAt(LocalDateTime.now());
@@ -166,7 +166,7 @@ public class TaskCommentDaoImpl implements TaskCommentDao {
                 return "评论不存在！";
             }
 
-            if(taskComment.getCommenter_id() != userId)
+            if(taskComment.getCommenterId() != userId)
             {
                 return "该评论不是由此用户发布！";
             }

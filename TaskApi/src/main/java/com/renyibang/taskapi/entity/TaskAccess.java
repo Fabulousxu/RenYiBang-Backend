@@ -23,7 +23,7 @@ public class TaskAccess {
   private Task task; // 任务
 
   @Column(name = "accessor_id")
-  private long accessor_id; // 任务接取者
+  private long accessorId; // 任务接取者
 
   @CreationTimestamp
   @Temporal(TemporalType.TIMESTAMP)

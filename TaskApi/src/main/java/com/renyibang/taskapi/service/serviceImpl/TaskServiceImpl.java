@@ -100,7 +100,7 @@ public class TaskServiceImpl implements TaskService {
             for(TaskComment taskComment : getResult)
             {
                 JSONObject taskCommentJson = taskComment.toJSON();
-                taskCommentJson.put("commenter", userClient.getUserJSON(taskComment.getCommenter_id()));
+                taskCommentJson.put("commenter", userClient.getUserJSON(taskComment.getCommenterId()));
 
                 result.add(taskCommentJson);
             }
@@ -128,7 +128,7 @@ public class TaskServiceImpl implements TaskService {
             for(TaskMessage taskMessage : getResult)
             {
                 JSONObject taskMessageJson = taskMessage.toJSON();
-                taskMessageJson.put("messager", userClient.getUserJSON(taskMessage.getMessager_id()));
+                taskMessageJson.put("messager", userClient.getUserJSON(taskMessage.getMessagerId()));
 
                 result.add(taskMessageJson);
             }

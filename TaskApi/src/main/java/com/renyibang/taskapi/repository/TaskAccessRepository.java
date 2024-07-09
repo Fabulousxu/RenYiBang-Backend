@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TaskAccessRepository extends JpaRepository<TaskAccess, Long> {
-    boolean existsByAccessor_idAndTask(long accessorId, Task task);
-    TaskAccess findByTaskAndAccessor_id(Task task, long accessorId);
+    boolean existsByAccessorIdAndTask(long accessorId, Task task);
+    TaskAccess findByTaskAndAccessorId(Task task, long accessorId);
 }
