@@ -2,7 +2,7 @@ package com.renyibang.taskapi.service.serviceImpl;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.renyibang.moduleapi.clients.UserClient;
+import com.renyibang.feignclient.UserClient;
 import com.renyibang.taskapi.dao.TaskCommentDao;
 import com.renyibang.taskapi.dao.TaskDao;
 import com.renyibang.taskapi.dao.TaskMessageDao;

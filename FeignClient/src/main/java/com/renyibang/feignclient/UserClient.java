@@ -1,4 +1,4 @@
-package com.renyibang.moduleapi.clients;
+package com.renyibang.feignclient;
 
 import com.alibaba.fastjson2.JSONObject;
 import org.springframework.cloud.openfeign.FeignClient;
