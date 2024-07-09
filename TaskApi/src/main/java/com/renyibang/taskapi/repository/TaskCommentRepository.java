@@ -12,5 +12,5 @@ import org.springframework.stereotype.Repository;
 public interface TaskCommentRepository extends JpaRepository<TaskComment, Long> {
     Page<TaskComment> findByTaskTaskId(long taskId, Pageable pageable);
 
-    boolean existsByTaskAndCommenter_id(Task task, long userId);
+    boolean existsByTaskAndCommenterId(Task task, long userId);
 }
