@@ -37,4 +37,18 @@ public class Order {
 
 	@Column(name = "item_id")
 	private long itemId; // task_id or service_id
+
+	// 有问题
+	public JSONObject toJSON(){
+		JSONObject json = new JSONObject();
+		json.put("id", orderId);
+		json.put("type", type);
+		json.put("initiator", owner.getNickname());
+		json.put("recipient", accessor.getNickname());
+		json.put("status", status.getCode());
+		json.put("cost", cost);
+		json.put("time", item.getCreatedAt());
+		json.put("name", item.getTitle());
+		return json;
+	}
 }

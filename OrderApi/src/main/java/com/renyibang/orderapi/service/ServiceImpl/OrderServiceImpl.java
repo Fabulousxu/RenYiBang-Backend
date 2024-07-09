@@ -1,8 +1,5 @@
 package com.renyibang.orderapi.service.ServiceImpl;
 
-import com.renyibang.orderapi.client.ServiceClient;
-import com.renyibang.orderapi.client.TaskClient;
-import com.renyibang.orderapi.client.UserClient;
 import com.renyibang.orderapi.dao.OrderDao;
 import com.renyibang.orderapi.dto.OrderDTO;
 import com.renyibang.orderapi.dto.ServiceDTO;
@@ -23,10 +20,7 @@ import org.springframework.web.client.RestTemplate;
 public class OrderServiceImpl implements OrderService {
   @Autowired private OrderDao orderDao;
 
-  // 使用openfeign替代restTemplate
-  @Autowired private UserClient userClient;
-  @Autowired private TaskClient taskClient;
-  @Autowired private ServiceClient serviceClient;
+  @Autowired private RestTemplate restTemplate;
 
   @Override
   public List<OrderDTO> findByOwnerIdAndType(long ownerId, Byte type) {
@@ -34,21 +28,29 @@ public class OrderServiceImpl implements OrderService {
     List<OrderDTO> orderDTOs = new ArrayList<>();
 
     // 向User module请求owner信息
-    UserDTO owner = userClient.getUserById(ownerId);
+    UserDTO owner =
+        restTemplate.getForObject(
+            "http://localhost:8080/api/user/" + orders.getFirst().getOwnerId(), UserDTO.class);
 
     for (Order order : orders) {
       OrderDTO orderDTO = new OrderDTO(order);
 
       //  向User module请求accessor信息
-      UserDTO accessor = userClient.getUserById(order.getAccessorId());
+      UserDTO accessor =
+          restTemplate.getForObject(
+              "http://localhost:8080/api/user/" + order.getAccessorId(), UserDTO.class);
 
       if (type == 0) {
         // 向Task module请求task信息
-        TaskDTO task = taskClient.getTaskById(order.getItemId());
+        TaskDTO task =
+            restTemplate.getForObject(
+                "http://localhost:8080/api/task/" + order.getItemId(), TaskDTO.class);
         orderDTO.setTask(task);
       } else {
         // 向Service module请求service信息
-        ServiceDTO service = serviceClient.getServiceById(order.getItemId());
+        ServiceDTO service =
+            restTemplate.getForObject(
+                "http://localhost:8080/api/service/" + order.getItemId(), ServiceDTO.class);
         orderDTO.setService(service);
       }
 
@@ -66,21 +68,28 @@ public class OrderServiceImpl implements OrderService {
     List<OrderDTO> orderDTOs = new ArrayList<>();
 
     // 向User module请求accessor信息
-    UserDTO accessor = userClient.getUserById(accessorId);
+    UserDTO accessor =
+        restTemplate.getForObject("http://localhost:8080/api/user/" + accessorId, UserDTO.class);
 
     for (Order order : orders) {
       OrderDTO orderDTO = new OrderDTO(order);
 
       //  向User module请求owner信息
-      UserDTO owner = userClient.getUserById(order.getOwnerId());
+      UserDTO owner =
+          restTemplate.getForObject(
+              "http://localhost:8080/api/user/" + order.getOwnerId(), UserDTO.class);
 
       if (type == 0) {
         // 向Task module请求task信息
-        TaskDTO task = taskClient.getTaskById(order.getItemId());
+        TaskDTO task =
+            restTemplate.getForObject(
+                "http://localhost:8080/api/task/" + order.getItemId(), TaskDTO.class);
         orderDTO.setTask(task);
       } else {
         // 向Service module请求service信息
-        ServiceDTO service = serviceClient.getServiceById(order.getItemId());
+        ServiceDTO service =
+            restTemplate.getForObject(
+                "http://localhost:8080/api/service/" + order.getItemId(), ServiceDTO.class);
         orderDTO.setService(service);
       }
 
@@ -131,7 +140,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public long createOrder(long taskId, long ownerId, long accessorId, long cost, Byte type) {
+  public long createOrder(long taskId, long ownerId, long accessorId, long cost) {
     // TODO 校验：任务是否存在
 
     // Create a new Order
@@ -203,26 +212,35 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public void modifyUserBalance(long userId, long amount) {
     // 向User module请求用户信息
-    UserDTO user = userClient.getUserById(userId);
+    UserDTO user =
+        restTemplate.getForObject("http://localhost:8080/api/user/" + userId, UserDTO.class);
     user.setBalance(user.getBalance() + amount);
-    userClient.updateUser(user);
+    restTemplate.put("http://localhost:8080/api/user/" + userId, user);
   }
 
   @Override
   public void mapOrderToOrderDTO(Order order, OrderDTO orderDTO) {
     //  向User module请求owner信息
-    UserDTO owner = userClient.getUserById(order.getOwnerId());
+    UserDTO owner =
+        restTemplate.getForObject(
+            "http://localhost:8080/api/user/" + order.getOwnerId(), UserDTO.class);
 
     //  向User module请求accessor信息
-    UserDTO accessor = userClient.getUserById(order.getAccessorId());
+    UserDTO accessor =
+        restTemplate.getForObject(
+            "http://localhost:8080/api/user/" + order.getAccessorId(), UserDTO.class);
 
     if (order.getType() == 0) {
       // 向Task module请求task信息
-      TaskDTO task = taskClient.getTaskById(order.getItemId());
+      TaskDTO task =
+          restTemplate.getForObject(
+              "http://localhost:8080/api/task/" + order.getItemId(), TaskDTO.class);
       orderDTO.setTask(task);
     } else {
       // 向Service module请求service信息
-      ServiceDTO service = serviceClient.getServiceById(order.getItemId());
+      ServiceDTO service =
+          restTemplate.getForObject(
+              "http://localhost:8080/api/service/" + order.getItemId(), ServiceDTO.class);
       orderDTO.setService(service);
     }
 

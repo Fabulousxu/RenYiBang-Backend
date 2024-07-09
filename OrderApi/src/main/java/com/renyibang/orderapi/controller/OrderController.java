@@ -1,11 +1,14 @@
-package com.renyibang.orderapi.controller;
+package com.example.renyibang.controller;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.renyibang.orderapi.dto.OrderDTO;
-import com.renyibang.orderapi.entity.Order;
-import com.renyibang.orderapi.enums.OrderStatus;
-import com.renyibang.orderapi.service.OrderService;
-import com.renyibang.orderapi.util.ResponseUtil;
+import com.example.renyibang.entity.Order;
+import com.example.renyibang.entity.Service;
+import com.example.renyibang.entity.ServiceOrder;
+import com.example.renyibang.entity.Task;
+import com.example.renyibang.entity.TaskOrder;
+import com.example.renyibang.enums.OrderStatus;
+import com.example.renyibang.service.OrderService;
+import com.example.renyibang.util.ResponseUtil;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/order")
 public class OrderController {
   @Autowired
-  private OrderService orderService;
+  private OrderService<TaskOrder, Task> taskOrderService;
+  @Autowired
+  private OrderService<ServiceOrder, Service> serviceOrderService;
 
   // 生成订单
   // /task/create
@@ -43,7 +48,7 @@ public class OrderController {
     }
 
     // 创建订单
-    orderService.createOrder(taskId, ownerId, accessorId, cost, (byte) 0);
+    taskOrderService.createOrder(taskId, ownerId, accessorId, cost);
     return ResponseUtil.success("订单创建成功");
   }
 
@@ -53,34 +58,35 @@ public class OrderController {
   public JSONObject getOrder(@PathVariable Long id) {
     // TODO: token, 获取当前用户id
     // 身份校验
-    OrderDTO order = orderService.findById(id);
-    return ResponseUtil.success(order.getDetail());
+    Order order = taskOrderService.findById(id);
+    com.example.renyibang.dto.OrderDTO orderDto = new com.example.renyibang.dto.OrderDTO(order);
+    return ResponseUtil.success(orderDto.toJSON());
   }
 
   // /task/owner/:ownerId
   @GetMapping("/task/initiator/{ownerId}")
   public JSONObject getTaskOrderByOwner(@PathVariable Long ownerId) {
     // TODO：取消路径参数，使用token获取用户id
-    List<OrderDTO> taskOrders = orderService.findByOwnerIdAndType(ownerId, (byte) 0);
+    List<TaskOrder> taskOrders = taskOrderService.findByOwnerId(ownerId);
     return ResponseUtil.success(toJSON(taskOrders));
   }
 
   @GetMapping("/task/recipient/{accessorId}")
   public JSONObject getTaskOrderByAccessor(@PathVariable Long accessorId) {
     // TODO：取消路径参数，使用token获取用户id
-    List<OrderDTO> taskOrders = orderService.findByAccessorIdAndType(accessorId, (byte) 0);
+    List<TaskOrder> taskOrders = taskOrderService.findByAccessorId(accessorId);
     return ResponseUtil.success(toJSON(taskOrders));
   }
   @GetMapping("/service/initiator")
   public JSONObject getServiceOrderByOwner() {
     // TODO：取消路径参数，使用token获取用户id
-    List<OrderDTO> serviceOrders = orderService.findByOwnerIdAndType(1, (byte) 1);
+    List<ServiceOrder> serviceOrders = serviceOrderService.findByOwnerId(1);
     return ResponseUtil.success(toJSON(serviceOrders));
   }
   @GetMapping("/service/recipient")
   public JSONObject getServiceOrderByAccessor() {
     // TODO：取消路径参数，使用token获取用户id
-    List<OrderDTO> serviceOrders = orderService.findByAccessorIdAndType(1, (byte) 1);
+    List<ServiceOrder> serviceOrders = serviceOrderService.findByAccessorId(1);
     return ResponseUtil.success(toJSON(serviceOrders));
   }
 
@@ -93,13 +99,13 @@ public class OrderController {
     // TODO：支付api
     int userId = 1;
     // 校验用户是否为任务发布者
-    OrderDTO taskOrder = orderService.findById(orderId);
-    if (userId != taskOrder.getOwner().getId()) {
+    TaskOrder taskOrder = taskOrderService.findById(orderId);
+    if (taskOrder.getOwner().getUserId() != userId) {
       return ResponseUtil.error("该用户不是任务发布者");
     }
 
     // 支付订单
-    orderService.payOrder(taskOrder.getOrder());
+    taskOrderService.payOrder(taskOrder);
     return ResponseUtil.success("支付成功");
   }
 
@@ -116,9 +122,9 @@ public class OrderController {
     int userId = 1;
 
     // 已知orderId, 获取order
-    OrderDTO taskOrder = orderService.findById(orderId);
+    TaskOrder taskOrder = taskOrderService.findById(orderId);
     // 校验用户是否为任务接收者
-    if(taskOrder.getAccessor().getId() != userId) {
+    if(taskOrder.getAccessor().getUserId() != userId) {
       return ResponseUtil.error("该用户不是任务接收者");
     }
 //    // 校验任务状态是否为进行中
@@ -127,7 +133,7 @@ public class OrderController {
 //    }
     // 修改订单状态
 //    taskOrder.setStatus(TaskStatus.COMPLETED);
-    taskOrder.getOrder().setStatus(status);
+    taskOrder.setStatus(status);
     return ResponseUtil.success("修改订单状态成功");
   }
 
@@ -138,13 +144,13 @@ public class OrderController {
     int userId = 1;
 
     // 已知orderId, 获取order
-    OrderDTO serviceOrder = orderService.findById(orderId);
+    ServiceOrder serviceOrder = serviceOrderService.findById(orderId);
     // 校验用户是否为任务接收者
-    if(serviceOrder.getAccessor().getId() != userId) {
+    if(serviceOrder.getAccessor().getUserId() != userId) {
       return ResponseUtil.error("该用户不是任务接收者");
     }
     // 修改订单状态
-    serviceOrder.getOrder().setStatus(status);
+    serviceOrder.setStatus(status);
     return ResponseUtil.success("修改订单状态成功");
   }
 
@@ -156,20 +162,20 @@ public class OrderController {
     int userId = 3;
 
     // 已知orderId, 获取order
-    OrderDTO taskOrder = orderService.findById(orderId);
+    TaskOrder taskOrder = taskOrderService.findById(orderId);
     // 校验用户是否为任务发起者
-    if (taskOrder.getOwner().getId() != userId) {
+    if (taskOrder.getOwner().getUserId() != userId) {
       return ResponseUtil.error("该用户不是任务发起者");
     }
     // 校验任务状态是否为已完成
-    if (taskOrder.getOrder().getStatus() != OrderStatus.COMPLETED) {
+    if (taskOrder.getStatus() != OrderStatus.COMPLETED) {
       return ResponseUtil.error("任务状态错误：未已完成");
     }
     // 修改订单状态
-    taskOrder.getOrder().setStatus(OrderStatus.CONFIRMED);
+    taskOrder.setStatus(OrderStatus.CONFIRMED);
 
     // 将帐号余额增加
-    orderService.modifyUserBalance(taskOrder.getOrder().getAccessorId(), taskOrder.getOrder().getCost());
+    taskOrderService.modifyUserBalance(taskOrder.getAccessor(), taskOrder.getCost());
     return ResponseUtil.success("订单确认完成");
   }
 
@@ -180,29 +186,29 @@ public class OrderController {
     int userId = 1;
 
     // 已知orderId, 获取order
-    OrderDTO serviceOrder = orderService.findById(orderId);
+    ServiceOrder serviceOrder = serviceOrderService.findById(orderId);
     // 校验用户是否为任务发起者
-    if (serviceOrder.getOwner().getId() != userId) {
+    if (serviceOrder.getOwner().getUserId() != userId) {
       return ResponseUtil.error("该用户不是任务发起者");
     }
     // 校验任务状态是否为已完成
-    if (serviceOrder.getOrder().getStatus() != OrderStatus.COMPLETED) {
+    if (serviceOrder.getStatus() != OrderStatus.COMPLETED) {
       return ResponseUtil.error("任务状态错误：未已完成");
     }
     // 修改订单状态
-    serviceOrder.getOrder().setStatus(OrderStatus.CONFIRMED);
+    serviceOrder.setStatus(OrderStatus.CONFIRMED);
 
     // 将帐号余额增加
-    orderService.modifyUserBalance(serviceOrder.getOrder().getAccessorId(), serviceOrder.getOrder().getCost());
+    taskOrderService.modifyUserBalance(serviceOrder.getAccessor(), serviceOrder.getCost());
     return ResponseUtil.success("订单确认完成");
   }
 
   // 非接口
   // 传入List<Order>，对于每一个Order，调用toJSON()方法，返回List<JSONObject>
   // 使用模板
-  private List<JSONObject> toJSON(List<? extends OrderDTO> orders) {
+  private List<JSONObject> toJSON(List<? extends Order> orders) {
     List<JSONObject> jsonObjects = new ArrayList<>();
-    for (OrderDTO order : orders) {
+    for (Order order : orders) {
       jsonObjects.add(order.toJSON());
     }
     return jsonObjects;

@@ -1,5 +1,5 @@
-.idea/
-nacos/
-work/
-logs/
-derby.log
+.idea
+.work
+.logs
+.derby.log
+.nacos

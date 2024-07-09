@@ -1,4 +1,4 @@
-package com.renyibang.orderapi.util;
+package com.example.renyibang.util;
 
 public class PriceUtil {
     public static long priceConvert(long price)
