@@ -137,7 +137,7 @@
 		<!-- 引入ModuleApi模块依赖 -->
 		<dependency>
 			<groupId>com.renyibang</groupId>
-			<artifactId>ModuleApi</artifactId>
+			<artifactId>FeignClient</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
