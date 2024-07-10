@@ -74,7 +74,7 @@ public class ChatServiceImpl implements ChatService {
       // 服务模块也要加
       JSONObject res = taskClient.getTaskOwnerId(ofId);
       if (!res.getBooleanValue("ok")) return ResponseUtil.error(res.getString("message"));
-      long ofOwnerId = res.getJSONObject("data").getLongValue("ownerId");
+      long ofOwnerId = res.getLongValue("data");
       chat = new Chat();
       chat.setType(type);
       chat.setOfId(ofId);
