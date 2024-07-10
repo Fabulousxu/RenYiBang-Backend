@@ -2,7 +2,7 @@ package com.renyibang.userapi.controller;
 
 import com.alibaba.fastjson2.JSONObject;
 
-import com.renyibang.feignclient.dto.UserDTO;
+import com.renyibang.global.dto.UserDTO;
 import com.renyibang.userapi.entity.RegisterRequest;
 import com.renyibang.userapi.entity.User;
 import com.renyibang.userapi.repository.UserRepository;
