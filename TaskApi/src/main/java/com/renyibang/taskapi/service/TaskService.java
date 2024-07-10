@@ -42,4 +42,6 @@ public interface TaskService {
     JSONObject publishTask(long userId, JSONObject body);
 
     TaskDTO getTaskById(Long taskId);
+
+    JSONObject getTaskOwnerId(long taskId);
 }
