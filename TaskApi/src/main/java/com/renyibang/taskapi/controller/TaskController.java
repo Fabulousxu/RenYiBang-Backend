@@ -1,7 +1,7 @@
 package com.renyibang.taskapi.controller;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.renyibang.feignclient.dto.TaskDTO;
+import com.renyibang.global.dto.TaskDTO;
 import com.renyibang.taskapi.service.TaskService;
 import com.renyibang.taskapi.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;

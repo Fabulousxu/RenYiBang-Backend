@@ -115,7 +115,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.renyibang</groupId>
-			<artifactId>FeignClient</artifactId>
+			<artifactId>global</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>

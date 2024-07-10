@@ -1,4 +1,4 @@
-package com.renyibang.feignclient;
+package com.renyibang.global.client;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.feignclient.dto.TaskDTO;

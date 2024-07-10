@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.renyibang</groupId>
-	<artifactId>ServiceApi</artifactId>
+	<artifactId>AuthApi</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ServiceApi</name>
-	<description>ServiceApi</description>
+	<name>AuthApi</name>
+	<description>AuthApi</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -39,18 +39,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -88,6 +76,7 @@
 			<groupId>com.renyibang</groupId>
 			<artifactId>global</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>

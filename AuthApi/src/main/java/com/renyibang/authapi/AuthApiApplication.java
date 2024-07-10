@@ -1,18 +1,16 @@
-package com.renyibang.chatapi;
+package com.renyibang.authapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.data.mongodb.config.EnableMongoAuditing;
 
 @SpringBootApplication
-@EnableMongoAuditing
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = "com.renyibang.global.client")
-public class ChatApiApplication {
+public class AuthApiApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(ChatApiApplication.class, args);
+    SpringApplication.run(AuthApiApplication.class, args);
   }
 }

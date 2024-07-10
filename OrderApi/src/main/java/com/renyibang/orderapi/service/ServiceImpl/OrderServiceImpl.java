@@ -1,12 +1,8 @@
 package com.renyibang.orderapi.service.ServiceImpl;
 
-import com.alibaba.fastjson2.JSONObject;
-import com.renyibang.feignclient.ServiceClient;
-import com.renyibang.feignclient.TaskClient;
-import com.renyibang.feignclient.UserClient;
-import com.renyibang.feignclient.dto.ServiceDTO;
-import com.renyibang.feignclient.dto.TaskDTO;
-import com.renyibang.feignclient.dto.UserDTO;
+import com.renyibang.global.client.ServiceClient;
+import com.renyibang.global.client.TaskClient;
+import com.renyibang.global.client.UserClient;
 import com.renyibang.orderapi.dao.OrderDao;
 import com.renyibang.orderapi.dto.OrderDTO;
 import com.renyibang.orderapi.entity.Order;

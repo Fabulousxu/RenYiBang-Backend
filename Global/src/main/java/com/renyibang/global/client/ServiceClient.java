@@ -1,4 +1,4 @@
-package com.renyibang.feignclient;
+package com.renyibang.global.client;
 
 import com.renyibang.feignclient.dto.ServiceDTO;
 import org.springframework.cloud.openfeign.FeignClient;

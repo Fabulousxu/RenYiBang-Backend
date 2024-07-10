@@ -1,6 +1,6 @@
 package com.renyibang.taskapi.dao.daoImpl;
 
-import com.renyibang.feignclient.UserClient;
+import com.renyibang.global.client.UserClient;
 import com.renyibang.taskapi.dao.TaskMessageDao;
 import com.renyibang.taskapi.entity.Task;
 import com.renyibang.taskapi.entity.TaskMessage;
