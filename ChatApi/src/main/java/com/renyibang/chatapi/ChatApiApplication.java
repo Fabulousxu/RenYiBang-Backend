@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 @SpringBootApplication
 @EnableMongoAuditing
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = "com.renyibang.feignclient")
+@EnableFeignClients(basePackages = "com.renyibang.global.client")
 public class ChatApiApplication {
 
   public static void main(String[] args) {

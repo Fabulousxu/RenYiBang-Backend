@@ -1,4 +1,4 @@
-package com.renyibang.feignclient.dto;
+package com.renyibang.global.dto;
 
 import lombok.Data;
 

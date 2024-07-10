@@ -1,8 +1,8 @@
 package com.renyibang.orderapi.service.ServiceImpl;
 
-import com.renyibang.feignclient.ServiceClient;
-import com.renyibang.feignclient.TaskClient;
-import com.renyibang.feignclient.UserClient;
+import com.renyibang.global.client.ServiceClient;
+import com.renyibang.global.client.TaskClient;
+import com.renyibang.global.client.UserClient;
 import com.renyibang.orderapi.dao.OrderDao;
 import com.renyibang.orderapi.dto.OrderDTO;
 import com.renyibang.orderapi.dto.ServiceDTO;
@@ -17,7 +17,6 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class OrderServiceImpl implements OrderService {

@@ -1,9 +1,8 @@
 package com.renyibang.orderapi.controller;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.renyibang.feignclient.TaskClient;
+import com.renyibang.global.client.TaskClient;
 import com.renyibang.orderapi.dto.OrderDTO;
-import com.renyibang.orderapi.entity.Order;
 import com.renyibang.orderapi.enums.OrderStatus;
 import com.renyibang.orderapi.service.OrderService;
 import com.renyibang.orderapi.util.ResponseUtil;

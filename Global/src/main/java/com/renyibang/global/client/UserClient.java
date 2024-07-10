@@ -1,4 +1,4 @@
-package com.renyibang.feignclient;
+package com.renyibang.global.client;
 
 import com.alibaba.fastjson2.JSONObject;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "UserApi")
 public interface UserClient {

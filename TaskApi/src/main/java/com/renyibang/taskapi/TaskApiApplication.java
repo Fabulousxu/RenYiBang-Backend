@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
-@EnableFeignClients(basePackages = "com.renyibang.feignclient")
+@EnableFeignClients(basePackages = "com.renyibang.global.client")
 public class TaskApiApplication {
 
 	public static void main(String[] args) {

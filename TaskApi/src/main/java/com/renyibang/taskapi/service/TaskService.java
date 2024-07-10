@@ -1,7 +1,7 @@
 package com.renyibang.taskapi.service;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.renyibang.feignclient.dto.TaskDTO;
+import com.renyibang.global.dto.TaskDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
