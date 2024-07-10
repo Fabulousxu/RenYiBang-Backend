@@ -13,9 +13,6 @@ public interface UserClient {
   @GetMapping("/api/user/{userId}/exist")
   boolean getUserExist(@PathVariable long userId);
 
-  @GetMapping("/api/user/{userId}/userJSON")
-  JSONObject getUserJSON(@PathVariable long userId);
-
   @GetMapping("/api/user/profile/{userId}")
   JSONObject getUserInfo(@PathVariable long userId);
 

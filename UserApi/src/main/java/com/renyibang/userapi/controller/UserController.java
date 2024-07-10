@@ -67,4 +67,9 @@ public class UserController {
         // 返回 查找到的 User 对象，将对象直接封装成JSON返回
         return ResponseUtil.success("查找成功", userRepository.findById(userId).orElse(null).toJSON());
     }
+
+    @GetMapping("/{userId}/exist")
+    boolean getUserExist(@PathVariable long userId) {
+        return userRepository.existsById(userId);
+    }
 }
