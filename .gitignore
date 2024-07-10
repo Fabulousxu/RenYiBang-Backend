@@ -3,3 +3,6 @@ nacos/
 work/
 logs/
 derby.log
+OrderApi/src/main/resources/application.properties
+TaskApi/src/main/resources/application.properties
+UserApi/src/main/resources/application.properties
