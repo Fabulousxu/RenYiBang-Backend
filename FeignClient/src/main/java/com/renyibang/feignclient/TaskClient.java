@@ -21,6 +21,6 @@ public interface TaskClient {
 	Object getTaskById(@PathVariable Long taskId);
 	///////////////////
 
-  @GetMapping("api/task/{taskId}/ownerId")
+  @GetMapping("/api/task/{taskId}/ownerId")
   JSONObject getTaskOwnerId(@PathVariable long taskId);
 }
