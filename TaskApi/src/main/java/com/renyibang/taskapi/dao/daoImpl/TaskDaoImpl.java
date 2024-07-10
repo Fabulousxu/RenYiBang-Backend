@@ -139,7 +139,7 @@ public class TaskDaoImpl implements TaskDao {
               return "任务不存在！";
           }
 
-          if(task.getOwner_id() == accessorId)
+          if(task.getOwnerId() == accessorId)
           {
               return "不能接取自己发布的任务！";
           }
@@ -245,7 +245,7 @@ public class TaskDaoImpl implements TaskDao {
           Task task = new Task();
           task.setTitle(title);
           task.setPrice(price);
-          task.setOwner_id(userId);
+          task.setOwnerId(userId);
           task.setImages(imagesURL);
           task.setDescription(description);
           task.setCreatedAt(LocalDateTime.now());

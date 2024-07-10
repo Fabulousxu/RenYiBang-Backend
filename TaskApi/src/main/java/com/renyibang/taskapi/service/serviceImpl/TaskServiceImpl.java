@@ -48,7 +48,7 @@ public class TaskServiceImpl implements TaskService {
                 //需要传入userId
                 JSONObject taskJson = task.toJSON();
 
-                taskJson.put("owner", userClient.getUserJSON(task.getOwner_id()));
+                taskJson.put("owner", userClient.getUserJSON(task.getOwnerId()));
 
                 result.add(taskJson);
             }
@@ -72,7 +72,7 @@ public class TaskServiceImpl implements TaskService {
         {
             Task result = taskDao.findById(taskId);
             JSONObject taskJson = result.toJSON();
-            taskJson.put("owner", userClient.getUserJSON(result.getOwner_id()));
+            taskJson.put("owner", userClient.getUserJSON(result.getOwnerId()));
 
             if(result == null)
             {
@@ -520,5 +520,17 @@ public class TaskServiceImpl implements TaskService {
         }
 
         return new TaskDTO(task.getTaskId(), task.getTitle(), task.getDescription(), task.getImages(), task.getCreatedAt());
+    }
+
+    @Override
+    public JSONObject getTaskOwnerId(long taskId)
+    {
+        Task task = taskDao.findById(taskId);
+        if(task == null)
+        {
+            return ResponseUtil.error("任务不存在！");
+        }
+
+        return ResponseUtil.success(task.getOwnerId());
     }
 }

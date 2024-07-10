@@ -26,7 +26,7 @@ public class Task {
   private long taskId; // 任务id
 
   @Column(name = "owner_id")
-  private long owner_id; // 任务发布者
+  private long ownerId; // 任务发布者
   @Column(name = "title")
   private String title; // 任务标题
   @Column(name = "images")

@@ -205,9 +205,20 @@ public class TaskController {
         return taskService.publishTask(userId, body);
     }
 
+    // 以下为后端模块API接口
+
+    //order模块调用
     @GetMapping("/getTask/{taskId}")
     public TaskDTO getTaskById(@PathVariable Long taskId)
     {
         return taskService.getTaskById(taskId);
+    }
+
+
+    //chat模块调用
+    @GetMapping("/{taskId}/ownerId")
+    public JSONObject getTaskOwnerId(@PathVariable long taskId)
+    {
+        return taskService.getTaskOwnerId(taskId);
     }
 }
