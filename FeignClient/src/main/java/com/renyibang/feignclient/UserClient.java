@@ -16,7 +16,7 @@ public interface UserClient {
   @GetMapping("/user/userJSON")
   JSONObject getUserJSON(@RequestParam("id") long userId);
 
-  @GetMapping("/api/user/{userId}/info")
+  @GetMapping("/api/user/profile/{userId}")
   JSONObject getUserInfo(@PathVariable long userId);
 
   /////////Order模块的调用/////////
