@@ -20,7 +20,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Vector;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -43,13 +46,30 @@ public class TaskServiceImpl implements TaskService {
             JSONArray result = new JSONArray();
             Page<Task> searchResult = taskDao.searchTaskByPaging(keyword, pageable, DateTimeUtil.getBeginDateTime(timeBegin), DateTimeUtil.getEndDateTime(timeEnd), priceLow, PriceUtil.priceConvert(priceHigh));
 
+            //创建一个list存储用户id
+            ArrayList<Long> userIds = new ArrayList<>();
+
             for(Task task : searchResult.getContent())
             {
                 //需要传入userId
+                //将userId存入list
+                userIds.add(task.getOwnerId());
+            }
+
+            JSONObject userInfos = userClient.getUserInfos(userIds);
+            if(Objects.equals(false, userInfos.get("ok")))
+            {
+                return ResponseUtil.error("用户信息获取失败！");
+            }
+
+            JSONArray userInfosArray = (JSONArray)userInfos.get("data");
+
+            //将用户信息存入taskJson
+            for(int i = 0; i < searchResult.getContent().size(); i++)
+            {
+                Task task = searchResult.getContent().get(i);
                 JSONObject taskJson = task.toJSON();
-
-                taskJson.put("owner", userClient.getUserJSON(task.getOwnerId()));
-
+                taskJson.put("owner", userInfosArray.get(i));
                 result.add(taskJson);
             }
 
@@ -71,18 +91,23 @@ public class TaskServiceImpl implements TaskService {
         try
         {
             Task result = taskDao.findById(taskId);
-            JSONObject taskJson = result.toJSON();
-            taskJson.put("owner", userClient.getUserJSON(result.getOwnerId()));
 
             if(result == null)
             {
                 return ResponseUtil.error("任务信息为null");
             }
 
-            else
+            JSONObject taskJson = result.toJSON();
+            JSONObject response = userClient.getUserInfo(result.getOwnerId());
+            if(Objects.equals(false, response.get("ok")))
             {
-                return ResponseUtil.success(taskJson);
+                return ResponseUtil.error("用户信息获取失败！");
             }
+
+            taskJson.put("owner", response.get("data"));
+
+            return ResponseUtil.success(taskJson);
+
         }
         catch (Exception e)
         {
@@ -98,11 +123,26 @@ public class TaskServiceImpl implements TaskService {
             JSONArray result = new JSONArray();
             Page<TaskComment> getResult = taskCommentDao.getTaskComments(taskId, pageable);
 
+            ArrayList<Long> userIds = new ArrayList<>();
+
             for(TaskComment taskComment : getResult)
             {
-                JSONObject taskCommentJson = taskComment.toJSON();
-                taskCommentJson.put("commenter", userClient.getUserJSON(taskComment.getCommenterId()));
+                userIds.add(taskComment.getCommenterId());
+            }
 
+            JSONObject userInfos = userClient.getUserInfos(userIds);
+            if(Objects.equals(false, userInfos.get("ok")))
+            {
+                return ResponseUtil.error("用户信息获取失败！");
+            }
+
+            JSONArray userInfosArray = (JSONArray)userInfos.get("data");
+
+            for(int i = 0; i < getResult.getContent().size(); i++)
+            {
+                TaskComment taskComment = getResult.getContent().get(i);
+                JSONObject taskCommentJson = taskComment.toJSON();
+                taskCommentJson.put("commenter", userInfosArray.get(i));
                 result.add(taskCommentJson);
             }
 
@@ -126,11 +166,26 @@ public class TaskServiceImpl implements TaskService {
             JSONArray result = new JSONArray();
             Page<TaskMessage> getResult = taskMessageDao.getTaskMessages(taskId, pageable);
 
+            ArrayList<Long> userIds = new ArrayList<>();
+
             for(TaskMessage taskMessage : getResult)
             {
-                JSONObject taskMessageJson = taskMessage.toJSON();
-                taskMessageJson.put("messager", userClient.getUserJSON(taskMessage.getMessagerId()));
+                userIds.add(taskMessage.getMessagerId());
+            }
 
+            JSONObject userInfos = userClient.getUserInfos(userIds);
+            if(Objects.equals(false, userInfos.get("ok")))
+            {
+                return ResponseUtil.error("用户信息获取失败！");
+            }
+
+            JSONArray userInfosArray = (JSONArray)userInfos.get("data");
+
+            for(int i = 0; i < getResult.getContent().size(); i++)
+            {
+                TaskMessage taskMessage = getResult.getContent().get(i);
+                JSONObject taskMessageJson = taskMessage.toJSON();
+                taskMessageJson.put("messager", userInfosArray.get(i));
                 result.add(taskMessageJson);
             }
 
