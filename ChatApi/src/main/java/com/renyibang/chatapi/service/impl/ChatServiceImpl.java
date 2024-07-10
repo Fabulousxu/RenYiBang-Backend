@@ -8,6 +8,7 @@ import com.renyibang.chatapi.entity.Chat;
 import com.renyibang.chatapi.entity.Message;
 import com.renyibang.chatapi.service.ChatService;
 import com.renyibang.chatapi.util.ResponseUtil;
+import com.renyibang.feignclient.TaskClient;
 import com.renyibang.feignclient.UserClient;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,12 +25,13 @@ public class ChatServiceImpl implements ChatService {
   @Autowired private ChatRepository chatRepository;
   @Autowired private MessageRepository messageRepository;
   @Autowired private UserClient userClient;
+  @Autowired private TaskClient taskClient;
 
-  private static JSONObject getChatJson(Chat chat, long userId) {
+  private JSONObject getChatJson(Chat chat, long userId) {
     long chatterId = chat.getOfOwnerId() == userId ? chat.getChatterId() : chat.getOfOwnerId();
-    /* ********** to do: fetch chatter info ********** */
     JSONObject chatterJson = new JSONObject();
-    /* *********************************************** */
+    JSONObject res = userClient.getUserInfo(chatterId);
+    if (res.getBooleanValue("ok")) chatterJson = res.getJSONObject("data");
     JSONObject chatJson = new JSONObject();
     chatJson.put("chatId", chat.getChatId());
     chatJson.put("type", chat.getType() == 0 ? "task" : "service");
@@ -40,7 +42,7 @@ public class ChatServiceImpl implements ChatService {
     return chatJson;
   }
 
-  private static JSONObject getMessageJson(Message message) {
+  private JSONObject getMessageJson(Message message) {
     JSONObject messageJson = new JSONObject();
     messageJson.put("messageId", message.getMessageId());
     messageJson.put("senderId", message.getSenderId());
@@ -58,9 +60,9 @@ public class ChatServiceImpl implements ChatService {
     for (Chat chat : chats) chatArray.add(getChatJson(chat, userId));
     JSONObject data = new JSONObject();
     data.put("chats", chatArray);
-    /* ********** to do: fetch chatter info ********** */
     JSONObject selfJson = new JSONObject();
-    /* *********************************************** */
+    JSONObject res = userClient.getUserInfo(userId);
+    if (res.getBooleanValue("ok")) selfJson = res.getJSONObject("data");
     data.put("self", selfJson);
     return ResponseUtil.success(data);
   }
@@ -69,9 +71,10 @@ public class ChatServiceImpl implements ChatService {
   public JSONObject initiateChat(long userId, byte type, long ofId) {
     Chat chat = chatRepository.findByTypeAndOfIdAndChatterId(type, ofId, userId).orElse(null);
     if (chat == null) {
-      /* ********** to do: fetch ofOwner id ********** */
-      long ofOwnerId = 2;
-      /* ********************************************* */
+      // 服务模块也要加
+      JSONObject res = taskClient.getTaskOwnerId(ofId);
+      if (!res.getBooleanValue("ok")) return ResponseUtil.error(res.getString("message"));
+      long ofOwnerId = res.getJSONObject("data").getLongValue("ownerId");
       chat = new Chat();
       chat.setType(type);
       chat.setOfId(ofId);
