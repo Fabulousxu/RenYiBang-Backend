@@ -1,6 +1,7 @@
 package com.renyibang.feignclient;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.renyibang.feignclient.dto.TaskDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +19,7 @@ public interface TaskClient {
 	}
 	*/
 	@GetMapping("/api/task/getTask/{taskId}")
-	Object getTaskById(@PathVariable Long taskId);
+	TaskDTO getTaskById(@PathVariable Long taskId);
 	///////////////////
 
   @GetMapping("/api/task/{taskId}/ownerId")

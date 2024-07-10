@@ -1,5 +1,6 @@
 package com.renyibang.feignclient;
 
+import com.renyibang.feignclient.dto.ServiceDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,6 @@ public interface ServiceClient {
 	}
 	 */
 	@GetMapping("/{id}")
-	Object getServiceById(@PathVariable("id") Long itemId);
+	ServiceDTO getServiceById(@PathVariable("id") Long itemId);
 	//////////////////////
 }

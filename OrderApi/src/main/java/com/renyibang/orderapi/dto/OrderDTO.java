@@ -1,6 +1,9 @@
 package com.renyibang.orderapi.dto;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.renyibang.feignclient.dto.ServiceDTO;
+import com.renyibang.feignclient.dto.TaskDTO;
+import com.renyibang.feignclient.dto.UserDTO;
 import com.renyibang.orderapi.entity.Order;
 import lombok.Data;
 

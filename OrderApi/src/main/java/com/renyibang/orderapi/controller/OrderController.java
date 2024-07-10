@@ -10,6 +10,7 @@ import com.renyibang.orderapi.util.ResponseUtil;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -72,130 +73,48 @@ public class OrderController {
     List<OrderDTO> taskOrders = orderService.findByAccessorIdAndType(accessorId, (byte) 0);
     return ResponseUtil.success(toJSON(taskOrders));
   }
-  @GetMapping("/service/initiator")
-  public JSONObject getServiceOrderByOwner() {
+  @GetMapping("/service/initiator/{ownerId}")
+  public JSONObject getServiceOrderByOwner(@PathVariable Long ownerId) {
     // TODO：取消路径参数，使用token获取用户id
-    List<OrderDTO> serviceOrders = orderService.findByOwnerIdAndType(1, (byte) 1);
+    List<OrderDTO> serviceOrders = orderService.findByOwnerIdAndType(ownerId, (byte) 1);
     return ResponseUtil.success(toJSON(serviceOrders));
   }
-  @GetMapping("/service/recipient")
-  public JSONObject getServiceOrderByAccessor() {
+  @GetMapping("/service/recipient/{accessorId}")
+  public JSONObject getServiceOrderByAccessor(@PathVariable Long accessorId) {
     // TODO：取消路径参数，使用token获取用户id
-    List<OrderDTO> serviceOrders = orderService.findByAccessorIdAndType(1, (byte) 1);
+    List<OrderDTO> serviceOrders = orderService.findByAccessorIdAndType(accessorId, (byte) 1);
     return ResponseUtil.success(toJSON(serviceOrders));
-  }
-
-  // 支付订单
-  // ？怎么实现？不同的支付api?
-  // 设计模式？
-  @PostMapping("/task/pay/{orderId}")
-  public JSONObject payTaskOrder(@PathVariable Long orderId) {
-    // TODO: token, 获取当前用户id
-    // TODO：支付api
-    int userId = 1;
-    // 校验用户是否为任务发布者
-    OrderDTO taskOrder = orderService.findById(orderId);
-    if (userId != taskOrder.getOwner().getId()) {
-      return ResponseUtil.error("该用户不是任务发布者");
-    }
-
-    // 支付订单
-    orderService.payOrder(taskOrder.getOrder());
-    return ResponseUtil.success("支付成功");
-  }
-
-  @PostMapping("/service/pay/{orderId}")
-  public JSONObject payServiceOrder(@PathVariable Long orderId) {
-    return ResponseUtil.success("支付成功");
   }
 
   // 任务完成
   @PostMapping("/task/status")
-  public JSONObject completeTaskOrder(@RequestParam Long orderId, @RequestParam OrderStatus status) {
+  public JSONObject changeTaskOrderStatus(@RequestParam Long orderId, @RequestParam OrderStatus status) {
     // TODO: token, 获取当前用户id
     // 测试用: userId = 1
     int userId = 1;
 
-    // 已知orderId, 获取order
-    OrderDTO taskOrder = orderService.findById(orderId);
-    // 校验用户是否为任务接收者
-    if(taskOrder.getAccessor().getId() != userId) {
-      return ResponseUtil.error("该用户不是任务接收者");
+    Pair<Boolean, String> result = orderService.markOrderStatus(orderId, userId, status);
+
+    if (result.getFirst()) {
+      return ResponseUtil.success("订单状态修改成功");
+    } else {
+      return ResponseUtil.error(result.getSecond());
     }
-//    // 校验任务状态是否为进行中
-//    if (taskOrder.getStatus() != TaskStatus.IN_PROGRESS) {
-//      return ResponseUtil.error("任务状态错误：未进行中");
-//    }
-    // 修改订单状态
-//    taskOrder.setStatus(TaskStatus.COMPLETED);
-    taskOrder.getOrder().setStatus(status);
-    return ResponseUtil.success("修改订单状态成功");
   }
 
   @PostMapping("/service/status")
-  public JSONObject completeServiceOrder(@RequestParam Long orderId, @RequestParam OrderStatus status) {
+  public JSONObject changeServiceOrderStatus(@RequestParam Long orderId, @RequestParam OrderStatus status) {
     // TODO: token, 获取当前用户id
     // 测试用: userId = 1
     int userId = 1;
 
-    // 已知orderId, 获取order
-    OrderDTO serviceOrder = orderService.findById(orderId);
-    // 校验用户是否为任务接收者
-    if(serviceOrder.getAccessor().getId() != userId) {
-      return ResponseUtil.error("该用户不是任务接收者");
+    Pair<Boolean, String> result = orderService.markOrderStatus(orderId, userId, status);
+
+    if (result.getFirst()) {
+      return ResponseUtil.success("订单状态修改成功");
+    } else {
+      return ResponseUtil.error(result.getSecond());
     }
-    // 修改订单状态
-    serviceOrder.getOrder().setStatus(status);
-    return ResponseUtil.success("修改订单状态成功");
-  }
-
-  // 确认订单完成
-  @PostMapping("/task/confirm/{orderId}")
-  public JSONObject confirmTaskOrder(@PathVariable Long orderId) {
-    // TODO: token, 获取当前用户id
-    // 测试用: userId = 1
-    int userId = 3;
-
-    // 已知orderId, 获取order
-    OrderDTO taskOrder = orderService.findById(orderId);
-    // 校验用户是否为任务发起者
-    if (taskOrder.getOwner().getId() != userId) {
-      return ResponseUtil.error("该用户不是任务发起者");
-    }
-    // 校验任务状态是否为已完成
-    if (taskOrder.getOrder().getStatus() != OrderStatus.COMPLETED) {
-      return ResponseUtil.error("任务状态错误：未已完成");
-    }
-    // 修改订单状态
-    taskOrder.getOrder().setStatus(OrderStatus.CONFIRMED);
-
-    // 将帐号余额增加
-    orderService.modifyUserBalance(taskOrder.getOrder().getAccessorId(), taskOrder.getOrder().getCost());
-    return ResponseUtil.success("订单确认完成");
-  }
-
-  @PostMapping("/service/confirm/{orderId}")
-  public JSONObject confirmServiceOrder(@PathVariable Long orderId) {
-    // TODO: token, 获取当前用户id
-    // 测试用: userId = 1
-    int userId = 1;
-
-    // 已知orderId, 获取order
-    OrderDTO serviceOrder = orderService.findById(orderId);
-    // 校验用户是否为任务发起者
-    if (serviceOrder.getOwner().getId() != userId) {
-      return ResponseUtil.error("该用户不是任务发起者");
-    }
-    // 校验任务状态是否为已完成
-    if (serviceOrder.getOrder().getStatus() != OrderStatus.COMPLETED) {
-      return ResponseUtil.error("任务状态错误：未已完成");
-    }
-    // 修改订单状态
-    serviceOrder.getOrder().setStatus(OrderStatus.CONFIRMED);
-
-    // 将帐号余额增加
-    orderService.modifyUserBalance(serviceOrder.getOrder().getAccessorId(), serviceOrder.getOrder().getCost());
-    return ResponseUtil.success("订单确认完成");
   }
 
   // 非接口
@@ -207,12 +126,5 @@ public class OrderController {
       jsonObjects.add(order.toJSON());
     }
     return jsonObjects;
-  }
-
-  @Autowired TaskClient taskClient;
-
-  @GetMapping("/test")
-  public Object test(long taskId) {
-    return taskClient.getTaskById(taskId);
   }
 }

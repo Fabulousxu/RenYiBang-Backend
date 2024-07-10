@@ -1,4 +1,4 @@
-USE renyibang;
+USE renyibang_order;
 
 INSERT INTO `order` (order_id, type, owner_id, accessor_id, status, cost, item_id)
 VALUES (1, 0, 16, 4, 0, 8088, 3),

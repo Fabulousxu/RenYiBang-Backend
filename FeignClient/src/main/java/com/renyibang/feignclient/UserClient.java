@@ -2,6 +2,7 @@ package com.renyibang.feignclient;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.renyibang.feignclient.dto.UserDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,10 +33,10 @@ public interface UserClient {
   }
   */
 
-  @GetMapping("/user/{id}")
-  Object getUserById(@PathVariable("id") Long id);
+  @GetMapping("/api/user/{userId}")
+  UserDTO getUserById(@PathVariable("userId") Long id);
 
-  @PostMapping("/user/update")
-  void updateUser(@RequestBody Object userDTO);
+  @PostMapping("/api/user/update")
+  JSONObject updateUser(@RequestBody UserDTO userDTO);
   //////////////////////////
 }
