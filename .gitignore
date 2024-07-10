@@ -3,4 +3,3 @@ nacos/
 work/
 logs/
 derby.log
-*.properties

@@ -2,7 +2,7 @@ package com.renyibang.global.client;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.renyibang.feignclient.dto.UserDTO;
+import com.renyibang.global.dto.UserDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

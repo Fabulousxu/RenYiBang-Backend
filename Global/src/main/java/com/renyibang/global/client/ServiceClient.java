@@ -1,6 +1,6 @@
 package com.renyibang.global.client;
 
-import com.renyibang.feignclient.dto.ServiceDTO;
+import com.renyibang.global.dto.ServiceDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
