@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "UserApi")
 public interface UserClient {
-  @GetMapping("/user/exist")
-  boolean getUserExist(@RequestParam("id") long userId);
+  @GetMapping("/api/user/{userId}/exist")
+  boolean getUserExist(@PathVariable long userId);
 
-  @GetMapping("/user/userJSON")
-  JSONObject getUserJSON(@RequestParam("id") long userId);
+  @GetMapping("/api/user/{userId}/userJSON")
+  JSONObject getUserJSON(@PathVariable long userId);
 
   @GetMapping("/api/user/{userId}/info")
   JSONObject getUserInfo(@PathVariable long userId);

@@ -1,6 +1,7 @@
 package com.renyibang.taskapi.service;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.renyibang.feignclient.dto.TaskDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -39,4 +40,6 @@ public interface TaskService {
     JSONObject deleteComment(long taskCommentId, long userId);
 
     JSONObject publishTask(long userId, JSONObject body);
+
+    TaskDTO getTaskById(Long taskId);
 }

@@ -3,6 +3,7 @@ package com.renyibang.taskapi.service.serviceImpl;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.feignclient.UserClient;
+import com.renyibang.feignclient.dto.TaskDTO;
 import com.renyibang.taskapi.dao.TaskCommentDao;
 import com.renyibang.taskapi.dao.TaskDao;
 import com.renyibang.taskapi.dao.TaskMessageDao;
@@ -507,5 +508,17 @@ public class TaskServiceImpl implements TaskService {
         {
             return ResponseUtil.error(String.valueOf(e));
         }
+    }
+
+    @Override
+    public TaskDTO getTaskById(Long taskId)
+    {
+        Task task = taskDao.findById(taskId);
+        if(task == null)
+        {
+            return null;
+        }
+
+        return new TaskDTO(task.getTaskId(), task.getTitle(), task.getDescription(), task.getImages(), task.getCreatedAt());
     }
 }
