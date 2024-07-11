@@ -1,6 +1,6 @@
 package com.renyibang.serviceapi.controller;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.serviceapi.service.ServiceService;
 import com.renyibang.serviceapi.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +70,7 @@ public class ServiceController {
 
         Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
 
-        return serviceService.getServiceComment(serviceId, pageable);
+        return serviceService.getServiceComments(serviceId, pageable);
     }
 
     @GetMapping("/{serviceId}/message")
@@ -95,7 +95,7 @@ public class ServiceController {
 
         Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
 
-        return serviceService.getServiceMessage(serviceId, pageable);
+        return serviceService.getServiceMessages(serviceId, pageable);
     }
 
     @PutMapping("/comment/{serviceCommentId}/like")
@@ -162,7 +162,7 @@ public class ServiceController {
     }
 
     @PutMapping("/{serviceId}/unaccess")
-    public JSONObject unaccessService(@PathVariable long serviceId, userId)
+    public JSONObject unaccessService(@PathVariable long serviceId, long userId)
     {
         //userId待替换
         long unaccessorId = 1;

@@ -26,7 +26,7 @@ public class Service {
     private long serviceId; // 服务id
 
     @Column(name = "owner_id")
-    private long owner_id; // 服务发布者
+    private long ownerId; // 服务发布者
     @Column(name = "title")
     private String title; // 服务标题
     @Column(name = "images")
@@ -81,7 +81,7 @@ public class Service {
         jsonObject.put("price", price);
         jsonObject.put("maxAccess", maxAccess);
         jsonObject.put("rating", rating);
-        jsonObject.put("createdAt", DateTimeUtil.format(createdAt));
+        jsonObject.put("createdAt", DateTimeUtil.formatDateTime(createdAt));
         jsonObject.put("collectedNumber", collectedNumber);
         jsonObject.put("status", status);
         return jsonObject;

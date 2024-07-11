@@ -18,15 +18,14 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+//import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 
-@Service
+@org.springframework.stereotype.Service
 public class ServiceServiceImpl implements ServiceService {
     @Autowired
     private ServiceDao serviceDao;
@@ -45,7 +44,7 @@ public class ServiceServiceImpl implements ServiceService {
     {
         try {
             JSONArray result = new JSONArray();
-            Page<Service> searchResult = serviceDao.searchServiceByPaging(keyword, pageable, DateTimeUtil.getBeginDateTime(timeBegin), DateTimeUtil.getEndDateTime(timeEnd), priceLow, priceConvert(priceHigh));
+            Page<Service> searchResult = serviceDao.searchServiceByPaging(keyword, pageable, DateTimeUtil.getBeginDateTime(timeBegin), DateTimeUtil.getEndDateTime(timeEnd), priceLow, PriceUtil.priceConvert(priceHigh));
 
             //创建一个list存储用户id
             List<Long> userIds = new ArrayList<>();
@@ -54,7 +53,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 //需要传入userID
                 //将userId存入list
-                userIds.add(task.getOwnerId());
+                userIds.add(service.getOwnerId());
             }
 
             if(userIds.isEmpty())
@@ -65,7 +64,7 @@ public class ServiceServiceImpl implements ServiceService {
                 return ResponseUtil.success(returnRes);
             }
 
-            JSONObject userInfos = userClient.getUsersInfos(userIds);
+            JSONObject userInfos = userClient.getUserInfos(userIds);
             if(Objects.equals(false, userInfos.get("ok")))
             {
                 return ResponseUtil.error("用户信息获取失败！");
@@ -129,13 +128,13 @@ public class ServiceServiceImpl implements ServiceService {
         try
         {
             JSONArray result = new JSONArray();
-            Page<ServiceComment> getResult = ServiceCommentDao.getServiceComments(serviceId, pageable);
+            Page<ServiceComment> getResult = serviceCommentDao.getServiceComments(serviceId, pageable);
 
             List<Long> userIds = new ArrayList<>();
 
-            for(ServiceComment comment : getResult)
+            for(ServiceComment serviceComment : getResult)
             {
-                userIds.add(taskComment.getCommenterId());
+                userIds.add(serviceComment.getCommenterId());
             }
 
             if(userIds.isEmpty())
@@ -146,7 +145,7 @@ public class ServiceServiceImpl implements ServiceService {
                 return ResponseUtil.success(returnRes);
             }
 
-            JSONObject userInfos = userClient.getUsersInfos(userIds);
+            JSONObject userInfos = userClient.getUserInfos(userIds);
             if(Objects.equals(false, userInfos.get("ok")))
             {
                 return ResponseUtil.error("用户信息获取失败！");
@@ -180,7 +179,7 @@ public class ServiceServiceImpl implements ServiceService {
         try
         {
             JSONArray result = new JSONArray();
-            Page<ServiceMessage> getResult = ServiceMessageDao.getServiceMessages(serviceId, pageable);
+            Page<ServiceMessage> getResult = serviceMessageDao.getServiceMessages(serviceId, pageable);
 
             List<Long> userIds = new ArrayList<>();
 
@@ -197,7 +196,7 @@ public class ServiceServiceImpl implements ServiceService {
                 return ResponseUtil.success(returnRes);
             }
 
-            JSONObject userInfos = userClient.getUsersInfos(userIds);
+            JSONObject userInfos = userClient.getUserInfos(userIds);
             if(Objects.equals(false, userInfos.get("ok")))
             {
                 return ResponseUtil.error("用户信息获取失败！");
@@ -231,7 +230,7 @@ public class ServiceServiceImpl implements ServiceService {
     {
         try
         {
-            String result = ServiceCommentDao.likeCommentByServiceCommentId(serviceCommentId, likerId);
+            String result = serviceCommentDao.likeCommentByServiceCommentId(serviceCommentId, likerId);
             if("点赞成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -254,7 +253,7 @@ public class ServiceServiceImpl implements ServiceService {
     {
         try
         {
-            String result = ServiceCommentDao.unlikeCommentByServiceCommentId(serviceCommentId, unlikerId);
+            String result = serviceCommentDao.unlikeCommentByServiceCommentId(serviceCommentId, unlikerId);
             if("取消点赞成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -277,7 +276,7 @@ public class ServiceServiceImpl implements ServiceService {
     {
         try
         {
-            String result = ServiceMessageDao.likeMessageByServiceMessageId(serviceMessageId, likerId);
+            String result = serviceMessageDao.likeMessageByServiceMessageId(serviceMessageId, likerId);
             if("点赞成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -300,7 +299,7 @@ public class ServiceServiceImpl implements ServiceService {
     {
         try
         {
-            String result = ServiceMessageDao.unlikeMessageByServiceMessageId(serviceMessageId, unlikerId);
+            String result = serviceMessageDao.unlikeMessageByServiceMessageId(serviceMessageId, unlikerId);
             if("取消点赞成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -323,7 +322,7 @@ public class ServiceServiceImpl implements ServiceService {
     {
         try
         {
-            String result = ServiceDao.collectServiceByServiceId(ServiceId, collectorId);
+            String result = serviceDao.collectServiceByServiceId(ServiceId, collectorId);
             if("收藏成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -346,7 +345,7 @@ public class ServiceServiceImpl implements ServiceService {
     {
         try
         {
-            String result = ServiceDao.uncollectServiceByServiceId(ServiceId, uncollectorId);
+            String result = serviceDao.uncollectServiceByServiceId(ServiceId, uncollectorId);
             if("取消收藏成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -369,7 +368,7 @@ public class ServiceServiceImpl implements ServiceService {
     {
         try
         {
-            String result = ServiceDao.accessServiceByServiceId(ServiceId, accessorId);
+            String result = serviceDao.accessServiceByServiceId(ServiceId, accessorId);
             if("接取服务成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -392,7 +391,7 @@ public class ServiceServiceImpl implements ServiceService {
     {
         try
         {
-            String result = ServiceDao.unaccessServiceByServiceId(ServiceId, unaccessorId);
+            String result = serviceDao.unaccessServiceByServiceId(ServiceId, unaccessorId);
             if("取消接取服务成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -425,7 +424,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.error("留言内容为空！");
             }
-            String result = ServiceMessageDao.publishMessage(serviceId, userId, content);
+            String result = serviceMessageDao.putMessage(serviceId, userId, content);
             if("发布留言成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -447,7 +446,7 @@ public class ServiceServiceImpl implements ServiceService {
     {
         try
         {
-            String result = ServiceMessageDao.deleteMessage(serviceMessageId, userId);
+            String result = serviceMessageDao.deleteMessage(serviceMessageId, userId);
             if("删除留言成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -484,7 +483,7 @@ public class ServiceServiceImpl implements ServiceService {
 
             byte rating = body.getByteValue("rating");
 
-            String result = ServiceCommentDao.publishComment(serviceId, userId, content, rating);
+            String result = serviceCommentDao.putComment(serviceId, userId, content, rating);
             if("发布评论成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -506,7 +505,7 @@ public class ServiceServiceImpl implements ServiceService {
     {
         try
         {
-            String result = ServiceCommentDao.deleteComment(serviceCommentId, userId);
+            String result = serviceCommentDao.deleteComment(serviceCommentId, userId);
             if("删除评论成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -572,7 +571,7 @@ public class ServiceServiceImpl implements ServiceService {
                 return ResponseUtil.error("价格不能为负数！");
             }
 
-            String result = ServiceDao.publishService(userId, title, description, price, (List<String>)requestImages);
+            String result = serviceDao.publishService(userId, title, description, price, (List<String>)requestImages);
 
             if("服务发布成功！".equals(result))
             {
@@ -598,7 +597,7 @@ public class ServiceServiceImpl implements ServiceService {
             return ResponseUtil.error("服务不存在！");
         }
 
-        return ResponseUtil.success(new ServiceDTO(service.getServiceId(), service.getTitle(), service.getDescription(), task.getImages(), task.getCreatedAt()));
+        return ResponseUtil.success(new ServiceDTO(service.getServiceId(), service.getTitle(), service.getDescription(), service.getImages(), service.getCreatedAt()));
     }
 
     @Override

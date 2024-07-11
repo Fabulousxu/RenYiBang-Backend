@@ -1,6 +1,6 @@
 package com.renyibang.serviceapi.dao.daoImpl;
 
-import com.renyibang.moduleapi.clients.UserClient;
+import com.renyibang.global.client.UserClient;
 import com.renyibang.serviceapi.dao.ServiceCommentDao;
 import com.renyibang.serviceapi.entity.Service;
 import com.renyibang.serviceapi.entity.ServiceComment;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 
 @Repository
-
 public class ServiceCommentDaoImpl implements ServiceCommentDao {
     @Autowired
     private ServiceCommentRepository serviceCommentRepository;
@@ -67,7 +66,7 @@ public class ServiceCommentDaoImpl implements ServiceCommentDao {
     }
 
     @Override
-    public String unLikeCommentByServiceCommentId(long serviceCommentId, long likerId) {
+    public String unlikeCommentByServiceCommentId(long serviceCommentId, long likerId) {
         try {
             ServiceComment serviceComment = serviceCommentRepository.findById(serviceCommentId).orElse(null);
             if (serviceComment == null) {
@@ -115,7 +114,7 @@ public class ServiceCommentDaoImpl implements ServiceCommentDao {
 
             ServiceComment serviceComment = new ServiceComment();
             serviceComment.setService(service);
-            serviceComment.setCommenter_id(userId);
+            serviceComment.setCommenterId(userId);
             serviceComment.setContent(content);
             serviceComment.setCreatedAt(LocalDateTime.now());
             serviceComment.setRating(rating);
@@ -142,7 +141,7 @@ public class ServiceCommentDaoImpl implements ServiceCommentDao {
                 return "评论不存在！";
             }
 
-            if (serviceComment.getCommenter_id() != userId) {
+            if (serviceComment.getCommenterId() != userId) {
                 return "该评论不是由此用户发布！";
             }
 
