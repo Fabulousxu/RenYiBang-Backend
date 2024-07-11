@@ -1,29 +1,20 @@
 package com.renyibang.userapi.service;
 
-import com.alibaba.fastjson2.JSONObject;
-
 import com.renyibang.global.dto.UserDTO;
-import com.renyibang.userapi.entity.User;
+import com.renyibang.global.util.Response;
+import com.renyibang.userapi.dto.Update;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Optional;
-
-
-
+@Service
 public interface UserService {
-    Optional<User> findById(long userId);
-    User save(User user);
-    void deleteById(long userId);
-    long register(String password, String nickname, String intro, String avatar) throws Exception;
+  Response getUserInfo(long userId);
 
-    JSONObject getUserInfo(long userId);
+  Response updateUserInfo(long userId, Update update);
 
-    JSONObject modifyUserInfo(long userId, JSONObject body);
+  boolean existsById(long userId);
 
-    JSONObject getUserDtoById(long userId);
+  Response getUserInfos(List<Long> userIds);
 
-    JSONObject updateUserByDto(UserDTO userDTO);
-
-    JSONObject getUserInfos(Collection<Long> userIds);
+  Response updateUserInfo_compatible(UserDTO userDTO);
 }

@@ -1,24 +1,25 @@
-package com.renyibang.taskapi.service.serviceImpl;
+package com.renyibang.serviceapi.service.serviceImpl;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.global.client.UserClient;
-import com.renyibang.global.dto.TaskDTO;
-import com.renyibang.taskapi.dao.TaskCommentDao;
-import com.renyibang.taskapi.dao.TaskDao;
-import com.renyibang.taskapi.dao.TaskMessageDao;
-import com.renyibang.taskapi.entity.Task;
-import com.renyibang.taskapi.entity.TaskComment;
-import com.renyibang.taskapi.entity.TaskMessage;
-import com.renyibang.taskapi.service.TaskService;
-import com.renyibang.taskapi.util.DateTimeUtil;
-import com.renyibang.taskapi.util.PriceUtil;
-import com.renyibang.taskapi.util.ResponseUtil;
+import com.renyibang.global.dto.ServiceDTO;
+import com.renyibang.serviceapi.dao.ServiceCommentDao;
+import com.renyibang.serviceapi.dao.ServiceDao;
+import com.renyibang.serviceapi.dao.ServiceMessageDao;
+import com.renyibang.serviceapi.entity.Service;
+import com.renyibang.serviceapi.entity.ServiceComment;
+import com.renyibang.serviceapi.entity.ServiceMessage;
+import com.renyibang.serviceapi.service.ServiceService;
+import com.renyibang.serviceapi.util.DateTimeUtil;
+import com.renyibang.serviceapi.util.PriceUtil;
+import com.renyibang.serviceapi.util.ResponseUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,32 +27,32 @@ import java.util.Objects;
 import java.util.Vector;
 
 @Service
-public class TaskServiceImpl implements TaskService {
+public class ServiceServiceImpl implements ServiceService {
     @Autowired
-    TaskDao taskDao;
+    private ServiceDao serviceDao;
 
     @Autowired
-    TaskCommentDao taskCommentDao;
+    private ServiceCommentDao serviceCommentDao;
 
     @Autowired
-    TaskMessageDao taskMessageDao;
+    private ServiceMessageDao serviceMessageDao;
 
     @Autowired
-    UserClient userClient;
+    private UserClient userClient;
 
     @Override
-    public JSONObject searchTaskByPaging(String keyword, Pageable pageable, String timeBegin, String timeEnd, long priceLow, long priceHigh)
+    public JSONObject searchServiceByPaging(String keyword, Pageable pageable, String timeBegin, String timeEnd, long priceLow, long priceHigh)
     {
-        try{
+        try {
             JSONArray result = new JSONArray();
-            Page<Task> searchResult = taskDao.searchTaskByPaging(keyword, pageable, DateTimeUtil.getBeginDateTime(timeBegin), DateTimeUtil.getEndDateTime(timeEnd), priceLow, PriceUtil.priceConvert(priceHigh));
+            Page<Service> searchResult = serviceDao.searchServiceByPaging(keyword, pageable, DateTimeUtil.getBeginDateTime(timeBegin), DateTimeUtil.getEndDateTime(timeEnd), priceLow, priceConvert(priceHigh));
 
             //创建一个list存储用户id
             List<Long> userIds = new ArrayList<>();
 
-            for(Task task : searchResult.getContent())
+            for(Service service : searchResult.getContent())
             {
-                //需要传入userId
+                //需要传入userID
                 //将userId存入list
                 userIds.add(task.getOwnerId());
             }
@@ -64,21 +65,20 @@ public class TaskServiceImpl implements TaskService {
                 return ResponseUtil.success(returnRes);
             }
 
-            JSONObject userInfos = userClient.getUserInfos(userIds);
+            JSONObject userInfos = userClient.getUsersInfos(userIds);
             if(Objects.equals(false, userInfos.get("ok")))
             {
                 return ResponseUtil.error("用户信息获取失败！");
             }
 
-
             ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
-            //将用户信息存入taskJson
+
             for(int i = 0; i < searchResult.getContent().size(); i++)
             {
-                Task task = searchResult.getContent().get(i);
-                JSONObject taskJson = task.toJSON();
-                taskJson.put("owner", userInfosArray.get(i));
-                result.add(taskJson);
+                Service service = searchResult.getContent().get(i);
+                JSONObject serviceJson = service.toJSON();
+                serviceJson.put("owner", userInfosArray.get(i));
+                result.add(serviceJson);
             }
 
             JSONObject returnRes = new JSONObject();
@@ -94,27 +94,27 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public JSONObject getTaskInfo(long taskId)
+    public JSONObject getServiceInfo(long taskId)
     {
         try
         {
-            Task result = taskDao.findById(taskId);
+            Service result = serviceDao.findById(taskId);
 
             if(result == null)
             {
                 return ResponseUtil.error("任务信息为null");
             }
 
-            JSONObject taskJson = result.toJSON();
+            JSONObject serviceJson = result.toJSON();
             JSONObject response = userClient.getUserInfo(result.getOwnerId());
             if(Objects.equals(false, response.get("ok")))
             {
                 return ResponseUtil.error("用户信息获取失败！");
             }
 
-            taskJson.put("owner", response.get("data"));
+            serviceJson.put("owner", response.get("data"));
 
-            return ResponseUtil.success(taskJson);
+            return ResponseUtil.success(serviceJson);
 
         }
         catch (Exception e)
@@ -124,16 +124,16 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public JSONObject getTaskComments(long taskId, Pageable pageable)
+    public JSONObject getServiceComments(long serviceId, Pageable pageable)
     {
         try
         {
             JSONArray result = new JSONArray();
-            Page<TaskComment> getResult = taskCommentDao.getTaskComments(taskId, pageable);
+            Page<ServiceComment> getResult = ServiceCommentDao.getServiceComments(serviceId, pageable);
 
             List<Long> userIds = new ArrayList<>();
 
-            for(TaskComment taskComment : getResult)
+            for(ServiceComment comment : getResult)
             {
                 userIds.add(taskComment.getCommenterId());
             }
@@ -146,7 +146,7 @@ public class TaskServiceImpl implements TaskService {
                 return ResponseUtil.success(returnRes);
             }
 
-            JSONObject userInfos = userClient.getUserInfos(userIds);
+            JSONObject userInfos = userClient.getUsersInfos(userIds);
             if(Objects.equals(false, userInfos.get("ok")))
             {
                 return ResponseUtil.error("用户信息获取失败！");
@@ -156,10 +156,10 @@ public class TaskServiceImpl implements TaskService {
 
             for(int i = 0; i < getResult.getContent().size(); i++)
             {
-                TaskComment taskComment = getResult.getContent().get(i);
-                JSONObject taskCommentJson = taskComment.toJSON();
-                taskCommentJson.put("commenter", userInfosArray.get(i));
-                result.add(taskCommentJson);
+                ServiceComment comment = getResult.getContent().get(i);
+                JSONObject serviceCommentJson = comment.toJSON();
+                serviceCommentJson.put("commenter", userInfosArray.get(i));
+                result.add(serviceCommentJson);
             }
 
             JSONObject returnRes = new JSONObject();
@@ -175,18 +175,18 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public JSONObject getTaskMessages(long taskId, Pageable pageable)
+    public JSONObject getServiceMessages(long serviceId, Pageable pageable)
     {
         try
         {
             JSONArray result = new JSONArray();
-            Page<TaskMessage> getResult = taskMessageDao.getTaskMessages(taskId, pageable);
+            Page<ServiceMessage> getResult = ServiceMessageDao.getServiceMessages(serviceId, pageable);
 
             List<Long> userIds = new ArrayList<>();
 
-            for(TaskMessage taskMessage : getResult)
+            for(ServiceMessage serviceMessage : getResult)
             {
-                userIds.add(taskMessage.getMessagerId());
+                userIds.add(serviceMessage.getMessagerId());
             }
 
             if(userIds.isEmpty())
@@ -197,7 +197,7 @@ public class TaskServiceImpl implements TaskService {
                 return ResponseUtil.success(returnRes);
             }
 
-            JSONObject userInfos = userClient.getUserInfos(userIds);
+            JSONObject userInfos = userClient.getUsersInfos(userIds);
             if(Objects.equals(false, userInfos.get("ok")))
             {
                 return ResponseUtil.error("用户信息获取失败！");
@@ -207,10 +207,10 @@ public class TaskServiceImpl implements TaskService {
 
             for(int i = 0; i < getResult.getContent().size(); i++)
             {
-                TaskMessage taskMessage = getResult.getContent().get(i);
-                JSONObject taskMessageJson = taskMessage.toJSON();
-                taskMessageJson.put("messager", userInfosArray.get(i));
-                result.add(taskMessageJson);
+                ServiceMessage serviceMessage = getResult.getContent().get(i);
+                JSONObject serviceMessageJson = serviceMessage.toJSON();
+                serviceMessageJson.put("messager", userInfosArray.get(i));
+                result.add(serviceMessageJson);
             }
 
             JSONObject returnRes = new JSONObject();
@@ -227,11 +227,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional
     @Override
-    public JSONObject likeComment(long taskCommentId, long likerId)
+    public JSONObject likeComment(long serviceCommentId, long likerId)
     {
         try
         {
-            String result = taskCommentDao.likeCommentByTaskCommentId(taskCommentId, likerId);
+            String result = ServiceCommentDao.likeCommentByServiceCommentId(serviceCommentId, likerId);
             if("点赞成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -250,11 +250,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional
     @Override
-    public JSONObject unlikeComment(long taskCommentId, long unlikerId)
+    public JSONObject unlikeComment(long serviceCommentId, long unlikerId)
     {
         try
         {
-            String result = taskCommentDao.unlikeCommentByTaskCommentId(taskCommentId, unlikerId);
+            String result = ServiceCommentDao.unlikeCommentByServiceCommentId(serviceCommentId, unlikerId);
             if("取消点赞成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -273,11 +273,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional
     @Override
-    public JSONObject likeMessage(long taskMessageId, long likerId)
+    public JSONObject likeMessage(long serviceMessageId, long likerId)
     {
         try
         {
-            String result = taskMessageDao.likeMessageByTaskMessageId(taskMessageId, likerId);
+            String result = ServiceMessageDao.likeMessageByServiceMessageId(serviceMessageId, likerId);
             if("点赞成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -296,11 +296,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional
     @Override
-    public JSONObject unlikeMessage(long taskMessageId, long unlikerId)
+    public JSONObject unlikeMessage(long serviceMessageId, long unlikerId)
     {
         try
         {
-            String result = taskMessageDao.unlikeMessageByTaskMessageId(taskMessageId, unlikerId);
+            String result = ServiceMessageDao.unlikeMessageByServiceMessageId(serviceMessageId, unlikerId);
             if("取消点赞成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -319,11 +319,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional
     @Override
-    public JSONObject collectTask(long taskId, long collectorId)
+    public JSONObject collectService(long ServiceId, long collectorId)
     {
         try
         {
-            String result = taskDao.collectTaskByTaskId(taskId, collectorId);
+            String result = ServiceDao.collectServiceByServiceId(ServiceId, collectorId);
             if("收藏成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -342,11 +342,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional
     @Override
-    public JSONObject uncollectTask(long taskId, long uncollectorId)
+    public JSONObject uncollectService(long ServiceId, long uncollectorId)
     {
         try
         {
-            String result = taskDao.uncollectTaskByTaskId(taskId, uncollectorId);
+            String result = ServiceDao.uncollectServiceByServiceId(ServiceId, uncollectorId);
             if("取消收藏成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -365,12 +365,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional
     @Override
-    public JSONObject accessTask(long taskId, long accessorId)
+    public JSONObject accessService(long ServiceId, long accessorId)
     {
         try
         {
-            String result = taskDao.accessTaskByTaskId(taskId, accessorId);
-            if("接取任务成功！".equals(result))
+            String result = ServiceDao.accessServiceByServiceId(ServiceId, accessorId);
+            if("接取服务成功！".equals(result))
             {
                 return ResponseUtil.success(result);
             }
@@ -388,12 +388,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional
     @Override
-    public JSONObject unaccessTask(long taskId, long unaccessorId)
+    public JSONObject unaccessService(long ServiceId, long unaccessorId)
     {
         try
         {
-            String result = taskDao.unaccessTaskByTaskId(taskId, unaccessorId);
-            if("取消接取任务成功！".equals(result))
+            String result = ServiceDao.unaccessServiceByServiceId(ServiceId, unaccessorId);
+            if("取消接取服务成功！".equals(result))
             {
                 return ResponseUtil.success(result);
             }
@@ -405,12 +405,12 @@ public class TaskServiceImpl implements TaskService {
         }
         catch (Exception e)
         {
-            return ResponseUtil.error(String.valueOf(e));
+            return ResponseUtil.error(String.valueOf(e.getMessage()));
         }
     }
 
     @Override
-    public JSONObject publishMessage(long taskId, long userId, JSONObject body)
+    public JSONObject publishMessage(long serviceId, long userId, JSONObject body)
     {
         try
         {
@@ -425,7 +425,7 @@ public class TaskServiceImpl implements TaskService {
             {
                 return ResponseUtil.error("留言内容为空！");
             }
-            String result = taskMessageDao.putMessage(taskId, userId, content);
+            String result = ServiceMessageDao.publishMessage(serviceId, userId, content);
             if("发布留言成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -438,16 +438,16 @@ public class TaskServiceImpl implements TaskService {
         }
         catch (Exception e)
         {
-            return ResponseUtil.error(String.valueOf(e));
+            return ResponseUtil.error(String.valueOf(e.getMessage()));
         }
     }
 
     @Override
-    public JSONObject deleteMessage(long taskMessageId, long userId)
+    public JSONObject deleteMessage(long serviceMessageId, long userId)
     {
         try
         {
-            String result = taskMessageDao.deleteMessage(taskMessageId, userId);
+            String result = ServiceMessageDao.deleteMessage(serviceMessageId, userId);
             if("删除留言成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -460,12 +460,12 @@ public class TaskServiceImpl implements TaskService {
         }
         catch (Exception e)
         {
-            return ResponseUtil.error(String.valueOf(e));
+            return ResponseUtil.error(String.valueOf(e.getMessage()));
         }
     }
 
     @Override
-    public JSONObject publishComment(long taskId, long userId, JSONObject body)
+    public JSONObject publishComment(long serviceId, long userId, JSONObject body)
     {
         try
         {
@@ -482,9 +482,9 @@ public class TaskServiceImpl implements TaskService {
                 return ResponseUtil.error("评论内容为空！");
             }
 
-            byte rating = body.getByteValue("rating");;
+            byte rating = body.getByteValue("rating");
 
-            String result = taskCommentDao.putComment(taskId, userId, content, rating);
+            String result = ServiceCommentDao.publishComment(serviceId, userId, content, rating);
             if("发布评论成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -497,16 +497,16 @@ public class TaskServiceImpl implements TaskService {
         }
         catch (Exception e)
         {
-            return ResponseUtil.error(String.valueOf(e));
+            return ResponseUtil.error(String.valueOf(e.getMessage()));
         }
     }
 
     @Override
-    public JSONObject deleteComment(long taskCommentId, long userId)
+    public JSONObject deleteComment(long serviceCommentId, long userId)
     {
         try
         {
-            String result = taskCommentDao.deleteComment(taskCommentId, userId);
+            String result = ServiceCommentDao.deleteComment(serviceCommentId, userId);
             if("删除评论成功！".equals(result))
             {
                 return ResponseUtil.success(result);
@@ -519,12 +519,12 @@ public class TaskServiceImpl implements TaskService {
         }
         catch (Exception e)
         {
-            return ResponseUtil.error(String.valueOf(e));
+            return ResponseUtil.error(String.valueOf(e.getMessage()));
         }
     }
 
     @Override
-    public JSONObject publishTask(long userId, JSONObject body)
+    public JSONObject publishService(long userId, JSONObject body)
     {
         try
         {
@@ -572,12 +572,12 @@ public class TaskServiceImpl implements TaskService {
                 return ResponseUtil.error("价格不能为负数！");
             }
 
-            String result = taskDao.publishTask(userId, title, description, price, (List<String>)requestImages);
-            if("任务发布成功！".equals(result))
+            String result = ServiceDao.publishService(userId, title, description, price, (List<String>)requestImages);
+
+            if("服务发布成功！".equals(result))
             {
                 return ResponseUtil.success(result);
             }
-
             else
             {
                 return ResponseUtil.error(result);
@@ -585,31 +585,31 @@ public class TaskServiceImpl implements TaskService {
         }
         catch (Exception e)
         {
-            return ResponseUtil.error(String.valueOf(e));
+            return ResponseUtil.error(String.valueOf(e.getMessage()));
         }
     }
 
     @Override
-    public JSONObject getTaskDtoById(Long taskId)
+    public JSONObject getServiceDtoById(Long serviceId)
     {
-        Task task = taskDao.findById(taskId);
-        if(task == null)
+        Service service = serviceDao.findById(serviceId);
+        if(service == null)
         {
-            return ResponseUtil.error("任务不存在！");
+            return ResponseUtil.error("服务不存在！");
         }
 
-        return ResponseUtil.success(new TaskDTO(task.getTaskId(), task.getTitle(), task.getDescription(), task.getImages(), task.getCreatedAt()));
+        return ResponseUtil.success(new ServiceDTO(service.getServiceId(), service.getTitle(), service.getDescription(), task.getImages(), task.getCreatedAt()));
     }
 
     @Override
-    public JSONObject getTaskOwnerId(long taskId)
+    public JSONObject getServiceOwnerId(long serviceId)
     {
-        Task task = taskDao.findById(taskId);
-        if(task == null)
+        Service service = serviceDao.findById(serviceId);
+        if(service == null)
         {
-            return ResponseUtil.error("任务不存在！");
+            return ResponseUtil.error("服务不存在！");
         }
 
-        return ResponseUtil.success(task.getOwnerId());
+        return ResponseUtil.success(service.getOwnerId());
     }
 }
