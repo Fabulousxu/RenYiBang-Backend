@@ -132,14 +132,6 @@
       <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
 
-<!-- FeignClient -->
-		<dependency>
-			<groupId>com.renyibang</groupId>
-			<artifactId>FeignClient</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-
   </dependencies>
 	<dependencyManagement>
 		<dependencies>
