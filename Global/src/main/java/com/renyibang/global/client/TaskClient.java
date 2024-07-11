@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "TaskApi")
 public interface TaskClient {
-	// Order 模块的调用
+    // Order 模块的调用
 	/*
 	public class TaskDTO {
 		long id;
@@ -18,10 +18,10 @@ public interface TaskClient {
 		LocalDateTime time;
 	}
 	*/
-	@GetMapping("/api/task/getTask/{taskId}")
-	TaskDTO getTaskById(@PathVariable Long taskId);
-	///////////////////
+    @GetMapping("/api/task/getTask/{taskId}")
+    JSONObject getTaskById(@PathVariable Long taskId);
+    ///////////////////
 
-  @GetMapping("/api/task/{taskId}/ownerId")
-  JSONObject getTaskOwnerId(@PathVariable long taskId);
+    @GetMapping("/api/task/{taskId}/ownerId")
+    JSONObject getTaskOwnerId(@PathVariable long taskId);
 }

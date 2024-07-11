@@ -566,15 +566,15 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDTO getTaskById(Long taskId)
+    public JSONObject getTaskDtoById(Long taskId)
     {
         Task task = taskDao.findById(taskId);
         if(task == null)
         {
-            return null;
+            return ResponseUtil.error("任务不存在！");
         }
 
-        return new TaskDTO(task.getTaskId(), task.getTitle(), task.getDescription(), task.getImages(), task.getCreatedAt());
+        return ResponseUtil.success(new TaskDTO(task.getTaskId(), task.getTitle(), task.getDescription(), task.getImages(), task.getCreatedAt()));
     }
 
     @Override

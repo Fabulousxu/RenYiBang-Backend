@@ -209,9 +209,9 @@ public class TaskController {
 
     //order模块调用
     @GetMapping("/getTask/{taskId}")
-    public TaskDTO getTaskById(@PathVariable Long taskId)
+    public JSONObject getTaskDtoById(@PathVariable Long taskId)
     {
-        return taskService.getTaskById(taskId);
+        return taskService.getTaskDtoById(taskId);
     }
 
 
