@@ -1,6 +1,7 @@
 package com.renyibang.userapi.service.serviceImpl;
 
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 
 import com.renyibang.global.dto.UserDTO;
@@ -14,6 +15,8 @@ import com.renyibang.userapi.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -159,6 +162,19 @@ public class UserServiceImpl implements UserService {
             userDAO.save(user);
 
             return ResponseUtil.success("更新成功！");
+        }
+        catch (Exception e)
+        {
+            return ResponseUtil.error(String.valueOf(e));
+        }
+    }
+
+    @Override
+    public JSONObject getUserInfos(Collection<Long> userIds)
+    {
+        try
+        {
+            return userDAO.findAllById(userIds);
         }
         catch (Exception e)
         {

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.Subject;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/api/user")
@@ -90,5 +91,10 @@ public class UserController {
         return userService.updateUserByDto(userDTO);
     }
 
-    ////////////////
+    // task模块调用
+    @GetMapping("/profile/users/{userIds}")
+    public JSONObject getUserInfos(@PathVariable Collection<Long> userIds)
+    {
+        return userService.getUserInfos(userIds);
+    }
 }

@@ -6,6 +6,7 @@ import com.renyibang.global.dto.UserDTO;
 import com.renyibang.userapi.entity.User;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Optional;
 
 
@@ -23,4 +24,6 @@ public interface UserService {
     JSONObject getUserDtoById(long userId);
 
     JSONObject updateUserByDto(UserDTO userDTO);
+
+    JSONObject getUserInfos(Collection<Long> userIds);
 }

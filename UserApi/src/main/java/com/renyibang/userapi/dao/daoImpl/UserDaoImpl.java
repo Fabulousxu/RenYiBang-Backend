@@ -1,10 +1,15 @@
 package com.renyibang.userapi.dao.daoImpl;
+import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.userapi.dao.UserDao;
 import com.renyibang.userapi.entity.User;
 import com.renyibang.userapi.repository.UserRepository;
+import com.renyibang.userapi.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -50,5 +55,25 @@ public class UserDaoImpl implements UserDao {
         {
             throw e;
         }
+    }
+
+    @Override
+    public JSONObject findAllById(Collection<Long> userIds)
+    {
+        List<User> users = new ArrayList<>();
+
+        for(Long userId : userIds)
+        {
+            User user = userRepository.findById(userId).orElse(null);
+
+            if(user == null)
+            {
+                return ResponseUtil.error("用户id为" + userId + "不存在！");
+            }
+
+            users.add(user);
+        }
+
+        return ResponseUtil.success("查找成功", users);
     }
 }
