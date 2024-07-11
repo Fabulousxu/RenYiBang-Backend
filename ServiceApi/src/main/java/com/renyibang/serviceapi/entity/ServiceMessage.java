@@ -27,7 +27,7 @@ public class ServiceMessage {
   private Service service; // 服务
 
   @Column(name = "messager_id")
-  private long messager_id; // 留言者
+  private long messagerId; // 留言者
 
   private String content; // 留言内容
 

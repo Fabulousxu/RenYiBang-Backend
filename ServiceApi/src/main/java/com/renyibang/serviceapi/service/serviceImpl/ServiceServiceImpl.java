@@ -2,7 +2,8 @@ package com.renyibang.serviceapi.service.serviceImpl;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.renyibang.moduleapi.clients.UserClient;
+import com.renyibang.global.client.UserClient;
+import com.renyibang.global.dto.ServiceDTO;
 import com.renyibang.serviceapi.dao.ServiceCommentDao;
 import com.renyibang.serviceapi.dao.ServiceDao;
 import com.renyibang.serviceapi.dao.ServiceMessageDao;
@@ -20,11 +21,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Vector;
 
 @Service
 public class ServiceServiceImpl implements ServiceService {
-
     @Autowired
     private ServiceDao serviceDao;
 
@@ -44,13 +47,37 @@ public class ServiceServiceImpl implements ServiceService {
             JSONArray result = new JSONArray();
             Page<Service> searchResult = serviceDao.searchServiceByPaging(keyword, pageable, DateTimeUtil.getBeginDateTime(timeBegin), DateTimeUtil.getEndDateTime(timeEnd), priceLow, priceConvert(priceHigh));
 
+            //创建一个list存储用户id
+            List<Long> userIds = new ArrayList<>();
+
             for(Service service : searchResult.getContent())
             {
                 //需要传入userID
+                //将userId存入list
+                userIds.add(task.getOwnerId());
+            }
+
+            if(userIds.isEmpty())
+            {
+                JSONObject returnRes = new JSONObject();
+                returnRes.put("total", searchResult.getTotalElements());
+                returnRes.put("items", result);
+                return ResponseUtil.success(returnRes);
+            }
+
+            JSONObject userInfos = userClient.getUsersInfos(userIds);
+            if(Objects.equals(false, userInfos.get("ok")))
+            {
+                return ResponseUtil.error("用户信息获取失败！");
+            }
+
+            ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
+
+            for(int i = 0; i < searchResult.getContent().size(); i++)
+            {
+                Service service = searchResult.getContent().get(i);
                 JSONObject serviceJson = service.toJSON();
-
-                taskJson.put("owner", userClient.getUserJSON(task.getOwner_id()));
-
+                serviceJson.put("owner", userInfosArray.get(i));
                 result.add(serviceJson);
             }
 
@@ -72,18 +99,23 @@ public class ServiceServiceImpl implements ServiceService {
         try
         {
             Service result = serviceDao.findById(taskId);
-            JSONObject serviceJson = result.toJSON();
-            serviceJson.put("owner", userClient.getUserJSON(result.getOwner_id()));
 
             if(result == null)
             {
                 return ResponseUtil.error("任务信息为null");
             }
 
-            else
+            JSONObject serviceJson = result.toJSON();
+            JSONObject response = userClient.getUserInfo(result.getOwnerId());
+            if(Objects.equals(false, response.get("ok")))
             {
-                return ResponseUtil.success(taskJson);
+                return ResponseUtil.error("用户信息获取失败！");
             }
+
+            serviceJson.put("owner", response.get("data"));
+
+            return ResponseUtil.success(serviceJson);
+
         }
         catch (Exception e)
         {
@@ -99,11 +131,34 @@ public class ServiceServiceImpl implements ServiceService {
             JSONArray result = new JSONArray();
             Page<ServiceComment> getResult = ServiceCommentDao.getServiceComments(serviceId, pageable);
 
+            List<Long> userIds = new ArrayList<>();
+
             for(ServiceComment comment : getResult)
             {
-                JSONObject serviceCommentJson = comment.toJSON();
-                serviceCommentJson.put("commenter", userClient.getUserJSON(comment.getCommenter_id()));
+                userIds.add(taskComment.getCommenterId());
+            }
 
+            if(userIds.isEmpty())
+            {
+                JSONObject returnRes = new JSONObject();
+                returnRes.put("total", getResult.getTotalElements());
+                returnRes.put("items", result);
+                return ResponseUtil.success(returnRes);
+            }
+
+            JSONObject userInfos = userClient.getUsersInfos(userIds);
+            if(Objects.equals(false, userInfos.get("ok")))
+            {
+                return ResponseUtil.error("用户信息获取失败！");
+            }
+
+            ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
+
+            for(int i = 0; i < getResult.getContent().size(); i++)
+            {
+                ServiceComment comment = getResult.getContent().get(i);
+                JSONObject serviceCommentJson = comment.toJSON();
+                serviceCommentJson.put("commenter", userInfosArray.get(i));
                 result.add(serviceCommentJson);
             }
 
@@ -127,11 +182,34 @@ public class ServiceServiceImpl implements ServiceService {
             JSONArray result = new JSONArray();
             Page<ServiceMessage> getResult = ServiceMessageDao.getServiceMessages(serviceId, pageable);
 
-            for(ServiceMessage message : getResult)
-            {
-                JSONObject serviceMessageJson = message.toJSON();
-                serviceMessageJson.put("messager", userClient.getUserJSON(message.getMessager_id()));
+            List<Long> userIds = new ArrayList<>();
 
+            for(ServiceMessage serviceMessage : getResult)
+            {
+                userIds.add(serviceMessage.getMessagerId());
+            }
+
+            if(userIds.isEmpty())
+            {
+                JSONObject returnRes = new JSONObject();
+                returnRes.put("total", getResult.getTotalElements());
+                returnRes.put("items", result);
+                return ResponseUtil.success(returnRes);
+            }
+
+            JSONObject userInfos = userClient.getUsersInfos(userIds);
+            if(Objects.equals(false, userInfos.get("ok")))
+            {
+                return ResponseUtil.error("用户信息获取失败！");
+            }
+
+            ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
+
+            for(int i = 0; i < getResult.getContent().size(); i++)
+            {
+                ServiceMessage serviceMessage = getResult.getContent().get(i);
+                JSONObject serviceMessageJson = serviceMessage.toJSON();
+                serviceMessageJson.put("messager", userInfosArray.get(i));
                 result.add(serviceMessageJson);
             }
 
@@ -158,6 +236,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.success(result);
             }
+
             else
             {
                 return ResponseUtil.error(result);
@@ -180,6 +259,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.success(result);
             }
+
             else
             {
                 return ResponseUtil.error(result);
@@ -202,6 +282,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.success(result);
             }
+
             else
             {
                 return ResponseUtil.error(result);
@@ -224,6 +305,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.success(result);
             }
+
             else
             {
                 return ResponseUtil.error(result);
@@ -246,6 +328,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.success(result);
             }
+
             else
             {
                 return ResponseUtil.error(result);
@@ -268,6 +351,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.success(result);
             }
+
             else
             {
                 return ResponseUtil.error(result);
@@ -290,6 +374,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.success(result);
             }
+
             else
             {
                 return ResponseUtil.error(result);
@@ -312,6 +397,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.success(result);
             }
+
             else
             {
                 return ResponseUtil.error(result);
@@ -344,6 +430,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.success(result);
             }
+
             else
             {
                 return ResponseUtil.error(result);
@@ -365,6 +452,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.success(result);
             }
+
             else
             {
                 return ResponseUtil.error(result);
@@ -401,6 +489,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.success(result);
             }
+
             else
             {
                 return ResponseUtil.error(result);
@@ -422,6 +511,7 @@ public class ServiceServiceImpl implements ServiceService {
             {
                 return ResponseUtil.success(result);
             }
+
             else
             {
                 return ResponseUtil.error(result);
@@ -497,5 +587,29 @@ public class ServiceServiceImpl implements ServiceService {
         {
             return ResponseUtil.error(String.valueOf(e.getMessage()));
         }
+    }
+
+    @Override
+    public JSONObject getServiceDtoById(Long serviceId)
+    {
+        Service service = serviceDao.findById(serviceId);
+        if(service == null)
+        {
+            return ResponseUtil.error("服务不存在！");
+        }
+
+        return ResponseUtil.success(new ServiceDTO(service.getServiceId(), service.getTitle(), service.getDescription(), task.getImages(), task.getCreatedAt()));
+    }
+
+    @Override
+    public JSONObject getServiceOwnerId(long serviceId)
+    {
+        Service service = serviceDao.findById(serviceId);
+        if(service == null)
+        {
+            return ResponseUtil.error("服务不存在！");
+        }
+
+        return ResponseUtil.success(service.getOwnerId());
     }
 }

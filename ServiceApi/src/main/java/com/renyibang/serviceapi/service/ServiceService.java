@@ -39,4 +39,8 @@ public interface ServiceService {
     JSONObject deleteComment(long serviceCommentId, long userId);
 
     JSONObject publishService(long userId, JSONObject body);
+
+    JSONObject getServiceDtoById(Long serviceId);
+
+    JSONObject getServiceOwnerId(long serviceId);
 }

@@ -150,7 +150,7 @@ public class ServiceMessageDaoImpl implements ServiceMessageDao {
                 return "留言不存在！";
             }
 
-            if (serviceMessage.getMessager_id() != userId) {
+            if (serviceMessage.getMessagerId() != userId) {
                 return "该留言不是由此用户发布！";
             }
 
