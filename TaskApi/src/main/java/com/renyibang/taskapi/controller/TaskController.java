@@ -38,6 +38,11 @@ public class TaskController {
             return ResponseUtil.error("Undefined order");
         }
 
+        if(pageSize <= 0)
+        {
+            return ResponseUtil.error("页大小不得为非正整数！");
+        }
+
         Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
 
         return taskService.searchTaskByPaging(keyword, pageable, timeBegin, timeEnd, priceLow, priceHigh);
@@ -69,6 +74,11 @@ public class TaskController {
             return ResponseUtil.error("Undefined order");
         }
 
+        if(pageSize <= 0)
+        {
+            return ResponseUtil.error("页大小不得为非正整数！");
+        }
+
         Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
 
         return taskService.getTaskComments(taskId, pageable);
@@ -92,6 +102,11 @@ public class TaskController {
         else
         {
             return ResponseUtil.error("Undefined order");
+        }
+
+        if(pageSize <= 0)
+        {
+            return ResponseUtil.error("页大小不得为非正整数！");
         }
 
         Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
@@ -150,59 +165,59 @@ public class TaskController {
     }
 
     @PutMapping("/{taskId}/access")
-    public JSONObject accessTask(@PathVariable long taskId, long userId)
+    public JSONObject accessTask(@PathVariable long taskId)
     {
         //userId待替换
         long accessorId = 1;
-        return taskService.accessTask(taskId, userId);
+        return taskService.accessTask(taskId, accessorId);
     }
 
     @DeleteMapping("/{taskId}/unaccess")
-    public JSONObject unaccessTask(@PathVariable long taskId, long userId)
+    public JSONObject unaccessTask(@PathVariable long taskId)
     {
         //userId待替换
         long unaccessorId = 1;
-        return taskService.unaccessTask(taskId, userId);
+        return taskService.unaccessTask(taskId, unaccessorId);
     }
 
     @PutMapping("/{taskId}/message")
-    public JSONObject publishMessage(@PathVariable long taskId, @RequestBody JSONObject body, long userId)
+    public JSONObject publishMessage(@PathVariable long taskId, @RequestBody JSONObject body)
     {
         //userId待替换
         long publisherId = 1;
-        return taskService.publishMessage(taskId, userId, body);
+        return taskService.publishMessage(taskId, publisherId, body);
     }
 
     @DeleteMapping("/message/{taskMessageId}")
-    public JSONObject deleteMessage(@PathVariable long taskMessageId, long userId)
+    public JSONObject deleteMessage(@PathVariable long taskMessageId)
     {
         //userId待替换
         long messagerId = 1;
-        return taskService.deleteMessage(taskMessageId, userId);
+        return taskService.deleteMessage(taskMessageId, messagerId);
     }
 
     @PutMapping("/{taskId}/comment")
-    public JSONObject publishComment(@PathVariable long taskId, @RequestBody JSONObject body, long userId)
+    public JSONObject publishComment(@PathVariable long taskId, @RequestBody JSONObject body)
     {
         //userId待替换
         long commenterId = 1;
-        return taskService.publishComment(taskId, userId, body);
+        return taskService.publishComment(taskId, commenterId, body);
     }
 
     @DeleteMapping("/comment/{taskCommentId}")
-    public JSONObject deleteComment(@PathVariable long taskCommentId, long userId)
+    public JSONObject deleteComment(@PathVariable long taskCommentId)
     {
         //userId待替换
         long commenterId = 1;
-        return taskService.deleteComment(taskCommentId, userId);
+        return taskService.deleteComment(taskCommentId, commenterId);
     }
 
     @PostMapping("/issue")
-    public JSONObject publishTask(@RequestBody JSONObject body, long userId)
+    public JSONObject publishTask(@RequestBody JSONObject body)
     {
         //userId待替换
         long publisherId = 1;
-        return taskService.publishTask(userId, body);
+        return taskService.publishTask(publisherId, body);
     }
 
     // 以下为后端模块API接口
