@@ -27,7 +27,7 @@ public class TaskComment {
   private Task task; // 任务
 
   @Column(name = "commenter_id")
-  private long commenter_id; // 评论者
+  private long commenterId; // 评论者
 
   private String content; // 评论内容
   private byte rating = 50; // 评论评分(存储10倍评分,范围0~100)

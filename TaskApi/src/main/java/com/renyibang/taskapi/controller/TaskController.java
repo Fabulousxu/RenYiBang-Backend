@@ -1,6 +1,7 @@
 package com.renyibang.taskapi.controller;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.renyibang.global.dto.TaskDTO;
 import com.renyibang.taskapi.service.TaskService;
 import com.renyibang.taskapi.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -202,5 +203,22 @@ public class TaskController {
         //userId待替换
         long publisherId = 1;
         return taskService.publishTask(userId, body);
+    }
+
+    // 以下为后端模块API接口
+
+    //order模块调用
+    @GetMapping("/getTask/{taskId}")
+    public JSONObject getTaskDtoById(@PathVariable Long taskId)
+    {
+        return taskService.getTaskDtoById(taskId);
+    }
+
+
+    //chat模块调用
+    @GetMapping("/{taskId}/ownerId")
+    public JSONObject getTaskOwnerId(@PathVariable long taskId)
+    {
+        return taskService.getTaskOwnerId(taskId);
     }
 }

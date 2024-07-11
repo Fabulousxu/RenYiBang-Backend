@@ -1,6 +1,6 @@
 package com.renyibang.taskapi.dao.daoImpl;
 
-import com.renyibang.moduleapi.clients.UserClient;
+import com.renyibang.global.client.UserClient;
 import com.renyibang.taskapi.dao.TaskMessageDao;
 import com.renyibang.taskapi.entity.Task;
 import com.renyibang.taskapi.entity.TaskMessage;
@@ -129,7 +129,7 @@ public class TaskMessageDaoImpl implements TaskMessageDao {
 
             TaskMessage taskMessage = new TaskMessage();
             taskMessage.setTask(task);
-            taskMessage.setMessager_id(userId);
+            taskMessage.setMessagerId(userId);
             taskMessage.setContent(content);
             taskMessage.setCreatedAt(LocalDateTime.now());
             taskMessageRepository.save(taskMessage);
@@ -158,7 +158,7 @@ public class TaskMessageDaoImpl implements TaskMessageDao {
                 return "留言不存在！";
             }
 
-            if(taskMessage.getMessager_id() != userId)
+            if(taskMessage.getMessagerId() != userId)
             {
                 return "该留言不是由此用户发布！";
             }

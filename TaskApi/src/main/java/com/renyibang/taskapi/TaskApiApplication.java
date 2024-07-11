@@ -2,11 +2,10 @@ package com.renyibang.taskapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
-@EnableFeignClients(basePackages = "com.renyibang.moduleapi.clients")
+@EnableFeignClients(basePackages = "com.renyibang.global.client")
 public class TaskApiApplication {
 
 	public static void main(String[] args) {

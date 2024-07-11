@@ -20,7 +20,7 @@ public class TaskCollect {
 
 
   @Column(name = "collector_id")
-  private long collector_id; // 收藏者
+  private long collectorId; // 收藏者
 
   @ManyToOne
   @JoinColumn(name = "task_id")

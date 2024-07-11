@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TaskCollectRepository extends JpaRepository<TaskCollect, Long> {
-    boolean existsByCollector_idAndAndTask(long collectorId, Task task);
+    boolean existsByCollectorIdAndAndTask(long collectorId, Task task);
 
-    TaskCollect findByTaskAndCollector_id(Task task, long collectorId);
+    TaskCollect findByTaskAndCollectorId(Task task, long collectorId);
 }

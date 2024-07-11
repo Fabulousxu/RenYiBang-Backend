@@ -1,6 +1,6 @@
 package com.renyibang.taskapi.dao.daoImpl;
 
-import com.renyibang.moduleapi.clients.UserClient;
+import com.renyibang.global.client.UserClient;
 import com.renyibang.taskapi.dao.TaskDao;
 import com.renyibang.taskapi.entity.Task;
 import com.renyibang.taskapi.entity.TaskAccess;
@@ -68,7 +68,7 @@ public class TaskDaoImpl implements TaskDao {
               return "该任务已被删除！";
           }
 
-          if(taskCollectRepository.existsByCollector_idAndAndTask(collectorId, task))
+          if(taskCollectRepository.existsByCollectorIdAndAndTask(collectorId, task))
           {
               return "用户已收藏该任务！";
           }
@@ -76,7 +76,7 @@ public class TaskDaoImpl implements TaskDao {
           task.setCollectedNumber(task.getCollectedNumber() + 1);
           TaskCollect taskCollect = new TaskCollect();
           taskCollect.setTask(task);
-          taskCollect.setCollector_id(collectorId);
+          taskCollect.setCollectorId(collectorId);
           taskCollect.setCreatedAt(LocalDateTime.now());
 
           taskCollectRepository.save(taskCollect);
@@ -110,7 +110,7 @@ public class TaskDaoImpl implements TaskDao {
               return "该任务已被删除！";
           }
 
-          TaskCollect taskCollect = taskCollectRepository.findByTaskAndCollector_id(task, uncollectorId);
+          TaskCollect taskCollect = taskCollectRepository.findByTaskAndCollectorId(task, uncollectorId);
 
           if(taskCollect == null)
           {
@@ -139,7 +139,7 @@ public class TaskDaoImpl implements TaskDao {
               return "任务不存在！";
           }
 
-          if(task.getOwner_id() == accessorId)
+          if(task.getOwnerId() == accessorId)
           {
               return "不能接取自己发布的任务！";
           }
@@ -159,7 +159,7 @@ public class TaskDaoImpl implements TaskDao {
               return "用户不存在！";
           }
 
-          if(taskAccessRepository.existsByAccessor_idAndTask(accessorId, task))
+          if(taskAccessRepository.existsByAccessorIdAndTask(accessorId, task))
           {
               return "用户已经接取该任务！";
           }
@@ -181,7 +181,7 @@ public class TaskDaoImpl implements TaskDao {
 
           TaskAccess taskAccess = new TaskAccess();
           taskAccess.setTask(task);
-          taskAccess.setAccessor_id(accessorId);
+          taskAccess.setAccessorId(accessorId);
           taskAccess.setCreatedAt(LocalDateTime.now());
 
           taskAccessRepository.save(taskAccess);
@@ -214,7 +214,7 @@ public class TaskDaoImpl implements TaskDao {
               return "用户不存在！";
           }
 
-          TaskAccess taskAccess = taskAccessRepository.findByTaskAndAccessor_id(task, unaccessorId);
+          TaskAccess taskAccess = taskAccessRepository.findByTaskAndAccessorId(task, unaccessorId);
 
           if(taskAccess == null)
           {
@@ -245,7 +245,7 @@ public class TaskDaoImpl implements TaskDao {
           Task task = new Task();
           task.setTitle(title);
           task.setPrice(price);
-          task.setOwner_id(userId);
+          task.setOwnerId(userId);
           task.setImages(imagesURL);
           task.setDescription(description);
           task.setCreatedAt(LocalDateTime.now());
