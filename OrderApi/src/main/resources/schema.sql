@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS renyibang;
-CREATE DATABASE renyibang;
-USE renyibang;
+DROP DATABASE IF EXISTS renyibang_order;
+CREATE DATABASE renyibang_order;
+USE renyibang_order;
 
 CREATE TABLE `order`
 (

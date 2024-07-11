@@ -2,7 +2,9 @@ package com.renyibang.userapi.controller;
 
 import com.alibaba.fastjson2.JSONObject;
 
+import com.renyibang.global.dto.UserDTO;
 import com.renyibang.userapi.entity.RegisterRequest;
+import com.renyibang.userapi.entity.User;
 import com.renyibang.userapi.repository.UserRepository;
 import com.renyibang.userapi.service.UserService;
 import com.renyibang.userapi.util.ResponseUtil;
@@ -72,4 +74,32 @@ public class UserController {
     boolean getUserExist(@PathVariable long userId) {
         return userRepository.existsById(userId);
     }
+
+    // order模块调用
+    @GetMapping("/{userId}")
+    public Object getUserDTOById(@PathVariable long userId)
+    {
+        User user = userRepository.findById(userId).orElse(null);
+        if(user == null) {
+            return null;
+        }
+        return new UserDTO(user.getUserId(), user.getBalance(), user.getNickname(), user.getAvatar());
+    }
+
+    @PostMapping("/update")
+    public JSONObject updateUser(@RequestBody UserDTO userDTO)
+    {
+        long userId = userDTO.getId();
+        User user = userRepository.findById(userId).orElse(null);
+        if(user == null) {
+            return ResponseUtil.error("用户不存在");
+        }
+        user.setBalance(userDTO.getBalance());
+        user.setNickname(userDTO.getNickname());
+        user.setAvatar(userDTO.getAvatar());
+        userRepository.save(user);
+        return ResponseUtil.success("更新成功");
+    }
+
+    ////////////////
 }

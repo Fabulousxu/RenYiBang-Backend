@@ -29,7 +29,7 @@ public interface OrderService {
 	void mapOrdersToOrderDTOs(List<Order> orders, List<OrderDTO> orderDTOs);
 
 	// 标记订单状态
-	Pair<Boolean, String> markOrderStatus(long orderId, OrderStatus status);
+	Pair<Boolean, String> markOrderStatus(long orderId, long userId, OrderStatus status);
 
 	boolean setOrderStatusForce(long orderId, OrderStatus status);
 
@@ -39,16 +39,16 @@ public interface OrderService {
 	// 校验订单状态是否为指定状态
 	boolean checkOrderStatus(long orderId, OrderStatus status);
 
-	void payOrder(Order order);
+	boolean payOrder(Order order);
 
-	void completeOrder(Order order);
+	boolean completeOrder(Order order);
 
-	void confirmOrder(Order order);
+	boolean confirmOrder(Order order);
 
-	void cancelOrder(Order order);
+	boolean cancelOrder(Order order);
 
 	// 用户转账
-	void modifyUserBalance(long userId, long amount);
+	boolean modifyUserBalance(long userId, long amount);
 }
 	
 	
