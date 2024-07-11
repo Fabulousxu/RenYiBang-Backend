@@ -1,4 +1,5 @@
 package com.renyibang.userapi.dao.daoImpl;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.userapi.dao.UserDao;
 import com.renyibang.userapi.entity.User;
@@ -60,7 +61,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public JSONObject findAllById(Collection<Long> userIds)
     {
-        List<User> users = new ArrayList<>();
+        JSONArray users = new JSONArray();
 
         for(Long userId : userIds)
         {
@@ -71,7 +72,7 @@ public class UserDaoImpl implements UserDao {
                 return ResponseUtil.error("用户id为" + userId + "不存在！");
             }
 
-            users.add(user);
+            users.add(user.toJSON());
         }
 
         return ResponseUtil.success("查找成功", users);

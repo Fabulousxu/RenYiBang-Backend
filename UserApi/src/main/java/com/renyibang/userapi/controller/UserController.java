@@ -4,16 +4,13 @@ import com.alibaba.fastjson2.JSONObject;
 
 import com.renyibang.global.dto.UserDTO;
 import com.renyibang.userapi.entity.RegisterRequest;
-import com.renyibang.userapi.entity.User;
 import com.renyibang.userapi.repository.UserRepository;
 import com.renyibang.userapi.service.UserService;
 import com.renyibang.userapi.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.security.auth.Subject;
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -93,7 +90,7 @@ public class UserController {
 
     // task模块调用
     @GetMapping("/profile/users/{userIds}")
-    public JSONObject getUserInfos(@PathVariable Collection<Long> userIds)
+    public JSONObject getUserInfos(@PathVariable List<Long> userIds)
     {
         return userService.getUserInfos(userIds);
     }
