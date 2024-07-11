@@ -47,7 +47,7 @@ public class TaskServiceImpl implements TaskService {
             Page<Task> searchResult = taskDao.searchTaskByPaging(keyword, pageable, DateTimeUtil.getBeginDateTime(timeBegin), DateTimeUtil.getEndDateTime(timeEnd), priceLow, PriceUtil.priceConvert(priceHigh));
 
             //创建一个list存储用户id
-            ArrayList<Long> userIds = new ArrayList<>();
+            List<Long> userIds = new ArrayList<>();
 
             for(Task task : searchResult.getContent())
             {
@@ -56,14 +56,22 @@ public class TaskServiceImpl implements TaskService {
                 userIds.add(task.getOwnerId());
             }
 
+            if(userIds.isEmpty())
+            {
+                JSONObject returnRes = new JSONObject();
+                returnRes.put("total", searchResult.getTotalElements());
+                returnRes.put("items", result);
+                return ResponseUtil.success(returnRes);
+            }
+
             JSONObject userInfos = userClient.getUserInfos(userIds);
             if(Objects.equals(false, userInfos.get("ok")))
             {
                 return ResponseUtil.error("用户信息获取失败！");
             }
 
-            JSONArray userInfosArray = (JSONArray)userInfos.get("data");
 
+            ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
             //将用户信息存入taskJson
             for(int i = 0; i < searchResult.getContent().size(); i++)
             {
@@ -123,11 +131,19 @@ public class TaskServiceImpl implements TaskService {
             JSONArray result = new JSONArray();
             Page<TaskComment> getResult = taskCommentDao.getTaskComments(taskId, pageable);
 
-            ArrayList<Long> userIds = new ArrayList<>();
+            List<Long> userIds = new ArrayList<>();
 
             for(TaskComment taskComment : getResult)
             {
                 userIds.add(taskComment.getCommenterId());
+            }
+
+            if(userIds.isEmpty())
+            {
+                JSONObject returnRes = new JSONObject();
+                returnRes.put("total", getResult.getTotalElements());
+                returnRes.put("items", result);
+                return ResponseUtil.success(returnRes);
             }
 
             JSONObject userInfos = userClient.getUserInfos(userIds);
@@ -136,7 +152,7 @@ public class TaskServiceImpl implements TaskService {
                 return ResponseUtil.error("用户信息获取失败！");
             }
 
-            JSONArray userInfosArray = (JSONArray)userInfos.get("data");
+            ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
 
             for(int i = 0; i < getResult.getContent().size(); i++)
             {
@@ -166,11 +182,19 @@ public class TaskServiceImpl implements TaskService {
             JSONArray result = new JSONArray();
             Page<TaskMessage> getResult = taskMessageDao.getTaskMessages(taskId, pageable);
 
-            ArrayList<Long> userIds = new ArrayList<>();
+            List<Long> userIds = new ArrayList<>();
 
             for(TaskMessage taskMessage : getResult)
             {
                 userIds.add(taskMessage.getMessagerId());
+            }
+
+            if(userIds.isEmpty())
+            {
+                JSONObject returnRes = new JSONObject();
+                returnRes.put("total", getResult.getTotalElements());
+                returnRes.put("items", result);
+                return ResponseUtil.success(returnRes);
             }
 
             JSONObject userInfos = userClient.getUserInfos(userIds);
@@ -179,7 +203,7 @@ public class TaskServiceImpl implements TaskService {
                 return ResponseUtil.error("用户信息获取失败！");
             }
 
-            JSONArray userInfosArray = (JSONArray)userInfos.get("data");
+            ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
 
             for(int i = 0; i < getResult.getContent().size(); i++)
             {

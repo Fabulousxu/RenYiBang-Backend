@@ -1,6 +1,5 @@
 package com.renyibang.global.client;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.global.dto.UserDTO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Collection;
+import java.util.List;
 
 @FeignClient(name = "UserApi")
 public interface UserClient {
@@ -20,7 +20,7 @@ public interface UserClient {
   JSONObject getUserInfo(@PathVariable long userId);
 
   @GetMapping("/api/user/profile/users/{userIds}")
-  JSONObject getUserInfos(@PathVariable Collection<Long> userIds);
+  JSONObject getUserInfos(@PathVariable List<Long> userIds);
 
   /////////Order模块的调用/////////
  /*
