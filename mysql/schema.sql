@@ -1,0 +1,3 @@
+DROP DATABASE IF EXISTS renyibang_user;
+DROP DATABASE IF EXISTS renyibang_task;
+DROP DATABASE IF EXISTS renyibang_user;
