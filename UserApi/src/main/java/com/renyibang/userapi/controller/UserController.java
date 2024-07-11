@@ -32,6 +32,11 @@ public class UserController {
 
   // 以下为对外模块接口
 
+  @GetMapping("/profile/{userId}")
+  public Response getUserInfo_compatible(@PathVariable long userId) {
+    return userService.getUserInfo(userId);
+  }
+  
   @GetMapping("/{userId}/exist")
   boolean getUserExist(@PathVariable long userId) {
     return userService.existsById(userId);
