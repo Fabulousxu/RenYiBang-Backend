@@ -35,33 +35,33 @@ public class OrderServiceImpl implements OrderService {
     List<OrderDTO> orderDTOs = new ArrayList<>();
 
     // 向User module请求owner信息
-    UserDTO owner = userClient.getUserById(ownerId);
-    if(owner == null) {
-      return orderDTOs;
-    }
+    JSONObject result = userClient.getUserById(ownerId);
+    if(!result.getBoolean("ok")) return orderDTOs;
+    UserDTO owner = result.getObject("data", UserDTO.class);
+    if(owner == null) return orderDTOs;
 
     for (Order order : orders) {
       OrderDTO orderDTO = new OrderDTO(order);
 
       //  向User module请求accessor信息
-      UserDTO accessor = userClient.getUserById(order.getAccessorId());
-      if(accessor == null) {
-        continue;
-      }
+      result = userClient.getUserById(ownerId);
+      if(!result.getBoolean("ok")) return orderDTOs;
+      UserDTO accessor = result.getObject("data", UserDTO.class);
+      if(accessor == null) continue;
 
       if (type == 0) {
         // 向Task module请求task信息
-        TaskDTO task = taskClient.getTaskById(order.getItemId());
-        if(task == null) {
-          continue;
-        }
+        result = taskClient.getTaskById(order.getItemId());
+        if(!result.getBoolean("ok")) continue;
+        TaskDTO task = result.getObject("data", TaskDTO.class);
+        if(task == null) continue;
         orderDTO.setTask(task);
       } else {
         // 向Service module请求service信息
-        ServiceDTO service = serviceClient.getServiceById(order.getItemId());
-        if(service == null) {
-          continue;
-        }
+        result = serviceClient.getServiceById(order.getItemId());
+        if(!result.getBoolean("ok")) continue;
+        ServiceDTO service = result.getObject("data", ServiceDTO.class);
+        if(service == null) continue;
         orderDTO.setService(service);
       }
 
@@ -79,33 +79,33 @@ public class OrderServiceImpl implements OrderService {
     List<OrderDTO> orderDTOs = new ArrayList<>();
 
     // 向User module请求accessor信息
-    UserDTO accessor = userClient.getUserById(accessorId);
-    if(accessor == null) {
-      return orderDTOs;
-    }
+    JSONObject result = userClient.getUserById(accessorId);
+    if(!result.getBoolean("ok")) return orderDTOs;
+    UserDTO accessor = result.getObject("data", UserDTO.class);
+    if(accessor == null) return orderDTOs;
 
     for (Order order : orders) {
       OrderDTO orderDTO = new OrderDTO(order);
 
       //  向User module请求owner信息
-      UserDTO owner = userClient.getUserById(order.getOwnerId());
-      if(owner == null) {
-        continue;
-      }
+      result = userClient.getUserById(order.getOwnerId());
+      if(!result.getBoolean("ok")) return orderDTOs;
+      UserDTO owner = result.getObject("data", UserDTO.class);
+      if(owner == null) continue;
 
       if (type == 0) {
         // 向Task module请求task信息
-        TaskDTO task = taskClient.getTaskById(order.getItemId());
-        if(task == null) {
-          continue;
-        }
+        result = taskClient.getTaskById(order.getItemId());
+        if(!result.getBoolean("ok")) continue;
+        TaskDTO task = result.getObject("data", TaskDTO.class);
+        if(task == null) continue;
         orderDTO.setTask(task);
       } else {
         // 向Service module请求service信息
-        ServiceDTO service = serviceClient.getServiceById(order.getItemId());
-        if(service == null) {
-          continue;
-        }
+        result = serviceClient.getServiceById(order.getItemId());
+        if(!result.getBoolean("ok")) continue;
+        ServiceDTO service = result.getObject("data", ServiceDTO.class);
+        if(service == null) continue;
         orderDTO.setService(service);
       }
 
@@ -174,9 +174,8 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public boolean setOrderStatusForce(long orderId, OrderStatus status) {
     Order order = orderDao.findById(orderId);
-    if (order == null) {
-      return false;
-    }
+    if (order == null) return false;
+
     order.setStatus(status);
     orderDao.save(order);
     return true;
@@ -196,9 +195,7 @@ public class OrderServiceImpl implements OrderService {
   public boolean payOrder(Order order) {
     // 获得任务发布者
     long ownerId = order.getOwnerId();
-    if(!this.modifyUserBalance(ownerId, -order.getCost())) {
-      return false;
-    }
+    if(!this.modifyUserBalance(ownerId, -order.getCost())) return false;
 
     // 修改订单状态
     order.setStatus(OrderStatus.IN_PROGRESS);
@@ -217,9 +214,7 @@ public class OrderServiceImpl implements OrderService {
   public boolean confirmOrder(Order order) {
     order.setStatus(OrderStatus.CONFIRMED);
     // 将帐号余额增加
-    if(!this.modifyUserBalance(order.getAccessorId(), order.getCost())) {
-      return false;
-    }
+    if(!this.modifyUserBalance(order.getAccessorId(), order.getCost())) return false;
     orderDao.save(order);
     return true;
   }
@@ -228,9 +223,7 @@ public class OrderServiceImpl implements OrderService {
   public boolean cancelOrder(Order order) {
     order.setStatus(OrderStatus.CANCELLED);
     // 将帐号余额增加
-    if(!this.modifyUserBalance(order.getOwnerId(), order.getCost())) {
-      return false;
-    }
+    if(!this.modifyUserBalance(order.getOwnerId(), order.getCost())) return false;
     orderDao.save(order);
     return true;
   }
@@ -238,42 +231,43 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public boolean modifyUserBalance(long userId, long amount) {
     // 向User module请求用户信息
-    UserDTO user = userClient.getUserById(userId);
-    if(user == null) {
-      return false;
-    }
+    JSONObject result = userClient.getUserById(userId);
+    if(!result.getBoolean("ok")) return false;
+    UserDTO user = result.getObject("data", UserDTO.class);
+    if(user == null) return false;
+
     user.setBalance(user.getBalance() + amount);
-    JSONObject result = userClient.updateUser(user);
+    result = userClient.updateUser(user);
 		return result.getBoolean("ok");
   }
 
   @Override
   public void mapOrderToOrderDTO(Order order, OrderDTO orderDTO) {
     //  向User module请求owner信息
-    UserDTO owner = userClient.getUserById(order.getOwnerId());
-    if(owner == null) {
-      return;
-    }
+    JSONObject result = userClient.getUserById(order.getOwnerId());
+    if(!result.getBoolean("ok")) return;
+    UserDTO owner = result.getObject("data", UserDTO.class);
+    if(owner == null) return;
 
     //  向User module请求accessor信息
-    UserDTO accessor = userClient.getUserById(order.getAccessorId());
-    if(accessor == null) {
-      return;
-    }
+    result = userClient.getUserById(order.getAccessorId());
+    if(!result.getBoolean("ok")) return;
+    UserDTO accessor = result.getObject("data", UserDTO.class);
+    if(accessor == null) return;
 
     if (order.getType() == 0) {
       // 向Task module请求task信息
-      TaskDTO task = taskClient.getTaskById(order.getItemId());
-      if(task == null) {
-        return;
-      }
+      result = taskClient.getTaskById(order.getItemId());
+      if(!result.getBoolean("ok")) return;
+      TaskDTO task = result.getObject("data", TaskDTO.class);
+      if(task == null) return;
       orderDTO.setTask(task);
     } else {
       // 向Service module请求service信息
-      ServiceDTO service = serviceClient.getServiceById(order.getItemId());
-      if(service == null) {
-        return;
-      }
+      result = serviceClient.getServiceById(order.getItemId());
+      if(!result.getBoolean("ok")) return;
+      ServiceDTO service = result.getObject("data", ServiceDTO.class);
+      if(service == null) return;
       orderDTO.setService(service);
     }
 
