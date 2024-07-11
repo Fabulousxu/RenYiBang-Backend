@@ -3,6 +3,7 @@ package com.renyibang.userapi.service.serviceImpl;
 
 import com.alibaba.fastjson2.JSONObject;
 
+import com.renyibang.global.dto.UserDTO;
 import com.renyibang.userapi.dao.UserAuthDAO;
 import com.renyibang.userapi.dao.UserDao;
 import com.renyibang.userapi.entity.User;
@@ -111,6 +112,53 @@ public class UserServiceImpl implements UserService {
             {
                 return ResponseUtil.error(result);
             }
+        }
+        catch (Exception e)
+        {
+            return ResponseUtil.error(String.valueOf(e));
+        }
+    }
+
+    @Override
+    public JSONObject getUserDtoById(long userId)
+    {
+        try
+        {
+            User user = userDAO.findById(userId).orElse(null);
+            if(user == null)
+            {
+                return ResponseUtil.error("用户不存在！");
+            }
+
+            UserDTO userDTO = new UserDTO(user.getUserId(), user.getBalance(), user.getNickname(), user.getAvatar());
+
+            return ResponseUtil.success("获取当前用户信息成功！", userDTO);
+        }
+        catch (Exception e)
+        {
+            return ResponseUtil.error(String.valueOf(e));
+        }
+    }
+
+    @Override
+    public JSONObject updateUserByDto(UserDTO userDTO)
+    {
+        try
+        {
+            long userId = userDTO.getId();
+            User user = userDAO.findById(userId).orElse(null);
+            if(user == null)
+            {
+                return ResponseUtil.error("用户不存在！");
+            }
+
+            user.setBalance(userDTO.getBalance());
+            user.setNickname(userDTO.getNickname());
+            user.setAvatar(userDTO.getAvatar());
+
+            userDAO.save(user);
+
+            return ResponseUtil.success("更新成功！");
         }
         catch (Exception e)
         {

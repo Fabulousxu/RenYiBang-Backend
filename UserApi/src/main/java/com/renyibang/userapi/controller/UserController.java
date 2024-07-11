@@ -70,6 +70,8 @@ public class UserController {
         return ResponseUtil.success("查找成功", userRepository.findById(userId).orElse(null).toJSON());
     }
 
+    // 以下为对外模块接口
+
     @GetMapping("/{userId}/exist")
     boolean getUserExist(@PathVariable long userId) {
         return userRepository.existsById(userId);
@@ -77,28 +79,15 @@ public class UserController {
 
     // order模块调用
     @GetMapping("/{userId}")
-    public Object getUserDTOById(@PathVariable long userId)
+    public JSONObject getUserDtoById(@PathVariable long userId)
     {
-        User user = userRepository.findById(userId).orElse(null);
-        if(user == null) {
-            return null;
-        }
-        return new UserDTO(user.getUserId(), user.getBalance(), user.getNickname(), user.getAvatar());
+        return userService.getUserDtoById(userId);
     }
 
     @PostMapping("/update")
     public JSONObject updateUser(@RequestBody UserDTO userDTO)
     {
-        long userId = userDTO.getId();
-        User user = userRepository.findById(userId).orElse(null);
-        if(user == null) {
-            return ResponseUtil.error("用户不存在");
-        }
-        user.setBalance(userDTO.getBalance());
-        user.setNickname(userDTO.getNickname());
-        user.setAvatar(userDTO.getAvatar());
-        userRepository.save(user);
-        return ResponseUtil.success("更新成功");
+        return userService.updateUserByDto(userDTO);
     }
 
     ////////////////

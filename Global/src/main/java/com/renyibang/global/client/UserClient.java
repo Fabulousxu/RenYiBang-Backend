@@ -33,7 +33,7 @@ public interface UserClient {
   */
 
   @GetMapping("/api/user/{userId}")
-  UserDTO getUserById(@PathVariable("userId") Long id);
+  JSONObject getUserById(@PathVariable("userId") Long id);
 
   @PostMapping("/api/user/update")
   JSONObject updateUser(@RequestBody UserDTO userDTO);
