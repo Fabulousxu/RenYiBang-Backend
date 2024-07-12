@@ -1,7 +1,6 @@
 package com.renyibang.gateway.filter;
 
 import com.renyibang.global.util.JwtUtil;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -14,64 +13,26 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
-@Log4j2
 public class AuthFilter implements GlobalFilter, Ordered {
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-    // 1.获取请求对象和响应对象
     ServerHttpRequest request = exchange.getRequest();
     ServerHttpResponse response = exchange.getResponse();
-    // 2.判断当前的请求是否为登录，如果是，直接放行
     if (request.getURI().getPath().equals("/api/user/login")
-        || request.getURI().getPath().equals("/api/user/register")) {
+      || request.getURI().getPath().equals("/api/user/register"))
       return chain.filter(exchange);
-    }
-
-    // 3.获取当前用户的请求头jwt信息
     HttpHeaders headers = request.getHeaders();
-    String jwtToken = headers.getFirst("jwt");
-
-    // 4.判断当前令牌是否存在
-    if (jwtToken == null || jwtToken.isEmpty()) {
-      // 如果不存在，向客户端返回错误提示信息
-      response.setStatusCode(HttpStatus.UNAUTHORIZED);
-      return response.setComplete();
-    }
-
     try {
-      // 5.如果令牌存在，解析jwt令牌，判断该令牌是否合法，如果不合法，则向客户端返回错误信息
-      //      Claims claims = AppJwtUtil.getClaimsBody(jwtToken);
-      //      int result = AppJwtUtil.verifyToken(claims);
-      //      if (result == 0 || result == -1) {
-      //        // 5.1 合法，则向header中重新设置userId
-      //        Integer id = (Integer) claims.get("id");
-      //        log.info("find userid:{} from uri:{}", id, request.getURI());
-      //        // 重新设置token到header中
-      //        ServerHttpRequest serverHttpRequest =
-      //            request
-      //                .mutate()
-      //                .headers(
-      //                    httpHeaders -> {
-      //                      httpHeaders.add("userId", id + "");
-      //                    })
-      //                .build();
-      //        exchange.mutate().request(serverHttpRequest).build();
-      //      }
-      String userId = JwtUtil.parse(jwtToken);
-      if (userId == null) {
-        response.setStatusCode(HttpStatus.UNAUTHORIZED);
-        return response.setComplete();
-      }
-      headers.add("userId", userId);
-
+      String jwt = headers.getFirst("jwt");
+      if (jwt == null || jwt.isEmpty()) throw new Exception();
+      String userId = JwtUtil.parse(jwt);
+      if (userId == null || userId.isEmpty()) throw new Exception();
+      ServerHttpRequest mutatedRequest = request.mutate().header("userId", userId).build();
+      return chain.filter(exchange.mutate().request(mutatedRequest).build());
     } catch (Exception e) {
-      // 想客户端返回错误提示信息
       response.setStatusCode(HttpStatus.UNAUTHORIZED);
       return response.setComplete();
     }
-
-    // 6.放行
-    return chain.filter(exchange);
   }
 
   @Override
