@@ -9,7 +9,7 @@ import com.renyibang.chatapi.entity.Message;
 import com.renyibang.chatapi.service.ChatService;
 import com.renyibang.global.client.TaskClient;
 import com.renyibang.global.client.UserClient;
-import com.renyibang.global.util.ResponseUtil;
+import com.renyibang.global.util.Response;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -35,10 +35,12 @@ public class ChatServiceImpl implements ChatService {
     JSONObject chatJson = new JSONObject();
     chatJson.put("chatId", chat.getChatId());
     chatJson.put("type", chat.getType() == 0 ? "task" : "service");
-    chatJson.put("unread", userId == chat.getLastMessageSenderId() ? 0 : chat.getUnreadCount());
-    chatJson.put("lastMessage", chat.getLastMessageContent());
-    chatJson.put("lastTime", chat.getLastMessageCreatedAt().format(formatter));
+    chatJson.put("ofId", chat.getOfId());
     chatJson.put("chatter", chatterJson);
+    chatJson.put(
+        "unreadCount", userId == chat.getLastMessageSenderId() ? 0 : chat.getUnreadCount());
+    chatJson.put("lastMessageContent", chat.getLastMessageContent());
+    chatJson.put("lastMessageCreatedAt", chat.getLastMessageCreatedAt().format(formatter));
     return chatJson;
   }
 
@@ -47,33 +49,30 @@ public class ChatServiceImpl implements ChatService {
     messageJson.put("messageId", message.getMessageId());
     messageJson.put("senderId", message.getSenderId());
     messageJson.put("content", message.getContent());
-    messageJson.put("time", message.getCreatedAt().format(formatter));
+    messageJson.put("createdAt", message.getCreatedAt().format(formatter));
     return messageJson;
   }
 
   @Override
-  public JSONObject getChats(long userId) {
+  public Response getChats(long userId) {
     List<Chat> chats =
         chatRepository.findByOfOwnerIdOrChatterIdOrderByLastMessageCreatedAtDesc(userId, userId);
     chats.sort((a, b) -> b.getLastMessageCreatedAt().compareTo(a.getLastMessageCreatedAt()));
     JSONArray chatArray = new JSONArray();
     for (Chat chat : chats) chatArray.add(getChatJson(chat, userId));
-    JSONObject data = new JSONObject();
-    data.put("chats", chatArray);
     JSONObject selfJson = new JSONObject();
     JSONObject res = userClient.getUserInfo(userId);
     if (res.getBooleanValue("ok")) selfJson = res.getJSONObject("data");
-    data.put("self", selfJson);
-    return ResponseUtil.success(data);
+    return Response.success(JSONObject.of("self", selfJson, "chats", chatArray));
   }
 
   @Override
-  public JSONObject initiateChat(long userId, byte type, long ofId) {
+  public Response initiateChat(long userId, byte type, long ofId) {
     Chat chat = chatRepository.findByTypeAndOfIdAndChatterId(type, ofId, userId).orElse(null);
     if (chat == null) {
       // 服务模块也要加
       JSONObject res = taskClient.getTaskOwnerId(ofId);
-      if (!res.getBooleanValue("ok")) return ResponseUtil.error(res.getString("message"));
+      if (!res.getBooleanValue("ok")) return Response.error(res.getString("message"));
       long ofOwnerId = res.getLongValue("data");
       chat = new Chat();
       chat.setType(type);
@@ -83,17 +82,15 @@ public class ChatServiceImpl implements ChatService {
       chat.setLastMessageSenderId(userId);
       chatRepository.save(chat);
     }
-    JSONObject data = new JSONObject();
-    data.put("chatId", chat.getChatId());
-    return ResponseUtil.success(data);
+    return Response.success(JSONObject.of("chatId", chat.getChatId()));
   }
 
   @Override
-  public JSONObject getChatHistory(long userId, String chatId, String lastMessageId, int count) {
+  public Response getChatHistory(long userId, String chatId, String lastMessageId, int count) {
     Chat chat = chatRepository.findById(chatId).orElse(null);
-    if (chat == null) return ResponseUtil.error("聊天不存在");
+    if (chat == null) return Response.error("聊天不存在");
     if (chat.getOfOwnerId() != userId && chat.getChatterId() != userId)
-      return ResponseUtil.error("无权查看聊天记录");
+      return Response.error("无权查看聊天记录");
     Message lastMessage = messageRepository.findById(lastMessageId).orElse(null);
     LocalDateTime lastMessageCreatedAt =
         lastMessage == null ? chat.getLastMessageCreatedAt() : lastMessage.getCreatedAt();
@@ -102,6 +99,6 @@ public class ChatServiceImpl implements ChatService {
             chatId, lastMessageCreatedAt, PageRequest.of(0, count));
     JSONArray messageArray = new JSONArray();
     for (Message message : messages) messageArray.add(getMessageJson(message));
-    return ResponseUtil.success(messageArray);
+    return Response.success(messageArray);
   }
 }
