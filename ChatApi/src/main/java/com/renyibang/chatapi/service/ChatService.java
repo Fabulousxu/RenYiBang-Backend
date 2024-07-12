@@ -1,13 +1,13 @@
 package com.renyibang.chatapi.service;
 
-import com.alibaba.fastjson2.JSONObject;
+import com.renyibang.global.util.Response;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface ChatService {
-  JSONObject getChats(long userId);
+  Response getChats(long userId);
 
-  JSONObject initiateChat(long userId, byte type, long ofId);
+  Response initiateChat(long userId, byte type, long ofId);
 
-  JSONObject getChatHistory(long userId, String chatId, String lastMessageId, int count);
+  Response getChatHistory(long userId, String chatId, String lastMessageId, int count);
 }
