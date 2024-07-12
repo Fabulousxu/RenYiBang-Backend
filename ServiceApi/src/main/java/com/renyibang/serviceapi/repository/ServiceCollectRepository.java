@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ServiceCollectRepository extends JpaRepository<ServiceCollect, Long> {
-    boolean existsByCollector_idAndAndService(long collectorId, Service service);
+    boolean existsByCollectorIdAndAndService(long collectorId, Service service);
 
-    ServiceCollect findByServiceAndCollector_id(Service service, long collectorId);
+    ServiceCollect findByServiceAndCollectorId(Service service, long collectorId);
 }

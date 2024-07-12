@@ -19,7 +19,7 @@ public class ServiceCollect {
   private long serviceCollectId; // 服务收藏id
 
   @Column(name = "collector_id")
-  private long collector_id; // 收藏者
+  private long collectorId; // 收藏者
 
   @ManyToOne
   @JoinColumn(name = "service_id")

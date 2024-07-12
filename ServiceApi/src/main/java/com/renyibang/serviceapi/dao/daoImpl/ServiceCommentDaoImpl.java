@@ -108,7 +108,7 @@ public class ServiceCommentDaoImpl implements ServiceCommentDao {
                 return "服务不存在！";
             }
 
-            if (serviceCommentRepository.existsByServiceAndCommenter_id(service, userId)) {
+            if (serviceCommentRepository.existsByServiceAndCommenterId(service, userId)) {
                 return "用户已经评论过该服务！";
             }
 

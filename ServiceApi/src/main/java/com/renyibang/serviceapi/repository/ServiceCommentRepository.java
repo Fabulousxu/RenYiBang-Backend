@@ -12,5 +12,5 @@ import org.springframework.stereotype.Repository;
 public interface ServiceCommentRepository extends JpaRepository<ServiceComment, Long> {
     Page<ServiceComment> findByServiceServiceId(long serviceId, Pageable pageable);
 
-    boolean existsByServiceAndCommenter_id(Service service, long userId);
+    boolean existsByServiceAndCommenterId(Service service, long userId);
 }

@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ServiceAccessRepository extends JpaRepository<ServiceAccess, Long> {
-    boolean existsByAccessor_idAndService(long accessorId, Service service);
-    ServiceAccess findByServiceAndAccessor_id(Service service, long accessorId);
+    boolean existsByAccessorIdAndService(long accessorId, Service service);
+    ServiceAccess findByServiceAndAccessorId(Service service, long accessorId);
 }
