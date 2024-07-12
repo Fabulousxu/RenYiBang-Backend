@@ -23,7 +23,7 @@ public class AuthServiceImpl implements AuthService {
     if (!authRepository.existsById(login.getUserId())) return Response.error("用户不存在");
     if (!authRepository.existsByUserIdAndPassword(login.getUserId(), login.getPassword()))
       return Response.error("密码错误");
-    String jwt = JwtUtil.create(JSONObject.of("userId", login.getUserId()).toString());
+    String jwt = JwtUtil.create(Long.toString(login.getUserId()));
     return Response.success("登录成功", JSONObject.of("jwt", jwt));
   }
 
