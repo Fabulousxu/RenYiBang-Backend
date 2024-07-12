@@ -1,6 +1,6 @@
 package com.renyibang.serviceapi.dao.daoImpl;
 
-import com.renyibang.moduleapi.clients.UserClient;
+import com.renyibang.global.client.UserClient;
 import com.renyibang.serviceapi.dao.ServiceMessageDao;
 import com.renyibang.serviceapi.entity.Service;
 import com.renyibang.serviceapi.entity.ServiceMessage;
@@ -124,7 +124,7 @@ public class ServiceMessageDaoImpl implements ServiceMessageDao {
 
             ServiceMessage serviceMessage = new ServiceMessage();
             serviceMessage.setService(service);
-            serviceMessage.setMessager_id(userId);
+            serviceMessage.setMessagerId(userId);
             serviceMessage.setContent(content);
             serviceMessage.setCreatedAt(LocalDateTime.now());
             serviceMessageRepository.save(serviceMessage);

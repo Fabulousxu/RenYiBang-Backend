@@ -1,6 +1,6 @@
 package com.renyibang.serviceapi.dao.daoImpl;
 
-import com.renyibang.moduleapi.clients.UserClient;
+import com.renyibang.global.client.UserClient;
 import com.renyibang.serviceapi.dao.ServiceDao;
 import com.renyibang.serviceapi.entity.Service;
 import com.renyibang.serviceapi.entity.ServiceAccess;
@@ -144,7 +144,7 @@ public class ServiceDaoImpl implements ServiceDao {
                 return "该服务已被下架！";
             }
 
-            if(service.getOwner_id() == accessorId)
+            if(service.getOwnerId() == accessorId)
             {
                 return "不能接取自己发布的服务！";
             }
@@ -154,7 +154,7 @@ public class ServiceDaoImpl implements ServiceDao {
                 return "用户不存在！";
             }
 
-            if(ServiceAccessRepository.existsByAccessor_idAndService(accessorId, service))
+            if(serviceAccessRepository.existsByAccessor_idAndService(accessorId, service))
             {
                 return "用户已经接取该服务！";
             }
@@ -234,7 +234,7 @@ public class ServiceDaoImpl implements ServiceDao {
             String imagesURL = ImageUtil.mergeImages(requestImages);
 
             Service service = new Service();
-            service.setOwner_id(userId);
+            service.setOwnerId(userId);
             service.setTitle(title);
             service.setDescription(description);
             service.setPrice(price);
