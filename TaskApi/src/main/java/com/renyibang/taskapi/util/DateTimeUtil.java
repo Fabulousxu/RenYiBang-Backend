@@ -27,7 +27,7 @@ public class DateTimeUtil {
             return LocalDateTime.parse(timeString, DATE_TIME_FORMATTER);
         } catch (Exception e) {
             // 解析失败，返回默认值
-            return defaultValue;
+            return null;
         }
     }
 
