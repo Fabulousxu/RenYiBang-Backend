@@ -115,109 +115,81 @@ public class TaskController {
     }
 
     @PutMapping("/comment/{taskCommentId}/like")
-    public JSONObject likeComment(@PathVariable long taskCommentId)
+    public JSONObject likeComment(@PathVariable long taskCommentId, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long likerId = 1;
-
-        return taskService.likeComment(taskCommentId, likerId);
+        return taskService.likeComment(taskCommentId, userId);
     }
 
     @DeleteMapping("/comment/{taskCommentId}/unlike")
-    public JSONObject unlikeComment(@PathVariable long taskCommentId)
+    public JSONObject unlikeComment(@PathVariable long taskCommentId, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long unlikerId = 1;
-
-        return taskService.unlikeComment(taskCommentId, unlikerId);
+        return taskService.unlikeComment(taskCommentId, userId);
     }
 
     @PutMapping("/message/{taskMessageId}/like")
-    public JSONObject likeMessage(@PathVariable long taskMessageId)
+    public JSONObject likeMessage(@PathVariable long taskMessageId, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long likerId = 1;
-        return taskService.likeMessage(taskMessageId, likerId);
+        return taskService.likeMessage(taskMessageId, userId);
     }
 
     @DeleteMapping("/message/{taskMessageId}/unlike")
-    public JSONObject unlikeMessage(@PathVariable long taskMessageId)
+    public JSONObject unlikeMessage(@PathVariable long taskMessageId, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long unlikerId = 1;
-        return taskService.unlikeMessage(taskMessageId, unlikerId);
+        return taskService.unlikeMessage(taskMessageId, userId);
     }
 
     @PutMapping("/{taskId}/collect")
-    public JSONObject collectTask(@PathVariable long taskId)
+    public JSONObject collectTask(@PathVariable long taskId, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long collectorId = 1;
-        return taskService.collectTask(taskId, collectorId);
+        return taskService.collectTask(taskId, userId);
     }
 
     @DeleteMapping("/{taskId}/uncollect")
-    public JSONObject uncollectTask(@PathVariable long taskId)
+    public JSONObject uncollectTask(@PathVariable long taskId, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long uncollectorId = 1;
-        return taskService.uncollectTask(taskId, uncollectorId);
+        return taskService.uncollectTask(taskId, userId);
     }
 
     @PutMapping("/{taskId}/access")
-    public JSONObject accessTask(@PathVariable long taskId)
+    public JSONObject accessTask(@PathVariable long taskId, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long accessorId = 1;
-        return taskService.accessTask(taskId, accessorId);
+        return taskService.accessTask(taskId, userId);
     }
 
     @DeleteMapping("/{taskId}/unaccess")
-    public JSONObject unaccessTask(@PathVariable long taskId)
+    public JSONObject unaccessTask(@PathVariable long taskId, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long unaccessorId = 1;
-        return taskService.unaccessTask(taskId, unaccessorId);
+        return taskService.unaccessTask(taskId, userId);
     }
 
     @PutMapping("/{taskId}/message")
-    public JSONObject publishMessage(@PathVariable long taskId, @RequestBody JSONObject body)
+    public JSONObject publishMessage(@PathVariable long taskId, @RequestBody JSONObject body, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long publisherId = 1;
-        return taskService.publishMessage(taskId, publisherId, body);
+        return taskService.publishMessage(taskId, userId, body);
     }
 
     @DeleteMapping("/message/{taskMessageId}")
-    public JSONObject deleteMessage(@PathVariable long taskMessageId)
+    public JSONObject deleteMessage(@PathVariable long taskMessageId, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long messagerId = 1;
-        return taskService.deleteMessage(taskMessageId, messagerId);
+        return taskService.deleteMessage(taskMessageId, userId);
     }
 
     @PutMapping("/{taskId}/comment")
-    public JSONObject publishComment(@PathVariable long taskId, @RequestBody JSONObject body)
+    public JSONObject publishComment(@PathVariable long taskId, @RequestBody JSONObject body, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long commenterId = 1;
-        return taskService.publishComment(taskId, commenterId, body);
+        return taskService.publishComment(taskId, userId, body);
     }
 
     @DeleteMapping("/comment/{taskCommentId}")
-    public JSONObject deleteComment(@PathVariable long taskCommentId)
+    public JSONObject deleteComment(@PathVariable long taskCommentId, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long commenterId = 1;
-        return taskService.deleteComment(taskCommentId, commenterId);
+        return taskService.deleteComment(taskCommentId, userId);
     }
 
     @PostMapping("/issue")
-    public JSONObject publishTask(@RequestBody JSONObject body)
+    public JSONObject publishTask(@RequestBody JSONObject body, @RequestHeader(value = "userId") long userId)
     {
-        //userId待替换
-        long publisherId = 1;
-        return taskService.publishTask(publisherId, body);
+        return taskService.publishTask(userId, body);
     }
 
     // 以下为后端模块API接口
