@@ -22,9 +22,9 @@ public interface OrderService {
 	List<OrderDTO> findAllOrders();
 
 	// 生成初始订单
-	long createOrder(long taskId, long ownerId, long accessorId, long cost, Byte type);
+	boolean createOrder(long taskId, long ownerId, long accessorId, long cost, Byte type);
 
-	void mapOrderToOrderDTO(Order order, OrderDTO orderDTO);
+	OrderDTO mapOrderToOrderDTO(Order order);
 
 	void mapOrdersToOrderDTOs(List<Order> orders, List<OrderDTO> orderDTOs);
 

@@ -15,4 +15,8 @@ public class UserDTO {
 		this.nickname = nickname;
 		this.avatar = avatar;
 	}
+
+  public UserDTO() {
+
+  }
 }

@@ -37,4 +37,14 @@ public class Order {
 
 	@Column(name = "item_id")
 	private long itemId; // task_id or service_id
+
+	public Order(long orderId, Byte type, long ownerId, long accessorId, OrderStatus status, long cost, long itemId) {
+		this.orderId = orderId;
+		this.type = type;
+		this.ownerId = ownerId;
+		this.accessorId = accessorId;
+		this.status = status;
+		this.cost = cost;
+		this.itemId = itemId;
+	}
 }
