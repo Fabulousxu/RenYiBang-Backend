@@ -11,8 +11,7 @@ public class ChatController {
   @Autowired private ChatService chatService;
 
   @GetMapping("/list")
-  public Response getChats() {
-    long userId = 1;
+  public Response getChats(@RequestHeader("userId") long userId) {
     return chatService.getChats(userId);
   }
 
