@@ -1,4 +1,4 @@
-package com.renyibang.taskapi.util;
+package com.renyibang.serviceapi.util;
 
 public class PriceUtil {
     public static long priceConvert(long price)

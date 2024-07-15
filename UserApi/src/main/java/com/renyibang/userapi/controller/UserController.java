@@ -4,18 +4,19 @@ import com.renyibang.global.dto.UserDTO;
 import com.renyibang.global.util.Response;
 import com.renyibang.userapi.dto.Update;
 import com.renyibang.userapi.service.UserService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
-  @Autowired private UserService userService;
+  @Autowired
+  private UserService userService;
 
   @GetMapping("/self")
-  public Response getSelfInfo() {
-    long userId = 1;
+  public Response getSelfInfo(@RequestHeader("userId") long userId) {
     return userService.getUserInfo(userId);
   }
 
@@ -36,7 +37,7 @@ public class UserController {
   public Response getUserInfo_compatible(@PathVariable long userId) {
     return userService.getUserInfo(userId);
   }
-  
+
   @GetMapping("/{userId}/exist")
   boolean getUserExist(@PathVariable long userId) {
     return userService.existsById(userId);

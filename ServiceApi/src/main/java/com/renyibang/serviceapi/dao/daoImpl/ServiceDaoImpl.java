@@ -1,6 +1,6 @@
 package com.renyibang.serviceapi.dao.daoImpl;
 
-import com.renyibang.moduleapi.clients.UserClient;
+import com.renyibang.global.client.UserClient;
 import com.renyibang.serviceapi.dao.ServiceDao;
 import com.renyibang.serviceapi.entity.Service;
 import com.renyibang.serviceapi.entity.ServiceAccess;
@@ -67,14 +67,14 @@ public class ServiceDaoImpl implements ServiceDao {
                 return "该服务已被删除！";
             }
 
-            if(serviceCollectRepository.existsByCollector_idAndAndService(collectorId, service))
+            if(serviceCollectRepository.existsByCollectorIdAndAndService(collectorId, service))
             {
                 return "用户已收藏该服务！";
             }
 
             service.setCollectedNumber(service.getCollectedNumber() + 1);
             ServiceCollect serviceCollect = new ServiceCollect();
-            serviceCollect.setCollector_id(collectorId);
+            serviceCollect.setCollectorId(collectorId);
             serviceCollect.setService(service);
             serviceCollect.setCreatedAt(LocalDateTime.now());
 
@@ -108,7 +108,7 @@ public class ServiceDaoImpl implements ServiceDao {
                 return "该服务已被删除！";
             }
 
-            ServiceCollect serviceCollect = serviceCollectRepository.findByServiceAndCollector_id(service, uncollectorId);
+            ServiceCollect serviceCollect = serviceCollectRepository.findByServiceAndCollectorId(service, uncollectorId);
             if(serviceCollect == null)
             {
                 return "用户未收藏该服务！";
@@ -144,7 +144,7 @@ public class ServiceDaoImpl implements ServiceDao {
                 return "该服务已被下架！";
             }
 
-            if(service.getOwner_id() == accessorId)
+            if(service.getOwnerId() == accessorId)
             {
                 return "不能接取自己发布的服务！";
             }
@@ -154,7 +154,7 @@ public class ServiceDaoImpl implements ServiceDao {
                 return "用户不存在！";
             }
 
-            if(ServiceAccessRepository.existsByAccessor_idAndService(accessorId, service))
+            if(serviceAccessRepository.existsByAccessorIdAndService(accessorId, service))
             {
                 return "用户已经接取该服务！";
             }
@@ -174,7 +174,7 @@ public class ServiceDaoImpl implements ServiceDao {
             }
 
             ServiceAccess serviceAccess = new ServiceAccess();
-            serviceAccess.setAccessor_id(accessorId);
+            serviceAccess.setAccessorId(accessorId);
             serviceAccess.setService(service);
             serviceAccess.setCreatedAt(LocalDateTime.now());
 
@@ -207,7 +207,7 @@ public class ServiceDaoImpl implements ServiceDao {
                 return "用户不存在！";
             }
 
-            ServiceAccess serviceAccess = serviceAccessRepository.findByServiceAndAccessor_id(service, unaccessorId);
+            ServiceAccess serviceAccess = serviceAccessRepository.findByServiceAndAccessorId(service, unaccessorId);
             if(serviceAccess == null)
             {
                 return "用户未接取该服务！";
@@ -234,7 +234,7 @@ public class ServiceDaoImpl implements ServiceDao {
             String imagesURL = ImageUtil.mergeImages(requestImages);
 
             Service service = new Service();
-            service.setOwner_id(userId);
+            service.setOwnerId(userId);
             service.setTitle(title);
             service.setDescription(description);
             service.setPrice(price);

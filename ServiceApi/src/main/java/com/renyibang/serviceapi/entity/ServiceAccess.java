@@ -23,7 +23,7 @@ public class ServiceAccess {
   private Service service; // 服务
 
   @Column(name = "accessor_id")
-  private long accessor_id; // 服务接取者
+  private long accessorId; // 服务接取者
 
   @CreationTimestamp
   @Temporal(TemporalType.TIMESTAMP)
