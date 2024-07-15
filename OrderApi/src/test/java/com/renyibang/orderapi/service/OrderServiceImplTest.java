@@ -1140,4 +1140,73 @@ public class OrderServiceImplTest {
         verify(orderServiceSpy, times(1)).modifyUserBalance(1L, 100L);
         verify(orderDao, times(0)).save(order);
     }
+
+    // modifyUserBalance
+    @Test
+    @DisplayName("Should modify user balance successfully when user exists")
+    public void modifyUserBalanceUserExists() {
+        long userId = 1L;
+        long amount = 100L;
+        UserDTO user = new UserDTO();
+        user.setBalance(500L);
+
+        JSONObject getUserResult = new JSONObject();
+        getUserResult.put("ok", true);
+        getUserResult.put("data", user);
+
+        JSONObject updateUserResult = new JSONObject();
+        updateUserResult.put("ok", true);
+
+        when(userClient.getUserById(userId)).thenReturn(getUserResult);
+        when(userClient.updateUser(any(UserDTO.class))).thenReturn(updateUserResult);
+
+        boolean result = orderService.modifyUserBalance(userId, amount);
+
+        assertTrue(result);
+        verify(userClient, times(1)).getUserById(userId);
+        verify(userClient, times(1)).updateUser(any(UserDTO.class));
+    }
+
+    @Test
+    @DisplayName("Should not modify user balance when user does not exist")
+    public void modifyUserBalanceUserDoesNotExist() {
+        long userId = 1L;
+        long amount = 100L;
+
+        JSONObject getUserResult = new JSONObject();
+        getUserResult.put("ok", false);
+
+        when(userClient.getUserById(userId)).thenReturn(getUserResult);
+
+        boolean result = orderService.modifyUserBalance(userId, amount);
+
+        assertFalse(result);
+        verify(userClient, times(1)).getUserById(userId);
+        verify(userClient, times(0)).updateUser(any(UserDTO.class));
+    }
+
+    @Test
+    @DisplayName("Should not modify user balance when updateUser fails")
+    public void modifyUserBalanceUpdateUserFails() {
+        long userId = 1L;
+        long amount = 100L;
+        UserDTO user = new UserDTO();
+        user.setBalance(500L);
+
+        JSONObject getUserResult = new JSONObject();
+        getUserResult.put("ok", true);
+        getUserResult.put("data", user);
+
+        JSONObject updateUserResult = new JSONObject();
+        updateUserResult.put("ok", false);
+
+        when(userClient.getUserById(userId)).thenReturn(getUserResult);
+        when(userClient.updateUser(any(UserDTO.class))).thenReturn(updateUserResult);
+
+        boolean result = orderService.modifyUserBalance(userId, amount);
+
+        assertFalse(result);
+        verify(userClient, times(1)).getUserById(userId);
+        verify(userClient, times(1)).updateUser(any(UserDTO.class));
+    }
 }
