@@ -19,4 +19,7 @@ public class TaskDTO {
         this.images = images;
         this.time = time;
     }
+
+    public TaskDTO() {
+    }
 }

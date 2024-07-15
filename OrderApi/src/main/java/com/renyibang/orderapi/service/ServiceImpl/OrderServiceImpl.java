@@ -44,7 +44,7 @@ public class OrderServiceImpl implements OrderService {
       OrderDTO orderDTO = new OrderDTO(order);
 
       //  向User module请求accessor信息
-      result = userClient.getUserById(ownerId);
+      result = userClient.getUserById(order.getAccessorId());
       if(!result.getBoolean("ok")) return orderDTOs;
       UserDTO accessor = result.getObject("data", UserDTO.class);
       if(accessor == null) continue;
@@ -140,9 +140,10 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public OrderDTO findById(long orderId) {
     Order order = orderDao.findById(orderId);
+    if (order == null) return null;
+
     OrderDTO orderDTO = new OrderDTO(order);
-    this.mapOrderToOrderDTO(order, orderDTO);
-    return orderDTO;
+    return mapOrderToOrderDTO(order);
   }
 
   @Override
@@ -156,8 +157,36 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public long createOrder(long taskId, long ownerId, long accessorId, long cost, Byte type) {
-    // TODO 校验：任务是否存在
+  public boolean createOrder(long taskId, long ownerId, long accessorId, long cost, Byte type) {
+    // 校验：是否存在
+    // 任务， owner, accessor
+    // cost是否为正数
+
+    // userFeign & taskFeign
+    if (type == 0) {
+      JSONObject result = taskClient.getTaskById(taskId);
+      if(!result.getBoolean("ok")) throw new IllegalArgumentException("任务不存在");
+      TaskDTO task = result.getObject("data", TaskDTO.class);
+      if(task == null) throw new IllegalArgumentException("任务不存在");
+    } else {
+      JSONObject result = serviceClient.getServiceById(taskId);
+      if(!result.getBoolean("ok")) throw new IllegalArgumentException("服务不存在");
+      ServiceDTO service = result.getObject("data", ServiceDTO.class);
+      if(service == null) throw new IllegalArgumentException("服务不存在");
+    }
+
+    // userFeign
+    JSONObject result = userClient.getUserById(ownerId);
+    if(!result.getBoolean("ok")) throw new IllegalArgumentException("发起者不存在");
+    UserDTO owner = result.getObject("data", UserDTO.class);
+    if(owner == null) throw new IllegalArgumentException("发起者不存在");
+
+    result = userClient.getUserById(accessorId);
+    if(!result.getBoolean("ok")) throw new IllegalArgumentException("接收者不存在");
+    UserDTO accessor = result.getObject("data", UserDTO.class);
+    if(accessor == null) throw new IllegalArgumentException("接收者不存在");
+
+    if (cost <= 0) throw new IllegalArgumentException("金额必须为正数");
 
     // Create a new Order
     Order order = new Order();
@@ -168,7 +197,8 @@ public class OrderServiceImpl implements OrderService {
     order.setStatus(OrderStatus.UNPAID);
 
     // Save the Order and return its ID
-    return orderDao.save(order).getOrderId();
+    orderDao.save(order);
+    return true;
   }
 
   @Override
@@ -188,7 +218,9 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public boolean checkOrderStatus(long orderId, OrderStatus status) {
-    return orderDao.findById(orderId).getStatus() == status;
+    Order order = orderDao.findById(orderId);
+    if (order == null) return false;
+    return order.getStatus() == status;
   }
 
   @Override
@@ -242,46 +274,53 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public void mapOrderToOrderDTO(Order order, OrderDTO orderDTO) {
+  public OrderDTO mapOrderToOrderDTO(Order order) {
+    OrderDTO orderDTO = new OrderDTO(order);
+
     //  向User module请求owner信息
     JSONObject result = userClient.getUserById(order.getOwnerId());
-    if(!result.getBoolean("ok")) return;
+    if(!result.getBoolean("ok")) return null;
     UserDTO owner = result.getObject("data", UserDTO.class);
-    if(owner == null) return;
+    if(owner == null) return null;
+
+    System.out.println("owner: " + owner);
 
     //  向User module请求accessor信息
     result = userClient.getUserById(order.getAccessorId());
-    if(!result.getBoolean("ok")) return;
+    if(!result.getBoolean("ok")) return null;
     UserDTO accessor = result.getObject("data", UserDTO.class);
-    if(accessor == null) return;
+    if(accessor == null) return null;
 
     if (order.getType() == 0) {
       // 向Task module请求task信息
       result = taskClient.getTaskById(order.getItemId());
-      if(!result.getBoolean("ok")) return;
+      if(!result.getBoolean("ok")) return null;
       TaskDTO task = result.getObject("data", TaskDTO.class);
-      if(task == null) return;
+      if(task == null) return null;
       orderDTO.setTask(task);
     } else {
       // 向Service module请求service信息
       result = serviceClient.getServiceById(order.getItemId());
-      if(!result.getBoolean("ok")) return;
+      if(!result.getBoolean("ok")) return null;
       ServiceDTO service = result.getObject("data", ServiceDTO.class);
-      if(service == null) return;
+      if(service == null) return null;
       orderDTO.setService(service);
     }
 
     orderDTO.setOrder(order);
     orderDTO.setOwner(owner);
     orderDTO.setAccessor(accessor);
+
+    return orderDTO;
   }
 
   @Override
   public void mapOrdersToOrderDTOs(List<Order> orders, List<OrderDTO> orderDTOs) {
     for (Order order : orders) {
-      OrderDTO orderDTO = new OrderDTO(order);
-      this.mapOrderToOrderDTO(order, orderDTO);
-      orderDTOs.add(orderDTO);
+      OrderDTO orderDTO = this.mapOrderToOrderDTO(order);
+      if (orderDTO != null) {
+        orderDTOs.add(orderDTO);
+      }
     }
   }
 
