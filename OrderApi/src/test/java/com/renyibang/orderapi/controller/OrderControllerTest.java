@@ -40,10 +40,21 @@ public class OrderControllerTest {
 	@InjectMocks
 	private OrderController orderController;
 
+	OrderDTO orderDTO;
+
 	@BeforeEach
 	public void setUp() {
 		MockitoAnnotations.openMocks(this);
 		mockMvc = MockMvcBuilders.standaloneSetup(orderController).build();
+
+		Order validTaskOrder = new Order(1, (byte) 0, 1, 5, OrderStatus.UNPAID, 100, 3);
+		UserDTO validOwner = new UserDTO(1, 3500, "Apple", "apple.png");
+		UserDTO validAccessor = new UserDTO(5, 4900, "Banana", "banana.png");
+		TaskDTO validTask = new TaskDTO(3, "Task 1", "Task 1 Description", "Task 1.png", LocalDateTime.of(2021, 1, 1, 0, 0));
+		this.orderDTO = new OrderDTO(validTaskOrder);
+		this.orderDTO.setOwner(validOwner);
+		this.orderDTO.setAccessor(validAccessor);
+		this.orderDTO.setTask(validTask);
 	}
 
 	@Test
@@ -123,6 +134,7 @@ public class OrderControllerTest {
 	@Test
 	@DisplayName("Should get task order by owner successfully")
 	public void getTaskOrderByOwnerSuccessfully() throws Exception {
+		when(orderService.findByOwnerIdAndType(anyLong(), any(Byte.class))).thenReturn(List.of(orderDTO));
 		mockMvc.perform(get("/api/order/task/initiator/1")
 						.header("userId", 1))
 				.andExpect(status().isOk())
