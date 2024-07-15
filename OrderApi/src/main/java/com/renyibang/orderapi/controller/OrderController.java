@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,11 +30,7 @@ public class OrderController {
   // Long taskId, Long ownerId, Long accessorId, Long cost
   // token中的userId
   @PostMapping("/task/create")
-  public JSONObject createTaskOrder(@RequestBody JSONObject data) {
-    // TODO: token, 获取当前用户id
-    // 测试用: userId = 1
-    int userId = 1;
-
+  public JSONObject createTaskOrder(@RequestBody JSONObject data, @RequestHeader("userId") Long userId) {
     long taskId = data.getLong("taskId");
     long ownerId = data.getLong("ownerId");
     long accessorId = data.getLong("accessorId");
@@ -44,17 +41,23 @@ public class OrderController {
     }
 
     // 创建订单
-    orderService.createOrder(taskId, ownerId, accessorId, cost, (byte) 0);
+    try{
+      orderService.createOrder(taskId, ownerId, accessorId, cost, (byte) 0);
+    } catch (Exception e) {
+      return ResponseUtil.error(e.getMessage());
+    }
     return ResponseUtil.success("订单创建成功");
   }
 
   // 获取指定id的order信息
   // /api/order/{id}
   @GetMapping("/{id}")
-  public JSONObject getOrder(@PathVariable Long id) {
-    // TODO: token, 获取当前用户id
+  public JSONObject getOrder(@PathVariable Long id, @RequestHeader("userId") Long userId) {
     // 身份校验
     OrderDTO order = orderService.findById(id);
+    if(order == null) {
+      return ResponseUtil.error("订单不存在");
+    }
     return ResponseUtil.success(order.getDetail());
   }
 
@@ -87,11 +90,7 @@ public class OrderController {
 
   // 任务完成
   @PostMapping("/task/status")
-  public JSONObject changeTaskOrderStatus(@RequestParam Long orderId, @RequestParam OrderStatus status) {
-    // TODO: token, 获取当前用户id
-    // 测试用: userId = 1
-    int userId = 1;
-
+  public JSONObject changeTaskOrderStatus(@RequestParam Long orderId, @RequestParam OrderStatus status, @RequestHeader("userId") Long userId) {
     Pair<Boolean, String> result = orderService.markOrderStatus(orderId, userId, status);
 
     if (result.getFirst()) {
@@ -102,11 +101,7 @@ public class OrderController {
   }
 
   @PostMapping("/service/status")
-  public JSONObject changeServiceOrderStatus(@RequestParam Long orderId, @RequestParam OrderStatus status) {
-    // TODO: token, 获取当前用户id
-    // 测试用: userId = 1
-    int userId = 1;
-
+  public JSONObject changeServiceOrderStatus(@RequestParam Long orderId, @RequestParam OrderStatus status, @RequestHeader("userId") Long userId) {
     Pair<Boolean, String> result = orderService.markOrderStatus(orderId, userId, status);
 
     if (result.getFirst()) {

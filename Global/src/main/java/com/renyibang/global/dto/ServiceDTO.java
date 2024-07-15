@@ -18,4 +18,7 @@ public class ServiceDTO {
         this.images = images;
         this.time = time;
     }
+
+    public ServiceDTO() {
+    }
 }
