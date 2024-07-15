@@ -32,11 +32,10 @@ CREATE TABLE user
     follower  INT          DEFAULT 0  NOT NULL COMMENT '粉丝数'
 ) comment '用户表';
 
-CREATE TABLE user_auth
+CREATE TABLE auth
 (
     user_id  BIGINT PRIMARY KEY COMMENT '用户id',
     password VARCHAR(16) NOT NULL COMMENT '用户密码',
-    valid    BOOLEAN     NOT NULL COMMENT '用户账号是否被封禁',
     FOREIGN KEY (user_id) REFERENCES user (user_id) ON UPDATE CASCADE ON DELETE CASCADE
 ) COMMENT '用户密码表';
 
@@ -166,7 +165,7 @@ USE renyibang_service;
 
 create table service
 (
-    service_id     bigint auto_increment comment '服务id'
+    service_id  bigint auto_increment comment '服务id'
         primary key,
     owner_id    bigint                              not null comment '服务发布者id',
     title       varchar(32)                         not null comment '服务标题',
@@ -186,9 +185,9 @@ create table service_access
     service_access_id bigint auto_increment comment '服务接取候选id'
         primary key,
     service_id        bigint                              not null comment '服务id',
-    accessor_id    bigint                              not null comment '接取者id',
-    created_at     timestamp default CURRENT_TIMESTAMP not null comment '接取时间',
-    valid          tinyint(1)                          not null comment '接取者是否被拒绝',
+    accessor_id       bigint                              not null comment '接取者id',
+    created_at        timestamp default CURRENT_TIMESTAMP not null comment '接取时间',
+    valid             tinyint(1)                          not null comment '接取者是否被拒绝',
     constraint service_access_ibfk_1
         foreign key (service_id) references service (service_id)
             on update cascade
@@ -203,8 +202,8 @@ create table service_collect
     service_collect_id bigint auto_increment comment '服务收藏id'
         primary key,
     service_id         bigint                              not null comment '服务id',
-    collector_id    bigint                              not null comment '收藏者id',
-    created_at      timestamp default CURRENT_TIMESTAMP not null comment '收藏时间',
+    collector_id       bigint                              not null comment '收藏者id',
+    created_at         timestamp default CURRENT_TIMESTAMP not null comment '收藏时间',
     constraint service_collect_ibfk_1
         foreign key (service_id) references service (service_id)
             on update cascade
@@ -219,11 +218,11 @@ create table service_comment
     service_comment_id bigint auto_increment comment '服务评论id'
         primary key,
     service_id         bigint                              not null comment '服务id',
-    commenter_id    bigint                              not null comment '评论者id',
-    content         text                                not null comment '评论内容',
-    created_at      timestamp default CURRENT_TIMESTAMP not null comment '评论时间',
-    rating          tinyint   default 50                not null comment '评论评分(存储10倍评分,范围0~100)',
-    liked_number    bigint                              not null comment '评论点赞数',
+    commenter_id       bigint                              not null comment '评论者id',
+    content            text                                not null comment '评论内容',
+    created_at         timestamp default CURRENT_TIMESTAMP not null comment '评论时间',
+    rating             tinyint   default 50                not null comment '评论评分(存储10倍评分,范围0~100)',
+    liked_number       bigint                              not null comment '评论点赞数',
     constraint service_comment_ibfk_1
         foreign key (service_id) references service (service_id)
             on update cascade
@@ -238,7 +237,7 @@ create table service_comment_like
     service_comment_like_id bigint auto_increment
         primary key,
     service_comment_id      bigint not null,
-    liker_id             bigint not null,
+    liker_id                bigint not null,
     constraint service_comment_like_service_comment_service_comment_id_fk
         foreign key (service_comment_id) references service_comment (service_comment_id)
 );
@@ -248,10 +247,10 @@ create table service_message
     service_message_id bigint auto_increment comment '服务留言id'
         primary key,
     service_id         bigint                              not null comment '服务id',
-    messager_id     bigint                              not null comment '留言者id',
-    content         text                                not null comment '消息内容',
-    created_at      timestamp default CURRENT_TIMESTAMP not null comment '消息发送时间',
-    liked_number    bigint                              not null comment '任务留言点赞数',
+    messager_id        bigint                              not null comment '留言者id',
+    content            text                                not null comment '消息内容',
+    created_at         timestamp default CURRENT_TIMESTAMP not null comment '消息发送时间',
+    liked_number       bigint                              not null comment '任务留言点赞数',
     constraint service_message_ibfk_1
         foreign key (service_id) references service (service_id)
             on update cascade
@@ -264,7 +263,7 @@ create index service_id
 create table service_message_like
 (
     service_message_id      bigint not null,
-    liker_id             bigint not null,
+    liker_id                bigint not null,
     service_message_like_id bigint auto_increment
         primary key,
     constraint service_message_like_service_message_service_message_id_fk
