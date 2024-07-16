@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 //import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,11 +40,47 @@ public class ServiceServiceImpl implements ServiceService {
     @Autowired
     private UserClient userClient;
 
+    private String isValidInput(LocalDateTime begin, LocalDateTime end, long low, long high)
+    {
+        if(begin == null || end == null)
+        {
+            return "时间格式错误！";
+        }
+
+        else if(begin.isAfter(end))
+        {
+            return "开始时间不能大于结束时间！";
+        }
+
+        else if(low < 0 || (high < 0 && high != -1))
+        {
+            return "价格不能为负数！";
+        }
+
+        else if(high >= 0 && low > high)
+        {
+            return "价格区间错误！";
+        }
+
+        return "OK";
+    }
+
     @Override
     public JSONObject searchServiceByPaging(String keyword, Pageable pageable, String timeBegin, String timeEnd, long priceLow, long priceHigh)
     {
         try {
             JSONArray result = new JSONArray();
+            LocalDateTime begin = DateTimeUtil.getBeginDateTime(timeBegin);
+            LocalDateTime end = DateTimeUtil.getEndDateTime(timeEnd);
+            long high = PriceUtil.priceConvert(priceHigh);
+
+            String isValid = isValidInput(begin, end, priceLow, high);
+
+            if(!Objects.equals("OK", isValid))
+            {
+                return ResponseUtil.error(isValid);
+            }
+
             Page<Service> searchResult = serviceDao.searchServiceByPaging(keyword, pageable, DateTimeUtil.getBeginDateTime(timeBegin), DateTimeUtil.getEndDateTime(timeEnd), priceLow, PriceUtil.priceConvert(priceHigh));
 
             //创建一个list存储用户id
