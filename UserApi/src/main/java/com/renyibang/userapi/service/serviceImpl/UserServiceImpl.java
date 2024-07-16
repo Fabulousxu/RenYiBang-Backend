@@ -60,4 +60,15 @@ public class UserServiceImpl implements UserService {
     userRepository.save(user);
     return Response.success("更新成功");
   }
+
+  @Override
+  public Response getUserDTO(long userId) {
+    User user = userRepository.findById(userId).orElse(null);
+    if (user == null) return Response.error("用户不存在");
+    UserDTO userDTO = new UserDTO();
+    userDTO.setId(user.getUserId());
+    userDTO.setNickname(user.getNickname());
+    userDTO.setAvatar(user.getAvatar());
+    return Response.success(userDTO);
+  }
 }

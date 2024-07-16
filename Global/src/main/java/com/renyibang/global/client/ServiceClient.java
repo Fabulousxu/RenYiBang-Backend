@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "service")
+@FeignClient(name = "ServiceApi")
 public interface ServiceClient {
     // Order 模块的调用
 	/*
@@ -18,7 +18,7 @@ public interface ServiceClient {
 		LocalDateTime time;
 	}
 	 */
-    @GetMapping("/{id}")
-    JSONObject getServiceById(@PathVariable("id") Long itemId);
+    @GetMapping("/api/service/getService/{serviceId}")
+    JSONObject getServiceById(@PathVariable Long serviceId);
     //////////////////////
 }

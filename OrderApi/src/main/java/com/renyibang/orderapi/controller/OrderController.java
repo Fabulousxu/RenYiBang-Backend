@@ -13,6 +13,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +30,7 @@ public class OrderController {
   // /task/create
   // Long taskId, Long ownerId, Long accessorId, Long cost
   // token中的userId
-  @PostMapping("/task/create")
+  @PutMapping("/task/create")
   public JSONObject createTaskOrder(@RequestBody JSONObject data, @RequestHeader("userId") Long userId) {
     long taskId = data.getLong("taskId");
     long ownerId = data.getLong("ownerId");
@@ -49,6 +50,26 @@ public class OrderController {
     return ResponseUtil.success("订单创建成功");
   }
 
+  @PutMapping("/service/create")
+  public JSONObject createServiceOrder(@RequestBody JSONObject data, @RequestHeader("userId") Long userId) {
+    long serviceId = data.getLong("serviceId");
+    long ownerId = data.getLong("ownerId");
+    long accessorId = data.getLong("accessorId");
+    long cost = data.getLong("cost");
+    // 校验ownerId是否为当前用户
+    if (ownerId != userId) {
+      return ResponseUtil.error("ownerId不匹配");
+    }
+
+    // 创建订单
+    try{
+      orderService.createOrder(serviceId, ownerId, accessorId, cost, (byte) 1);
+    } catch (Exception e) {
+      return ResponseUtil.error(e.getMessage());
+    }
+    return ResponseUtil.success("订单创建成功");
+  }
+
   // 获取指定id的order信息
   // /api/order/{id}
   @GetMapping("/{id}")
@@ -58,51 +79,38 @@ public class OrderController {
     if(order == null) {
       return ResponseUtil.error("订单不存在");
     }
+    if (order.getOwner().getId() != userId && order.getAccessor().getId() != userId) {
+      return ResponseUtil.error("无权查看订单");
+    }
     return ResponseUtil.success(order.getDetail());
   }
 
-  // /task/owner/:ownerId
-  @GetMapping("/task/initiator/{ownerId}")
-  public JSONObject getTaskOrderByOwner(@PathVariable Long ownerId) {
-    // TODO：取消路径参数，使用token获取用户id
-    List<OrderDTO> taskOrders = orderService.findByOwnerIdAndType(ownerId, (byte) 0);
+  @GetMapping("/task/initiator")
+  public JSONObject getTaskOrderByOwner(@RequestHeader("userId") Long userId) {
+    List<OrderDTO> taskOrders = orderService.findByOwnerIdAndType(userId, (byte) 0);
     return ResponseUtil.success(toJSON(taskOrders));
   }
 
-  @GetMapping("/task/recipient/{accessorId}")
-  public JSONObject getTaskOrderByAccessor(@PathVariable Long accessorId) {
-    // TODO：取消路径参数，使用token获取用户id
-    List<OrderDTO> taskOrders = orderService.findByAccessorIdAndType(accessorId, (byte) 0);
+  @GetMapping("/task/recipient")
+  public JSONObject getTaskOrderByAccessor(@RequestHeader("userId") Long userId) {
+    List<OrderDTO> taskOrders = orderService.findByAccessorIdAndType(userId, (byte) 0);
     return ResponseUtil.success(toJSON(taskOrders));
   }
-  @GetMapping("/service/initiator/{ownerId}")
-  public JSONObject getServiceOrderByOwner(@PathVariable Long ownerId) {
-    // TODO：取消路径参数，使用token获取用户id
-    List<OrderDTO> serviceOrders = orderService.findByOwnerIdAndType(ownerId, (byte) 1);
+  @GetMapping("/service/initiator")
+  public JSONObject getServiceOrderByOwner(@RequestHeader("userId") Long userId) {
+    List<OrderDTO> serviceOrders = orderService.findByOwnerIdAndType(userId, (byte) 1);
     return ResponseUtil.success(toJSON(serviceOrders));
   }
-  @GetMapping("/service/recipient/{accessorId}")
-  public JSONObject getServiceOrderByAccessor(@PathVariable Long accessorId) {
-    // TODO：取消路径参数，使用token获取用户id
-    List<OrderDTO> serviceOrders = orderService.findByAccessorIdAndType(accessorId, (byte) 1);
+  @GetMapping("/service/recipient")
+  public JSONObject getServiceOrderByAccessor(@RequestHeader("userId") Long userId) {
+    List<OrderDTO> serviceOrders = orderService.findByAccessorIdAndType(userId, (byte) 1);
     return ResponseUtil.success(toJSON(serviceOrders));
   }
 
   // 任务完成
-  @PostMapping("/task/status")
-  public JSONObject changeTaskOrderStatus(@RequestParam Long orderId, @RequestParam OrderStatus status, @RequestHeader("userId") Long userId) {
-    Pair<Boolean, String> result = orderService.markOrderStatus(orderId, userId, status);
-
-    if (result.getFirst()) {
-      return ResponseUtil.success("订单状态修改成功");
-    } else {
-      return ResponseUtil.error(result.getSecond());
-    }
-  }
-
-  @PostMapping("/service/status")
-  public JSONObject changeServiceOrderStatus(@RequestParam Long orderId, @RequestParam OrderStatus status, @RequestHeader("userId") Long userId) {
-    Pair<Boolean, String> result = orderService.markOrderStatus(orderId, userId, status);
+  @PostMapping("/status")
+  public JSONObject changeOrderStatus(@RequestParam Long orderId, @RequestParam Long status, @RequestHeader("userId") Long userId) {
+    Pair<Boolean, String> result = orderService.markOrderStatus(orderId, userId, OrderStatus.fromCode(Math.toIntExact(status)));
 
     if (result.getFirst()) {
       return ResponseUtil.success("订单状态修改成功");
