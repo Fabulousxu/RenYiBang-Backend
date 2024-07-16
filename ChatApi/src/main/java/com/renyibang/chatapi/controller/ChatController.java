@@ -11,15 +11,16 @@ public class ChatController {
   @Autowired private ChatService chatService;
 
   @GetMapping("/list")
-  public Response getChats() {
-    long userId = 1;
+  public Response getChats(@RequestHeader("userId") long userId) {
     return chatService.getChats(userId);
   }
 
   @PostMapping("/enter/{type}/{ofId}")
   public Response initiateChat(
       @PathVariable String type, @PathVariable long ofId, @RequestHeader("userId") long userId) {
-    return chatService.initiateChat(userId, (byte) (type.equals("task") ? 0 : 1), ofId);
+    if (type.equals("task")) return chatService.initiateChat(userId, (byte) 0, ofId);
+    else if (type.equals("service")) return chatService.initiateChat(userId, (byte) 1, ofId);
+    else return Response.error("类型错误");
   }
 
   @GetMapping("/history")

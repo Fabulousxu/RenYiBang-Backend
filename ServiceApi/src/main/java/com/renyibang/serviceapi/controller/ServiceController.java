@@ -209,4 +209,20 @@ public class ServiceController {
         long publisherId = 1;
         return serviceService.publishService(userId, body);
     }
+
+    // 以下为后端模块API接口
+
+    //order模块调用
+    @GetMapping("/getService/{serviceId}")
+    public JSONObject getServiceDtoById(@PathVariable long serviceId)
+    {
+        return serviceService.getServiceDtoById(serviceId);
+    }
+
+    //chat模块调用
+    @GetMapping("/{serviceId}/ownerId")
+    public JSONObject getServiceOwnerId(@PathVariable long serviceId)
+    {
+        return serviceService.getServiceOwnerId(serviceId);
+    }
 }

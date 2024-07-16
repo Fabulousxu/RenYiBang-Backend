@@ -22,7 +22,7 @@ public class UserController {
 
   @GetMapping("/{userId}")
   public Response getUserInfo(@PathVariable long userId) {
-    return userService.getUserInfo(userId);
+    return userService.getUserDTO(userId);
   }
 
   @PostMapping("/self/update")
