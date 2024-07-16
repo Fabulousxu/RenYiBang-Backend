@@ -7,6 +7,7 @@ import com.renyibang.chatapi.dao.MessageRepository;
 import com.renyibang.chatapi.entity.Chat;
 import com.renyibang.chatapi.entity.Message;
 import com.renyibang.chatapi.service.ChatService;
+import com.renyibang.global.client.ServiceClient;
 import com.renyibang.global.client.TaskClient;
 import com.renyibang.global.client.UserClient;
 import com.renyibang.global.util.Response;
@@ -26,6 +27,7 @@ public class ChatServiceImpl implements ChatService {
   @Autowired private MessageRepository messageRepository;
   @Autowired private UserClient userClient;
   @Autowired private TaskClient taskClient;
+  @Autowired private ServiceClient serviceClient;
 
   private JSONObject getChatJson(Chat chat, long userId) {
     long chatterId = chat.getOfOwnerId() == userId ? chat.getChatterId() : chat.getOfOwnerId();
@@ -70,16 +72,11 @@ public class ChatServiceImpl implements ChatService {
   public Response initiateChat(long userId, byte type, long ofId) {
     Chat chat = chatRepository.findByTypeAndOfIdAndChatterId(type, ofId, userId).orElse(null);
     if (chat == null) {
-      // 服务模块也要加
-      JSONObject res = taskClient.getTaskOwnerId(ofId);
+      JSONObject res =
+          type == 0 ? taskClient.getTaskOwnerId(ofId) : serviceClient.getServiceOwnerId(ofId);
       if (!res.getBooleanValue("ok")) return Response.error(res.getString("message"));
       long ofOwnerId = res.getLongValue("data");
-      chat = new Chat();
-      chat.setType(type);
-      chat.setOfId(ofId);
-      chat.setOfOwnerId(ofOwnerId);
-      chat.setChatterId(userId);
-      chat.setLastMessageSenderId(userId);
+      chat = new Chat(type, ofId, ofOwnerId, userId);
       chatRepository.save(chat);
     }
     return Response.success(JSONObject.of("chatId", chat.getChatId()));
