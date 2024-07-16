@@ -5,6 +5,7 @@ import com.renyibang.global.dto.ServiceDTO;
 import com.renyibang.global.dto.TaskDTO;
 import com.renyibang.global.dto.UserDTO;
 import com.renyibang.orderapi.entity.Order;
+import java.util.Collections;
 import lombok.Data;
 
 @Data
@@ -48,7 +49,7 @@ public class OrderDTO {
 		json.put("recipient_img", accessor.getAvatar());
 		json.put("status", order.getStatus().getCode());
 		json.put("time", order.getType() == 0 ? task.getTime() : service.getTime());
-		json.put("order_img", order.getType() == 0 ? task.getImages() : service.getImages());
+		json.put("order_img", order.getType() == 0 ? Collections.singletonList(task.getImages()) : Collections.singletonList(service.getImages()));
 		json.put("description", order.getType() == 0 ? task.getDescription() : service.getDescription());
 		return json;
 	}
