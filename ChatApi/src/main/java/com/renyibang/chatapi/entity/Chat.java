@@ -2,14 +2,15 @@ package com.renyibang.chatapi.entity;
 
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
 
 @Data
+@NoArgsConstructor
 @Document("chat")
 public class Chat {
   @MongoId private String chatId;
@@ -25,4 +26,12 @@ public class Chat {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   @Indexed
   private LocalDateTime lastMessageCreatedAt;
+
+  public Chat(byte type, long ofId, long ofOwnerId, long chatterId) {
+    this.type = type;
+    this.ofId = ofId;
+    this.ofOwnerId = ofOwnerId;
+    this.chatterId = chatterId;
+    this.lastMessageSenderId = chatterId;
+  }
 }

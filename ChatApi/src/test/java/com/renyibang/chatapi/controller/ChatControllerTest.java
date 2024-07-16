@@ -38,12 +38,30 @@ public class ChatControllerTest {
   }
 
   @Test
-  public void initiateChatTest() throws Exception {
+  public void initiateChatTest1() throws Exception {
     when(chatService.initiateChat(anyLong(), anyByte(), anyLong())).thenReturn(Response.success());
     mockMvc
         .perform(post("/api/chat/enter/task/1").header("userId", 1))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.ok").value(true));
+  }
+
+  @Test
+  public void initiateChatTest2() throws Exception {
+    when(chatService.initiateChat(anyLong(), anyByte(), anyLong())).thenReturn(Response.success());
+    mockMvc
+        .perform(post("/api/chat/enter/service/1").header("userId", 1))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.ok").value(true));
+  }
+
+  @Test
+  public void initiateChatTest3() throws Exception {
+    when(chatService.initiateChat(anyLong(), anyByte(), anyLong())).thenReturn(Response.success());
+    mockMvc
+        .perform(post("/api/chat/enter/other/1").header("userId", 1))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.ok").value(false));
   }
 
   @Test
