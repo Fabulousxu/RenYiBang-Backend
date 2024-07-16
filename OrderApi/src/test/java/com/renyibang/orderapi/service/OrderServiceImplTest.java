@@ -22,6 +22,7 @@ import org.hibernate.grammars.hql.HqlParser.LocalDateTimeContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -31,12 +32,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.util.Pair;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@ExtendWith(SpringExtension.class)
 public class OrderServiceImplTest {
     @InjectMocks
     private OrderServiceImpl orderService;
