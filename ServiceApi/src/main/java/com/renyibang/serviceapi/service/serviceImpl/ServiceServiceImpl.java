@@ -81,7 +81,7 @@ public class ServiceServiceImpl implements ServiceService {
                 return ResponseUtil.error(isValid);
             }
 
-            Page<Service> searchResult = serviceDao.searchServiceByPaging(keyword, pageable, DateTimeUtil.getBeginDateTime(timeBegin), DateTimeUtil.getEndDateTime(timeEnd), priceLow, PriceUtil.priceConvert(priceHigh));
+            Page<Service> searchResult = serviceDao.searchServiceByPaging(keyword, pageable, DateTimeUtil.getBeginDateTime(timeBegin), DateTimeUtil.getEndDateTime(timeEnd), priceLow, priceHigh);
 
             //创建一个list存储用户id
             List<Long> userIds = new ArrayList<>();
