@@ -356,7 +356,7 @@ public class ServiceControllerTest {
         JSONObject expectedResponse = new JSONObject();
         expectedResponse.put("success", true);
         // 配置模拟对象的行为
-        given(serviceService.publishService(anyLong(), any(ServiceDTO.class))).willReturn(expectedResponse);
+        given(serviceService.publishService(anyLong(), any(JSONObject.class))).willReturn(expectedResponse);
         // 执行测试
         mockMvc.perform(put("/api/service")
                         .param("userId", "1"))
