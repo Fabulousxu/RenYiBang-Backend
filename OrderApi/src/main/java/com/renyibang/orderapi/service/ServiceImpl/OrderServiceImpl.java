@@ -142,7 +142,6 @@ public class OrderServiceImpl implements OrderService {
     Order order = orderDao.findById(orderId);
     if (order == null) return null;
 
-    OrderDTO orderDTO = new OrderDTO(order);
     return mapOrderToOrderDTO(order);
   }
 
@@ -195,6 +194,7 @@ public class OrderServiceImpl implements OrderService {
     order.setAccessorId(accessorId);
     order.setCost(cost);
     order.setStatus(OrderStatus.UNPAID);
+    order.setType(type);
 
     // Save the Order and return its ID
     orderDao.save(order);
@@ -282,8 +282,6 @@ public class OrderServiceImpl implements OrderService {
     if(!result.getBoolean("ok")) return null;
     UserDTO owner = result.getObject("data", UserDTO.class);
     if(owner == null) return null;
-
-    System.out.println("owner: " + owner);
 
     //  向User module请求accessor信息
     result = userClient.getUserById(order.getAccessorId());

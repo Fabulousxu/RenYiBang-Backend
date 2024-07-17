@@ -47,10 +47,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     List<WebSocketSession> senderSessionList = userSessionMap.get(senderId);
     List<WebSocketSession> receiverSessionList =
         userSessionMap.getOrDefault(receiverId, new CopyOnWriteArrayList<>());
-    Message chatMessage = new Message();
-    chatMessage.setChatId(chatId);
-    chatMessage.setSenderId(senderId);
-    chatMessage.setContent(json.getString("content"));
+    Message chatMessage = new Message(chatId, senderId, json.getString("content"));
     messageRepository.save(chatMessage);
     if (receiverSessionList.isEmpty()) chat.setUnreadCount(chat.getUnreadCount() + 1);
     chat.setLastMessageSenderId(senderId);
