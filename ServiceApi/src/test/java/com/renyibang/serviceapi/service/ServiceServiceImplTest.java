@@ -61,26 +61,27 @@ public class ServiceServiceImplTest {
     @BeforeEach
     public void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(serviceService).build();
+        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         service = new Service();
         service.setOwnerId(1L);
         service.setTitle("test");
         service.setDescription("test");
         service.setPrice(1000);
-        service.setCreatedAt(LocalDateTime.parse("2024-06-01 00:00:00", formatter));
+        service.setCreatedAt(LocalDateTime.parse("2024-06-01 01:00:00", formatter));
+        servicelist = new ArrayList<>();
         servicelist.add(service);
         servicepage = new PageImpl<>(servicelist);
         pageable = PageRequest.of(0, 10);
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         begintime = LocalDateTime.parse("2024-06-01 00:00:00", formatter);
         endtime = LocalDateTime.parse("2024-06-02 00:00:00", formatter);
+        successResponse = new JSONObject();
+        errorResponse = new JSONObject();
         successResponse.put("ok", true);
         errorResponse.put("ok", false);
     }
 
     @Test
     public void testSearchServiceByPaging() {
-        LocalDateTime begintime = LocalDateTime.parse("2024-06-01 00:00:00", formatter);
-        LocalDateTime endtime = LocalDateTime.parse("2024-06-02 00:00:00", formatter);
         JSONArray userIds = new JSONArray();
         userIds.add(1L);
         JSONObject userObject = new JSONObject();
@@ -91,7 +92,7 @@ public class ServiceServiceImplTest {
         when(userClient.getUserInfos(anyList())).thenReturn(userObject);
 
         //执行测试
-        JSONObject page = serviceService.searchServiceByPaging("test", pageable, begintime.toString(), endtime.toString(), 1, 10000);
+        JSONObject page = serviceService.searchServiceByPaging("test", pageable, begintime.toString(), endtime.toString(), 1L, 10000L);
         assert page.get("ok").equals(true);
     }
 
