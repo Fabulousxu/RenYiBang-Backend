@@ -13,7 +13,6 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/service")
-@CrossOrigin
 public class ServiceController {
     @Autowired ServiceService serviceService;
 

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/task")
-@CrossOrigin
 public class TaskController {
   @Autowired TaskService taskService;
 
