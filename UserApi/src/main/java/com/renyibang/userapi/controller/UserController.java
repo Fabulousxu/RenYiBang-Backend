@@ -26,8 +26,7 @@ public class UserController {
   }
 
   @PostMapping("/self/update")
-  public Response updateUserInfo(@RequestBody Update update) {
-    long userId = 1;
+  public Response updateUserInfo(@RequestBody Update update, @RequestHeader("userId") long userId){
     return userService.updateUserInfo(userId, update);
   }
 
