@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 
+/**
+ * @author asus
+ */
 @Service
 public class TaskServiceImpl implements TaskService {
     @Autowired
@@ -53,12 +56,12 @@ public class TaskServiceImpl implements TaskService {
             return "开始时间不能大于结束时间！";
         }
 
-        else if(low < 0 || (high < 0 && high != -1))
+        else if(low < 0 || (high < 0))
         {
             return "价格不能为负数！";
         }
 
-        else if(high >= 0 && low > high)
+        else if(low > high)
         {
             return "价格区间错误！";
         }
