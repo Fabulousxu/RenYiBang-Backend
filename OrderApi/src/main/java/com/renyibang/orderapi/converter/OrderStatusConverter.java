@@ -1,4 +1,4 @@
-package com.example.renyibang.converter;
+package com.renyibang.orderapi.converter;
 
 import com.renyibang.orderapi.enums.OrderStatus;
 import jakarta.persistence.AttributeConverter;
