@@ -138,7 +138,7 @@ public class OrderControllerTest {
 	}
 
 	@Test
-	@DisplayName("Should get order successfully")
+	@DisplayName("Owner Should get order successfully")
 	public void getOrderSuccessfully() throws Exception {
 		TaskDTO taskDTO = new TaskDTO(1, "task", "task description", "test.jpg", LocalDateTime.of(2021, 1, 1, 0, 0));
 		UserDTO owner = new UserDTO(1, 10000, "owner", "owner.jpg");
@@ -154,6 +154,28 @@ public class OrderControllerTest {
 
 		mockMvc.perform(get("/api/order/1")
 						.header("userId", 1))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.ok").value(true))
+				.andExpect(jsonPath("$.data").exists());
+	}
+
+	@Test
+	@DisplayName("Accessor Should get order successfully")
+	public void getAccessorOrderSuccessfully() throws Exception {
+		TaskDTO taskDTO = new TaskDTO(1, "task", "task description", "test.jpg", LocalDateTime.of(2021, 1, 1, 0, 0));
+		UserDTO owner = new UserDTO(1, 10000, "owner", "owner.jpg");
+		UserDTO accessor = new UserDTO(2, 10000, "accessor", "accessor.jpg");
+		Order order = new Order(1, (byte) 0, 1, 2, OrderStatus.UNPAID, 100, 1);
+
+		OrderDTO orderDTO = new OrderDTO(order);
+		orderDTO.setTask(taskDTO);
+		orderDTO.setOwner(owner);
+		orderDTO.setAccessor(accessor);
+
+		when(orderService.findById(anyLong())).thenReturn(orderDTO);
+
+		mockMvc.perform(get("/api/order/1")
+						.header("userId", 2))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.ok").value(true))
 				.andExpect(jsonPath("$.data").exists());

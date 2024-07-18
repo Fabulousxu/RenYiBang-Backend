@@ -7,13 +7,15 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TaskMessageDao {
-    Page<TaskMessage> getTaskMessages(long taskId, Pageable pageable);
+  Page<TaskMessage> getTaskMessages(long taskId, Pageable pageable);
 
-    String likeMessageByTaskMessageId(long taskMessageId, long likerId);
+  String likeMessageByTaskMessageId(long taskMessageId, long likerId);
 
-    String unlikeMessageByTaskMessageId(long taskMessageId, long unlikerId);
+  String unlikeMessageByTaskMessageId(long taskMessageId, long unlikerId);
 
-    String putMessage(long taskId, long userId, String content);
+  String putMessage(long taskId, long userId, String content);
 
-    String deleteMessage(long taskMessageId, long userId);
+  String deleteMessage(long taskMessageId, long userId);
+
+  boolean isLiked(long taskMessageId, long likerId);
 }
