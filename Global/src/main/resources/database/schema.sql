@@ -69,6 +69,9 @@ create table task
 )
     comment '任务表';
 
+alter table task add fulltext index title (title) with parser ngram;
+alter table task add fulltext index description (description) with parser ngram;
+
 create table task_access
 (
     task_access_id bigint auto_increment comment '任务接取候选id'

@@ -10,12 +10,13 @@ import com.renyibang.taskapi.repository.TaskAccessRepository;
 import com.renyibang.taskapi.repository.TaskCollectRepository;
 import com.renyibang.taskapi.repository.TaskRepository;
 import com.renyibang.taskapi.util.ImageUtil;
-import java.time.LocalDateTime;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public class TaskDaoImpl implements TaskDao {
@@ -42,7 +43,7 @@ public class TaskDaoImpl implements TaskDao {
       long priceHigh) {
     if (!keyword.isEmpty()) {
       return taskRepository.searchTasks(
-          keyword, priceLow, priceHigh, beginDateTime, endDateTime, TaskStatus.DELETE, pageable);
+              keyword, priceLow, priceHigh, beginDateTime, endDateTime, TaskStatus.DELETE, pageable);
     } else {
       return taskRepository.findByPriceBetweenAndCreatedAtBetweenAndStatusNot(
           priceLow, priceHigh, beginDateTime, endDateTime, TaskStatus.DELETE, pageable);
