@@ -66,7 +66,7 @@ public class ServiceServiceImpl implements ServiceService {
     }
 
     @Override
-    public JSONObject searchServiceByPaging(String keyword, Pageable pageable, String timeBegin, String timeEnd, long priceLow, long priceHigh)
+    public JSONObject searchServiceByPaging(String keyword, Pageable pageable, String timeBegin, String timeEnd, long priceLow, long priceHigh, long userId)
     {
         try {
             JSONArray result = new JSONArray();
@@ -114,6 +114,7 @@ public class ServiceServiceImpl implements ServiceService {
                 Service service = searchResult.getContent().get(i);
                 JSONObject serviceJson = service.toJSON();
                 serviceJson.put("owner", userInfosArray.get(i));
+                serviceJson.put("collected", serviceDao.isCollected(service.getServiceId(), userId));
                 result.add(serviceJson);
             }
 
@@ -130,7 +131,7 @@ public class ServiceServiceImpl implements ServiceService {
     }
 
     @Override
-    public JSONObject getServiceInfo(long taskId)
+    public JSONObject getServiceInfo(long taskId, long userId)
     {
         try
         {
@@ -149,6 +150,7 @@ public class ServiceServiceImpl implements ServiceService {
             }
 
             serviceJson.put("owner", response.get("data"));
+            serviceJson.put("collected", serviceDao.isCollected(result.getServiceId(), result.getOwnerId()));
 
             return ResponseUtil.success(serviceJson);
 
@@ -160,7 +162,7 @@ public class ServiceServiceImpl implements ServiceService {
     }
 
     @Override
-    public JSONObject getServiceComments(long serviceId, Pageable pageable)
+    public JSONObject getServiceComments(long serviceId, Pageable pageable, long userId)
     {
         try
         {
@@ -195,6 +197,7 @@ public class ServiceServiceImpl implements ServiceService {
                 ServiceComment comment = getResult.getContent().get(i);
                 JSONObject serviceCommentJson = comment.toJSON();
                 serviceCommentJson.put("commenter", userInfosArray.get(i));
+                serviceCommentJson.put("liked", serviceCommentDao.isLiked(comment.getServiceCommentId(), userId));
                 result.add(serviceCommentJson);
             }
 
@@ -211,7 +214,7 @@ public class ServiceServiceImpl implements ServiceService {
     }
 
     @Override
-    public JSONObject getServiceMessages(long serviceId, Pageable pageable)
+    public JSONObject getServiceMessages(long serviceId, Pageable pageable, long userId)
     {
         try
         {
@@ -246,6 +249,7 @@ public class ServiceServiceImpl implements ServiceService {
                 ServiceMessage serviceMessage = getResult.getContent().get(i);
                 JSONObject serviceMessageJson = serviceMessage.toJSON();
                 serviceMessageJson.put("messager", userInfosArray.get(i));
+                serviceMessageJson.put("liked", serviceMessageDao.isLiked(serviceMessage.getServiceMessageId(), userId));
                 result.add(serviceMessageJson);
             }
 

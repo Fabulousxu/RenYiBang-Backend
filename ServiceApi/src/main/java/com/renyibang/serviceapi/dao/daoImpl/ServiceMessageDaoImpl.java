@@ -160,4 +160,16 @@ public class ServiceMessageDaoImpl implements ServiceMessageDao {
             throw e;
         }
     }
+
+    @Override
+    public boolean isLiked(long serviceMessageId, long likerId)
+    {
+        ServiceMessage serviceMessage = serviceMessageRepository.findById(serviceMessageId).orElse(null);
+        if(serviceMessage == null)
+        {
+            return false;
+        }
+
+        return serviceMessageLikeRepository.existsByLikerIdAndServiceMessage(likerId, serviceMessage);
+    }
 }

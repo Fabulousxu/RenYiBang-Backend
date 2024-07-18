@@ -16,4 +16,6 @@ public interface ServiceCommentDao {
     String putComment(long serviceId, long userId, String content, byte rating);
 
     String deleteComment(long serviceCommentId, long userId);
+
+    boolean isLiked(long serviceCommentId, long likerId);
 }

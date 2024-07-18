@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface ServiceService {
-    JSONObject searchServiceByPaging(String keyword, Pageable pageable, String timeBegin, String timeEnd, long priceLow, long priceHigh);
+    JSONObject searchServiceByPaging(String keyword, Pageable pageable, String timeBegin, String timeEnd, long priceLow, long priceHigh, long userId);
 
-    JSONObject getServiceInfo(long serviceId);
+    JSONObject getServiceInfo(long serviceId, long userId);
 
-    JSONObject getServiceComments(long serviceId, Pageable pageable);
+    JSONObject getServiceComments(long serviceId, Pageable pageable, long userId);
 
-    JSONObject getServiceMessages(long serviceId, Pageable pageable);
+    JSONObject getServiceMessages(long serviceId, Pageable pageable, long userId);
 
     JSONObject likeComment(long serviceCommentId, long likerId);
 
