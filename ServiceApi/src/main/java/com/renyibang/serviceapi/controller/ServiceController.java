@@ -150,7 +150,7 @@ public class ServiceController {
         return serviceService.accessService(serviceId, userId);
     }
 
-    @PutMapping("/{serviceId}/unaccess")
+    @DeleteMapping("/{serviceId}/unaccess")
     public JSONObject unaccessService(@PathVariable long serviceId, @RequestHeader long userId)
     {
         return serviceService.unaccessService(serviceId, userId);
