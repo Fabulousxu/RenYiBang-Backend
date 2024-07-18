@@ -19,6 +19,8 @@ public class ServiceController {
     @GetMapping("/search")
     public JSONObject searchService(String keyword, int pageSize, int pageIndex, String order, String timeBegin, String timeEnd, long priceLow, long priceHigh)
     {
+        System.out.println("searchService");
+
         Sort sort;
 
         if(Objects.equals(order, "time"))
@@ -33,9 +35,10 @@ public class ServiceController {
 
         else
         {
-            return ResponseUtil.error("Undefined order");
+            return ResponseUtil.error("排序类型错误");
         }
 
+        if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
         Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
 
         return serviceService.searchServiceByPaging(keyword, pageable, timeBegin, timeEnd, priceLow, priceHigh);
@@ -64,9 +67,10 @@ public class ServiceController {
 
         else
         {
-            return ResponseUtil.error("Undefined order");
+            return ResponseUtil.error("排序类型错误");
         }
 
+        if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
         Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
 
         return serviceService.getServiceComments(serviceId, pageable);
@@ -89,123 +93,90 @@ public class ServiceController {
 
         else
         {
-            return ResponseUtil.error("Undefined order");
+            return ResponseUtil.error("排序类型错误");
         }
 
+        if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
         Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
 
         return serviceService.getServiceMessages(serviceId, pageable);
     }
 
     @PutMapping("/comment/{serviceCommentId}/like")
-    public JSONObject likeComment(@PathVariable long serviceCommentId)
+    public JSONObject likeComment(@PathVariable long serviceCommentId, @RequestHeader long userId)
     {
-        //userId待替换
-        long likerId = 1;
-
-        return serviceService.likeComment(serviceCommentId, likerId);
+        return serviceService.likeComment(serviceCommentId, userId);
     }
 
     @DeleteMapping("/comment/{serviceCommentId}/unlike")
-    public JSONObject unlikeComment(@PathVariable long serviceCommentId)
+    public JSONObject unlikeComment(@PathVariable long serviceCommentId, @RequestHeader long userId)
     {
-        //userId待替换
-        long unlikerId = 1;
-
-        return serviceService.unlikeComment(serviceCommentId, unlikerId);
+        return serviceService.unlikeComment(serviceCommentId, userId);
     }
 
     @PutMapping("/message/{serviceMessageId}/like")
-    public JSONObject likeMessage(@PathVariable long serviceMessageId)
+    public JSONObject likeMessage(@PathVariable long serviceMessageId, @RequestHeader long userId)
     {
-        //userId待替换
-        long likerId = 1;
-
-        return serviceService.likeMessage(serviceMessageId, likerId);
+        return serviceService.likeMessage(serviceMessageId, userId);
     }
 
     @DeleteMapping("/message/{serviceMessageId}/unlike")
-    public JSONObject unlikeMessage(@PathVariable long serviceMessageId)
+    public JSONObject unlikeMessage(@PathVariable long serviceMessageId, @RequestHeader long userId)
     {
-        //userId待替换
-        long unlikerId = 1;
-
-        return serviceService.unlikeMessage(serviceMessageId, unlikerId);
+        return serviceService.unlikeMessage(serviceMessageId, userId);
     }
 
     @PutMapping("/{serviceId}/collect")
-    public JSONObject collectService(@PathVariable long serviceId)
+    public JSONObject collectService(@PathVariable long serviceId, @RequestHeader long userId)
     {
-        //userId待替换
-        long collectorId = 1;
-
-        return serviceService.collectService(serviceId, collectorId);
+        return serviceService.collectService(serviceId, userId);
     }
 
     @DeleteMapping("/{serviceId}/uncollect")
-    public JSONObject uncollectService(@PathVariable long serviceId)
+    public JSONObject uncollectService(@PathVariable long serviceId, @RequestHeader long userId)
     {
-        //userId待替换
-        long uncollectorId = 1;
-
-        return serviceService.uncollectService(serviceId, uncollectorId);
+        return serviceService.uncollectService(serviceId, userId);
     }
 
     @PutMapping("/{serviceId}/access")
-    public JSONObject accessService(@PathVariable long serviceId, long userId)
+    public JSONObject accessService(@PathVariable long serviceId, @RequestHeader long userId)
     {
-        //userId待替换
-        long accessorId = 1;
-
         return serviceService.accessService(serviceId, userId);
     }
 
     @PutMapping("/{serviceId}/unaccess")
-    public JSONObject unaccessService(@PathVariable long serviceId, long userId)
+    public JSONObject unaccessService(@PathVariable long serviceId, @RequestHeader long userId)
     {
-        //userId待替换
-        long unaccessorId = 1;
-
         return serviceService.unaccessService(serviceId, userId);
     }
 
     @PutMapping("/{serviceId}/message")
-    public JSONObject publishMessage(@PathVariable long serviceId, @RequestBody JSONObject body, long userId)
+    public JSONObject publishMessage(@PathVariable long serviceId, @RequestBody JSONObject body, @RequestHeader long userId)
     {
-        //userId待替换
-        long messagerId = 1;
         return serviceService.publishMessage(serviceId, userId, body);
     }
 
     @DeleteMapping("/message/{serviceMessageId}")
-    public JSONObject deleteMessage(@PathVariable long serviceMessageId, long userId)
+    public JSONObject deleteMessage(@PathVariable long serviceMessageId, @RequestHeader long userId)
     {
-        //userId待替换
-        long messagerId = 1;
         return serviceService.deleteMessage(serviceMessageId, userId);
     }
 
     @PutMapping("/{serviceId}/comment")
-    public JSONObject publishComment(@PathVariable long serviceId, @RequestBody JSONObject body, long userId)
+    public JSONObject publishComment(@PathVariable long serviceId, @RequestBody JSONObject body, @RequestHeader long userId)
     {
-        //userId待替换
-        long commenterId = 1;
         return serviceService.publishComment(serviceId, userId, body);
     }
 
     @DeleteMapping("/comment/{serviceCommentId}")
-    public JSONObject deleteComment(@PathVariable long serviceCommentId, long userId)
+    public JSONObject deleteComment(@PathVariable long serviceCommentId, @RequestHeader long userId)
     {
-        //userId待替换
-        long commenterId = 1;
         return serviceService.deleteComment(serviceCommentId, userId);
     }
 
     @PostMapping("/issue")
-    public JSONObject publishService(@RequestBody JSONObject body, long userId)
+    public JSONObject publishService(@RequestBody JSONObject body, @RequestHeader long userId)
     {
-        //userId待替换
-        long publisherId = 1;
         return serviceService.publishService(userId, body);
     }
 

@@ -30,6 +30,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.util.Pair;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -407,6 +408,26 @@ public class OrderServiceImplTest {
         verify(userClient, times(1)).getUserById(1L);
         verify(userClient, times(1)).getUserById(5L);
         verify(taskClient, times(1)).getTaskById(3L);
+    }
+
+    @Test
+    @DisplayName("Should return OrderDTO when all dependencies found and type is not 0")
+    public void mapOrderToOrderDTOAllDependenciesFoundTypeNonZero() {
+        Order order = new Order(1, (byte) 1, 1, 5, OrderStatus.UNPAID, 100, 6);
+        UserDTO owner = new UserDTO(1, 3500, "Apple", "apple.png");
+        UserDTO accessor = new UserDTO(5, 4900, "Banana", "banana.png");
+        ServiceDTO service = new ServiceDTO(6, "Service 1", "Service 1 Description", "Service 1.png", LocalDateTime.of(2021, 1, 1, 0, 0));
+
+        when(userClient.getUserById(1L)).thenReturn(ResponseUtil.success("获取当前用户信息成功！", owner));
+        when(userClient.getUserById(5L)).thenReturn(ResponseUtil.success("获取当前用户信息成功！", accessor));
+        when(serviceClient.getServiceById(6L)).thenReturn(ResponseUtil.error("服务不存在！"));
+
+        OrderDTO result = orderService.mapOrderToOrderDTO(order);
+
+        assertNull(result);
+        verify(userClient, times(1)).getUserById(1L);
+        verify(userClient, times(1)).getUserById(5L);
+        verify(serviceClient, times(1)).getServiceById(6L);
     }
 
     // mapOrdersToOrderDTOs
@@ -993,18 +1014,230 @@ public class OrderServiceImplTest {
         verify(orderDao, times(1)).findById(orderId);
     }
 
+    // 支付失败
     @Test
-    @DisplayName("Should return order status illegal when order status does not match any valid transitions")
-    public void markOrderStatusOrderStatusIllegal() {
+    @DisplayName("Should return order payment failure when order is unpaid and status is in progress")
+    public void markOrderStatusOrderPaymentFailure() {
         long orderId = 1L;
-        OrderStatus status = OrderStatus.UNPAID;
+        OrderStatus status = OrderStatus.IN_PROGRESS;
+        Order order = new Order();
+        order.setStatus(OrderStatus.UNPAID);
+        order.setOwnerId(1L);
+
+        OrderServiceImpl orderServiceSpy = Mockito.spy(orderService);
+
+        when(orderDao.findById(orderId)).thenReturn(order);
+        doReturn(false).when(orderServiceSpy).payOrder(order);
+
+        Pair<Boolean, String> result = orderServiceSpy.markOrderStatus(orderId, 1L, status);
+
+        assertFalse(result.getFirst());
+        assertEquals("订单支付失败", result.getSecond());
+        verify(orderDao, times(1)).findById(orderId);
+    }
+
+    // 确认失败
+    @Test
+    @DisplayName("Should return order confirmation failure when order is completed and status is confirmed")
+    public void markOrderStatusOrderConfirmationFailure() {
+        long orderId = 1L;
+        OrderStatus status = OrderStatus.CONFIRMED;
+        Order order = new Order();
+        order.setStatus(OrderStatus.COMPLETED);
+        order.setOwnerId(1L);
+
+        OrderServiceImpl orderServiceSpy = Mockito.spy(orderService);
+
+        when(orderDao.findById(orderId)).thenReturn(order);
+        doReturn(false).when(orderServiceSpy).confirmOrder(order);
+
+        Pair<Boolean, String> result = orderServiceSpy.markOrderStatus(orderId, 1L, status);
+
+        assertFalse(result.getFirst());
+        assertEquals("订单确认失败", result.getSecond());
+        verify(orderDao, times(1)).findById(orderId);
+    }
+
+    // 完成失败
+    @Test
+    @DisplayName("Should return order completion failure when order is in progress and status is completed")
+    public void markOrderStatusOrderCompletionFailure() {
+        long orderId = 1L;
+        OrderStatus status = OrderStatus.COMPLETED;
+        Order order = new Order();
+        order.setStatus(OrderStatus.IN_PROGRESS);
+        order.setAccessorId(1L);
+
+        OrderServiceImpl orderServiceSpy = Mockito.spy(orderService);
+
+        when(orderDao.findById(orderId)).thenReturn(order);
+        doReturn(false).when(orderServiceSpy).completeOrder(order);
+
+        Pair<Boolean, String> result = orderServiceSpy.markOrderStatus(orderId, 1L, status);
+
+        assertFalse(result.getFirst());
+        assertEquals("订单完成失败", result.getSecond());
+        verify(orderDao, times(1)).findById(orderId);
+    }
+
+    // 取消失败
+    @Test
+    @DisplayName("Should return order cancellation failure when order is not confirmed or cancelled and status is cancelled")
+    public void markOrderStatusOrderCancellationFailure() {
+        long orderId = 1L;
+        OrderStatus status = OrderStatus.CANCELLED;
+        Order order = new Order();
+        order.setStatus(OrderStatus.IN_PROGRESS);
+        order.setOwnerId(1L);
+
+        OrderServiceImpl orderServiceSpy = Mockito.spy(orderService);
+
+        when(orderDao.findById(orderId)).thenReturn(order);
+        doReturn(false).when(orderServiceSpy).cancelOrder(order);
+
+        Pair<Boolean, String> result = orderServiceSpy.markOrderStatus(orderId, 1L, status);
+
+        assertFalse(result.getFirst());
+        assertEquals("订单取消失败", result.getSecond());
+        verify(orderDao, times(1)).findById(orderId);
+    }
+
+    // illegal status
+
+    @Test
+    @DisplayName("Should return order status illegal when order status does not match: UNPAID -> IN_PROGRESS")
+    public void markOrderStatusIllegalStatusUnpaidInProgress() {
+        long orderId = 1L;
+        OrderStatus status = OrderStatus.COMPLETED;
+        Order order = new Order();
+        order.setStatus(OrderStatus.UNPAID);
+
+        when(orderDao.findById(orderId)).thenReturn(order);
+
+        Pair<Boolean, String> result = orderService.markOrderStatus(orderId, 1L, status);
+
+        assertFalse(result.getFirst());
+        assertEquals("订单状态不合法", result.getSecond());
+        verify(orderDao, times(1)).findById(orderId);
+    }
+
+    @Test
+    @DisplayName("Should return order status illegal when order status does not match: IN_PROGRESS -> COMPLETED")
+    public void markOrderStatusIllegalStatusInProgressCompleted() {
+        long orderId = 1L;
+        OrderStatus status = OrderStatus.CONFIRMED;
+        Order order = new Order();
+        order.setStatus(OrderStatus.IN_PROGRESS);
+
+        when(orderDao.findById(orderId)).thenReturn(order);
+
+        Pair<Boolean, String> result = orderService.markOrderStatus(orderId, 1L, status);
+
+        assertFalse(result.getFirst());
+        assertEquals("订单状态不合法", result.getSecond());
+        verify(orderDao, times(1)).findById(orderId);
+    }
+
+    @Test
+    @DisplayName("Should return order status illegal when order status does not match: COMPLETED -> CONFIRMED")
+    public void markOrderStatusIllegalStatusCompletedConfirmed() {
+        long orderId = 1L;
+        OrderStatus status = OrderStatus.CANCELLED;
+        Order order = new Order();
+        order.setStatus(OrderStatus.COMPLETED);
+
+        when(orderDao.findById(orderId)).thenReturn(order);
+
+        Pair<Boolean, String> result = orderService.markOrderStatus(orderId, 1L, status);
+
+        assertFalse(result.getFirst());
+        assertEquals("订单状态不合法", result.getSecond());
+        verify(orderDao, times(1)).findById(orderId);
+    }
+
+    @Test
+    @DisplayName("Should return order status illegal when order status match: CONFIRMED -> CANCELLED")
+    public void markOrderStatusIllegalStatusConfirmedCancelled() {
+        long orderId = 1L;
+        OrderStatus status = OrderStatus.CANCELLED;
+        Order order = new Order();
+        order.setStatus(OrderStatus.CONFIRMED);
+
+        when(orderDao.findById(orderId)).thenReturn(order);
+
+        Pair<Boolean, String> result = orderService.markOrderStatus(orderId, 1L, status);
+
+        assertFalse(result.getFirst());
+        assertEquals("订单状态不合法", result.getSecond());
+        verify(orderDao, times(1)).findById(orderId);
+    }
+
+    @Test
+    @DisplayName("Should return order status illegal when order status does not match: CANCELLED -> CANCELLED")
+    public void markOrderStatusIllegalStatusCancelledCancelled() {
+        long orderId = 1L;
+        OrderStatus status = OrderStatus.CANCELLED;
+        Order order = new Order();
+        order.setStatus(OrderStatus.CANCELLED);
+
+        when(orderDao.findById(orderId)).thenReturn(order);
+
+        Pair<Boolean, String> result = orderService.markOrderStatus(orderId, 1L, status);
+
+        assertFalse(result.getFirst());
+        assertEquals("订单状态不合法", result.getSecond());
+        verify(orderDao, times(1)).findById(orderId);
+    }
+
+    // 由于userId不匹配而失败
+    @Test
+    @DisplayName("Should return order status illegal when userId does not match order owner")
+    public void markOrderStatusUserIdNotMatch() {
+        long orderId = 1L;
+        OrderStatus status = OrderStatus.IN_PROGRESS;
+        Order order = new Order();
+        order.setStatus(OrderStatus.UNPAID);
+        order.setOwnerId(1L);
+
+        when(orderDao.findById(orderId)).thenReturn(order);
+
+        Pair<Boolean, String> result = orderService.markOrderStatus(orderId, 2L, status);
+
+        assertFalse(result.getFirst());
+        assertEquals("订单状态不合法", result.getSecond());
+        verify(orderDao, times(1)).findById(orderId);
+    }
+
+    @Test
+    @DisplayName("Should return order status illegal when userId does not match order accessor")
+    public void markOrderStatusUserIdNotMatchAccessor() {
+        long orderId = 1L;
+        OrderStatus status = OrderStatus.COMPLETED;
+        Order order = new Order();
+        order.setStatus(OrderStatus.IN_PROGRESS);
+        order.setAccessorId(1L);
+
+        when(orderDao.findById(orderId)).thenReturn(order);
+
+        Pair<Boolean, String> result = orderService.markOrderStatus(orderId, 2L, status);
+
+        assertFalse(result.getFirst());
+        assertEquals("订单状态不合法", result.getSecond());
+        verify(orderDao, times(1)).findById(orderId);
+    }
+
+    @Test
+    @DisplayName("Should return order status illegal when userId does not match order owner, COMPLETED -> CONFIRMED")
+    public void markOrderStatusUserIdNotMatchCompletedConfirmed() {
+        long orderId = 1L;
+        OrderStatus status = OrderStatus.CONFIRMED;
         Order order = new Order();
         order.setStatus(OrderStatus.COMPLETED);
         order.setOwnerId(1L);
 
         when(orderDao.findById(orderId)).thenReturn(order);
 
-        Pair<Boolean, String> result = orderService.markOrderStatus(orderId, 1L, status);
+        Pair<Boolean, String> result = orderService.markOrderStatus(orderId, 2L, status);
 
         assertFalse(result.getFirst());
         assertEquals("订单状态不合法", result.getSecond());

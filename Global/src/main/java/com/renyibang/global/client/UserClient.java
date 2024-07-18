@@ -17,7 +17,7 @@ public interface UserClient {
   @GetMapping("/api/user/{userId}")
   JSONObject getUserInfo(@PathVariable long userId);
 
-  @GetMapping("/api/user/{userId}")
+  @GetMapping("/api/user/{userId}/dto")
   JSONObject getUserById(@PathVariable long userId);
 
   @GetMapping("/api/user/list/{userIds}")
