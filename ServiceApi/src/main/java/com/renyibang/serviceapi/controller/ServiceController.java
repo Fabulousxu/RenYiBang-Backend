@@ -17,10 +17,16 @@ public class ServiceController {
     @Autowired ServiceService serviceService;
 
     @GetMapping("/search")
-    public JSONObject searchService(String keyword, int pageSize, int pageIndex, String order, String timeBegin, String timeEnd, long priceLow, long priceHigh)
+    public JSONObject searchService(String keyword,
+                                    int pageSize,
+                                    int pageIndex,
+                                    String order,
+                                    String timeBegin,
+                                    String timeEnd,
+                                    long priceLow,
+                                    long priceHigh,
+                                    @RequestHeader long userId)
     {
-        System.out.println("searchService");
-
         Sort sort;
 
         if(Objects.equals(order, "time"))
@@ -41,17 +47,17 @@ public class ServiceController {
         if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
         Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
 
-        return serviceService.searchServiceByPaging(keyword, pageable, timeBegin, timeEnd, priceLow, priceHigh);
+        return serviceService.searchServiceByPaging(keyword, pageable, timeBegin, timeEnd, priceLow, priceHigh, userId);
     }
 
     @GetMapping("/{serviceId}")
-    public JSONObject getServiceInfo(@PathVariable long serviceId)
+    public JSONObject getServiceInfo(@PathVariable long serviceId, @RequestHeader long userId)
     {
-        return serviceService.getServiceInfo(serviceId);
+        return serviceService.getServiceInfo(serviceId, userId);
     }
 
     @GetMapping("/{serviceId}/comment")
-    public JSONObject getServiceComment(@PathVariable long serviceId, int pageSize, int pageIndex, String order)
+    public JSONObject getServiceComment(@PathVariable long serviceId, int pageSize, int pageIndex, String order, @RequestHeader long userId)
     {
         Sort sort;
 
@@ -73,11 +79,11 @@ public class ServiceController {
         if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
         Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
 
-        return serviceService.getServiceComments(serviceId, pageable);
+        return serviceService.getServiceComments(serviceId, pageable, userId);
     }
 
     @GetMapping("/{serviceId}/message")
-    public JSONObject getServiceMessage(@PathVariable long serviceId, int pageSize, int pageIndex, String order)
+    public JSONObject getServiceMessage(@PathVariable long serviceId, int pageSize, int pageIndex, String order, @RequestHeader long userId)
     {
         Sort sort;
 
@@ -99,7 +105,7 @@ public class ServiceController {
         if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
         Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);
 
-        return serviceService.getServiceMessages(serviceId, pageable);
+        return serviceService.getServiceMessages(serviceId, pageable, userId);
     }
 
     @PutMapping("/comment/{serviceCommentId}/like")

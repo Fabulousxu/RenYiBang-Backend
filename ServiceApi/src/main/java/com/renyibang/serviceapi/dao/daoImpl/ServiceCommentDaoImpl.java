@@ -153,4 +153,14 @@ public class ServiceCommentDaoImpl implements ServiceCommentDao {
         }
     }
 
+    @Override
+    public boolean isLiked(long serviceCommentId, long likerId) {
+        ServiceComment serviceComment = serviceCommentRepository.findById(serviceCommentId).orElse(null);
+        if (serviceComment == null) {
+            return false;
+        }
+
+        return serviceCommentLikeRepository.existsByLikerIdAndServiceComment(likerId, serviceComment);
+    }
+
 }

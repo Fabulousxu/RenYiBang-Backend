@@ -16,4 +16,6 @@ public interface ServiceMessageDao {
     String putMessage(long serviceId, long userId, String content);
 
     String deleteMessage(long serviceMessageId, long userId);
+
+    boolean isLiked(long serviceMessageId, long likerId);
 }

@@ -251,6 +251,11 @@ public class ServiceDaoImpl implements ServiceDao {
             throw e;
         }
     }
+
+    @Override
+    public boolean isCollected(long serviceId, long collectorId) {
+        return serviceCollectRepository.existsByCollectorIdAndAndService(collectorId, serviceRepository.findById(serviceId).orElse(null));
+    }
 }
 
 
