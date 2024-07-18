@@ -23,7 +23,8 @@ public class TaskController {
       String timeBegin,
       String timeEnd,
       long priceLow,
-      long priceHigh) {
+      long priceHigh,
+      @RequestHeader long userId) {
     Sort sort;
     if (Objects.equals(order, "time")) sort = Sort.by("createdAt").descending();
     else if (Objects.equals(order, "rating")) sort = Sort.by("rating").descending();
@@ -35,34 +36,43 @@ public class TaskController {
         timeBegin,
         timeEnd,
         priceLow,
-        priceHigh);
+        priceHigh,
+        userId);
   }
 
   @GetMapping("/{taskId}")
-  public JSONObject getTaskInfo(@PathVariable long taskId) {
-    return taskService.getTaskInfo(taskId);
+  public JSONObject getTaskInfo(@PathVariable long taskId, @RequestHeader long userId) {
+    return taskService.getTaskInfo(taskId, userId);
   }
 
   @GetMapping("/{taskId}/comment")
   public JSONObject getTaskComment(
-      @PathVariable long taskId, int pageSize, int pageIndex, String order) {
+      @PathVariable long taskId,
+      int pageSize,
+      int pageIndex,
+      String order,
+      @RequestHeader long userId) {
     Sort sort;
     if (Objects.equals(order, "likes")) sort = Sort.by("likedNumber").descending();
     else if (Objects.equals(order, "time")) sort = Sort.by("createdAt").descending();
     else return ResponseUtil.error("排序类型错误");
     if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
-    return taskService.getTaskComments(taskId, PageRequest.of(pageIndex, pageSize, sort));
+    return taskService.getTaskComments(taskId, PageRequest.of(pageIndex, pageSize, sort), userId);
   }
 
   @GetMapping("/{taskId}/message")
   public JSONObject getTaskMessage(
-      @PathVariable long taskId, int pageSize, int pageIndex, String order) {
+      @PathVariable long taskId,
+      int pageSize,
+      int pageIndex,
+      String order,
+      @RequestHeader long userId) {
     Sort sort;
     if (Objects.equals(order, "likes")) sort = Sort.by("likedNumber").descending();
     else if (Objects.equals(order, "time")) sort = Sort.by("createdAt").descending();
     else return ResponseUtil.error("排序类型错误");
     if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
-    return taskService.getTaskMessages(taskId, PageRequest.of(pageIndex, pageSize, sort));
+    return taskService.getTaskMessages(taskId, PageRequest.of(pageIndex, pageSize, sort), userId);
   }
 
   @PutMapping("/comment/{taskCommentId}/like")

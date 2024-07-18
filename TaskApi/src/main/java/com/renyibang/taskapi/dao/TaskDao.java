@@ -24,4 +24,6 @@ public interface TaskDao {
   String unaccessTaskByTaskId(long taskId, long unaccessorId);
 
   String publishTask(long userId, String title, String description, long price, List<String> requestImages);
+
+  boolean isCollected(long taskId, long collectorId);
 }
