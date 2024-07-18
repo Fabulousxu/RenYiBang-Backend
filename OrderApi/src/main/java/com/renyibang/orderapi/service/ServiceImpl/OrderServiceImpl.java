@@ -38,7 +38,6 @@ public class OrderServiceImpl implements OrderService {
     JSONObject result = userClient.getUserById(ownerId);
     if(!result.getBoolean("ok")) return orderDTOs;
     UserDTO owner = result.getObject("data", UserDTO.class);
-    if(owner == null) return orderDTOs;
 
     for (Order order : orders) {
       OrderDTO orderDTO = new OrderDTO(order);
@@ -47,21 +46,18 @@ public class OrderServiceImpl implements OrderService {
       result = userClient.getUserById(order.getAccessorId());
       if(!result.getBoolean("ok")) return orderDTOs;
       UserDTO accessor = result.getObject("data", UserDTO.class);
-      if(accessor == null) continue;
 
       if (type == 0) {
         // 向Task module请求task信息
         result = taskClient.getTaskById(order.getItemId());
         if(!result.getBoolean("ok")) continue;
         TaskDTO task = result.getObject("data", TaskDTO.class);
-        if(task == null) continue;
         orderDTO.setTask(task);
       } else {
         // 向Service module请求service信息
         result = serviceClient.getServiceById(order.getItemId());
         if(!result.getBoolean("ok")) continue;
         ServiceDTO service = result.getObject("data", ServiceDTO.class);
-        if(service == null) continue;
         orderDTO.setService(service);
       }
 
@@ -82,7 +78,6 @@ public class OrderServiceImpl implements OrderService {
     JSONObject result = userClient.getUserById(accessorId);
     if(!result.getBoolean("ok")) return orderDTOs;
     UserDTO accessor = result.getObject("data", UserDTO.class);
-    if(accessor == null) return orderDTOs;
 
     for (Order order : orders) {
       OrderDTO orderDTO = new OrderDTO(order);
@@ -91,21 +86,18 @@ public class OrderServiceImpl implements OrderService {
       result = userClient.getUserById(order.getOwnerId());
       if(!result.getBoolean("ok")) return orderDTOs;
       UserDTO owner = result.getObject("data", UserDTO.class);
-      if(owner == null) continue;
 
       if (type == 0) {
         // 向Task module请求task信息
         result = taskClient.getTaskById(order.getItemId());
         if(!result.getBoolean("ok")) continue;
         TaskDTO task = result.getObject("data", TaskDTO.class);
-        if(task == null) continue;
         orderDTO.setTask(task);
       } else {
         // 向Service module请求service信息
         result = serviceClient.getServiceById(order.getItemId());
         if(!result.getBoolean("ok")) continue;
         ServiceDTO service = result.getObject("data", ServiceDTO.class);
-        if(service == null) continue;
         orderDTO.setService(service);
       }
 
@@ -161,29 +153,21 @@ public class OrderServiceImpl implements OrderService {
     // 任务， owner, accessor
     // cost是否为正数
 
-    // userFeign & taskFeign
+    //  taskFeign / serviceFeign
     if (type == 0) {
       JSONObject result = taskClient.getTaskById(taskId);
       if(!result.getBoolean("ok")) throw new IllegalArgumentException("任务不存在");
-      TaskDTO task = result.getObject("data", TaskDTO.class);
-      if(task == null) throw new IllegalArgumentException("任务不存在");
     } else {
       JSONObject result = serviceClient.getServiceById(taskId);
       if(!result.getBoolean("ok")) throw new IllegalArgumentException("服务不存在");
-      ServiceDTO service = result.getObject("data", ServiceDTO.class);
-      if(service == null) throw new IllegalArgumentException("服务不存在");
     }
 
     // userFeign
     JSONObject result = userClient.getUserById(ownerId);
     if(!result.getBoolean("ok")) throw new IllegalArgumentException("发起者不存在");
-    UserDTO owner = result.getObject("data", UserDTO.class);
-    if(owner == null) throw new IllegalArgumentException("发起者不存在");
 
     result = userClient.getUserById(accessorId);
     if(!result.getBoolean("ok")) throw new IllegalArgumentException("接收者不存在");
-    UserDTO accessor = result.getObject("data", UserDTO.class);
-    if(accessor == null) throw new IllegalArgumentException("接收者不存在");
 
     if (cost <= 0) throw new IllegalArgumentException("金额必须为正数");
 
@@ -266,7 +250,6 @@ public class OrderServiceImpl implements OrderService {
     JSONObject result = userClient.getUserById(userId);
     if(!result.getBoolean("ok")) return false;
     UserDTO user = result.getObject("data", UserDTO.class);
-    if(user == null) return false;
 
     user.setBalance(user.getBalance() + amount);
     result = userClient.updateUser(user);
@@ -281,27 +264,23 @@ public class OrderServiceImpl implements OrderService {
     JSONObject result = userClient.getUserById(order.getOwnerId());
     if(!result.getBoolean("ok")) return null;
     UserDTO owner = result.getObject("data", UserDTO.class);
-    if(owner == null) return null;
 
     //  向User module请求accessor信息
     result = userClient.getUserById(order.getAccessorId());
     if(!result.getBoolean("ok")) return null;
     UserDTO accessor = result.getObject("data", UserDTO.class);
-    if(accessor == null) return null;
 
     if (order.getType() == 0) {
       // 向Task module请求task信息
       result = taskClient.getTaskById(order.getItemId());
       if(!result.getBoolean("ok")) return null;
       TaskDTO task = result.getObject("data", TaskDTO.class);
-      if(task == null) return null;
       orderDTO.setTask(task);
     } else {
       // 向Service module请求service信息
       result = serviceClient.getServiceById(order.getItemId());
       if(!result.getBoolean("ok")) return null;
       ServiceDTO service = result.getObject("data", ServiceDTO.class);
-      if(service == null) return null;
       orderDTO.setService(service);
     }
 
@@ -331,7 +310,7 @@ public class OrderServiceImpl implements OrderService {
 
     OrderStatus currentStatus = order.getStatus();
     if (currentStatus == OrderStatus.UNPAID && status == OrderStatus.IN_PROGRESS && userId == order.getOwnerId()) {
-      return this.payOrder(order) ? Pair.of(true, "订单支付成功") : Pair.of(false, "支付失败");
+      return this.payOrder(order) ? Pair.of(true, "订单支付成功") : Pair.of(false, "订单支付失败");
     } else if (currentStatus == OrderStatus.IN_PROGRESS && status == OrderStatus.COMPLETED && userId == order.getAccessorId()) {
       return this.completeOrder(order) ? Pair.of(true, "订单完成成功") : Pair.of(false, "订单完成失败");
     } else if (currentStatus == OrderStatus.COMPLETED && status == OrderStatus.CONFIRMED && userId == order.getOwnerId()) {

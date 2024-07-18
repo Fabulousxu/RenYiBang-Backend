@@ -52,7 +52,7 @@ public class ServiceServiceImpl implements ServiceService {
             return "开始时间不能大于结束时间！";
         }
 
-        else if(low < 0 || (high < 0 && high != -1))
+        else if(low < 0 || (high < 0))
         {
             return "价格不能为负数！";
         }
@@ -81,7 +81,7 @@ public class ServiceServiceImpl implements ServiceService {
                 return ResponseUtil.error(isValid);
             }
 
-            Page<Service> searchResult = serviceDao.searchServiceByPaging(keyword, pageable, DateTimeUtil.getBeginDateTime(timeBegin), DateTimeUtil.getEndDateTime(timeEnd), priceLow, priceHigh);
+            Page<Service> searchResult = serviceDao.searchServiceByPaging(keyword, pageable, begin, end, priceLow, high);
 
             //创建一个list存储用户id
             List<Long> userIds = new ArrayList<>();

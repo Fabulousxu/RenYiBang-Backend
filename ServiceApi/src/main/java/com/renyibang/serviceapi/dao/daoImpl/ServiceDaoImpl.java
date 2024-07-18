@@ -37,6 +37,8 @@ public class ServiceDaoImpl implements ServiceDao {
     @Override
     public Page<Service> searchServiceByPaging(String keyword, Pageable pageable, LocalDateTime beginDateTime, LocalDateTime endDateTime, long priceLow, long priceHigh)
     {
+        System.out.println("keyword: " + keyword);
+        System.out.println("priceHigh: " + priceHigh);
         if(!keyword.isEmpty())
         {
             return serviceRepository.searchServices(keyword, priceLow, priceHigh, beginDateTime, endDateTime, ServiceStatus.DELETE, pageable);

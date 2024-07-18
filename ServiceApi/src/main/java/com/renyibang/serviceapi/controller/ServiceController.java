@@ -19,6 +19,8 @@ public class ServiceController {
     @GetMapping("/search")
     public JSONObject searchService(String keyword, int pageSize, int pageIndex, String order, String timeBegin, String timeEnd, long priceLow, long priceHigh)
     {
+        System.out.println("searchService");
+
         Sort sort;
 
         if(Objects.equals(order, "time"))

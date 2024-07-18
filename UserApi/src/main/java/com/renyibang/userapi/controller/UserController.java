@@ -18,9 +18,14 @@ public class UserController {
     return userService.getUserInfo(userId);
   }
 
+  @GetMapping("/{userId}/dto")
+  public Response getUserDTO(@PathVariable long userId) {
+    return userService.getUserDTO(userId);
+  }
+
   @GetMapping("/{userId}")
   public Response getUserInfo(@PathVariable long userId) {
-    return userService.getUserDTO(userId);
+    return userService.getUserInfo(userId);
   }
 
   @PostMapping("/self/update")
