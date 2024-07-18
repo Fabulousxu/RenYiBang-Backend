@@ -1,4 +1,4 @@
-package com.renyibang.chatapi.util;
+package com.renyibang.taskapi.util;
 
 import com.alibaba.fastjson2.JSONObject;
 
@@ -16,7 +16,7 @@ public class ResponseUtil {
   }
 
   public static JSONObject success(String message) {
-    return response(true, message, null);
+    return response(true, message, new JSONObject());
   }
 
   public static JSONObject success(Object data) {
@@ -24,14 +24,14 @@ public class ResponseUtil {
   }
 
   public static JSONObject success() {
-    return response(true, "", null);
+    return response(true, "", new JSONObject());
   }
 
   public static JSONObject error(String message) {
-    return response(false, message, null);
+    return response(false, message, new JSONObject());
   }
 
   public static JSONObject error() {
-    return response(false, "", null);
+    return response(false, "", new JSONObject());
   }
 }
