@@ -10,22 +10,22 @@ import com.renyibang.serviceapi.entity.Service;
 import com.renyibang.serviceapi.entity.ServiceComment;
 import com.renyibang.serviceapi.entity.ServiceMessage;
 import com.renyibang.serviceapi.service.serviceImpl.ServiceServiceImpl;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -92,13 +92,13 @@ public class ServiceServiceImplTest {
         when(userClient.getUserInfos(anyList())).thenReturn(userObject);
 
         //执行测试
-        JSONObject page = serviceService.searchServiceByPaging("test", pageable, begintime.toString(), endtime.toString(), 1L, 10000L);
+        JSONObject page = serviceService.searchServiceByPaging("test", pageable, begintime.toString(), endtime.toString(), 1L, 10000L, 1L);
         assert page.get("ok").equals(true);
     }
 
     @Test
     public void testSearchServiceByPagingWithInvalidParams() {
-        JSONObject page = serviceService.searchServiceByPaging("test", pageable, begintime.toString(), endtime.toString(), -1, -2);
+        JSONObject page = serviceService.searchServiceByPaging("test", pageable, begintime.toString(), endtime.toString(), -1L, -2L, 1L);
         assert page.get("ok").equals(false);
     }
 
@@ -112,7 +112,7 @@ public class ServiceServiceImplTest {
         when(serviceDao.searchServiceByPaging(anyString(),any(Pageable.class),any(LocalDateTime.class),any(LocalDateTime.class),anyLong(),anyLong())).thenReturn(servicepage);
         when(userClient.getUserInfos(anyList())).thenReturn(userObject);
 
-        JSONObject page = serviceService.searchServiceByPaging("test", pageable, begintime.toString(), endtime.toString(), 1, 10000);
+        JSONObject page = serviceService.searchServiceByPaging("test", pageable, begintime.toString(), endtime.toString(), 1L, 10000L, 1L);
         assert page.get("ok").equals(false);
     }
 
@@ -120,14 +120,14 @@ public class ServiceServiceImplTest {
     public void testGetServiceInfo() {
         when(serviceDao.findById(anyLong())).thenReturn(service);
         when(userClient.getUserInfo(anyLong())).thenReturn(successResponse);
-        JSONObject result = serviceService.getServiceInfo(1);
+        JSONObject result = serviceService.getServiceInfo(1L, 1L);
         assert result.get("ok").equals(true);
     }
 
     @Test
     public void testGetServiceInfoWithEmptyService() {
         when(serviceDao.findById(anyLong())).thenReturn(null);
-        JSONObject result = serviceService.getServiceInfo(1);
+        JSONObject result = serviceService.getServiceInfo(1L, 1L);
         assert result.get("ok").equals(false);
     }
 
@@ -135,7 +135,7 @@ public class ServiceServiceImplTest {
     public void testGetServiceInfoWithEmptyUser() {
         when(serviceDao.findById(anyLong())).thenReturn(service);
         when(userClient.getUserInfo(anyLong())).thenReturn(errorResponse);
-        JSONObject result = serviceService.getServiceInfo(1);
+        JSONObject result = serviceService.getServiceInfo(1L,1L);
         assert result.get("ok").equals(false);
     }
 
@@ -147,7 +147,7 @@ public class ServiceServiceImplTest {
         when(serviceCommentDao.getServiceComments(anyLong(),any(Pageable.class))).thenReturn(serviceCommentPage);
         when(userClient.getUserInfos(anyList())).thenReturn(successResponse);
 
-        JSONObject result = serviceService.getServiceComments(1, pageable);
+        JSONObject result = serviceService.getServiceComments(1L, pageable, 1L);
         assert result.get("ok").equals(true);
     }
 
@@ -155,7 +155,7 @@ public class ServiceServiceImplTest {
     public void testGetServiceCommentsWithEmptyComments() {
         Page<ServiceComment> serviceCommentPage = new PageImpl<>(new ArrayList<>());
         when(serviceCommentDao.getServiceComments(anyLong(),any(Pageable.class))).thenReturn(serviceCommentPage);
-        JSONObject result = serviceService.getServiceComments(1, pageable);
+        JSONObject result = serviceService.getServiceComments(1L, pageable, 1L);
         assert result.get("ok").equals(true);
     }
 
@@ -167,7 +167,7 @@ public class ServiceServiceImplTest {
         when(serviceCommentDao.getServiceComments(anyLong(),any(Pageable.class))).thenReturn(serviceCommentPage);
         when(userClient.getUserInfos(anyList())).thenReturn(errorResponse);
 
-        JSONObject result = serviceService.getServiceComments(1, pageable);
+        JSONObject result = serviceService.getServiceComments(1L, pageable, 1L);
         assert result.get("ok").equals(false);
     }
 
@@ -179,7 +179,7 @@ public class ServiceServiceImplTest {
         when(serviceMessageDao.getServiceMessages(anyLong(),any(Pageable.class))).thenReturn(serviceMessagePage);
         when(userClient.getUserInfos(anyList())).thenReturn(successResponse);
 
-        JSONObject result = serviceService.getServiceMessages(1, pageable);
+        JSONObject result = serviceService.getServiceMessages(1L, pageable, 1L);
         assert result.get("ok").equals(true);
     }
 
@@ -187,7 +187,7 @@ public class ServiceServiceImplTest {
     public void testGetServiceMessagesWithEmptyMessages() {
         Page<ServiceMessage> serviceMessagePage = new PageImpl<>(new ArrayList<>());
         when(serviceMessageDao.getServiceMessages(anyLong(),any(Pageable.class))).thenReturn(serviceMessagePage);
-        JSONObject result = serviceService.getServiceMessages(1, pageable);
+        JSONObject result = serviceService.getServiceMessages(1L, pageable, 1L);
         assert result.get("ok").equals(true);
     }
 
@@ -199,7 +199,7 @@ public class ServiceServiceImplTest {
         when(serviceMessageDao.getServiceMessages(anyLong(),any(Pageable.class))).thenReturn(serviceMessagePage);
         when(userClient.getUserInfos(anyList())).thenReturn(errorResponse);
 
-        JSONObject result = serviceService.getServiceMessages(1, pageable);
+        JSONObject result = serviceService.getServiceMessages(1L, pageable, 1L);
         assert result.get("ok").equals(false);
     }
 
