@@ -91,6 +91,21 @@ public class Task {
     return result;
   }
 
+  public JSONObject toSelfJSON()
+  {
+    JSONObject result = new JSONObject();
+    result.put("taskId", taskId);
+    result.put("title", title);
+    result.put("price", price);
+    result.put("maxAccess", maxAccess);
+    result.put("rating", rating);
+    result.put("createdAt", DateTimeUtil.formatDateTime(createdAt));
+    result.put("collectedNumber", collectedNumber);
+    result.put("status", status.toString());
+
+    return result;
+  }
+
   public boolean accessNotFull()
   {
     return accesses.size() < maxAccess;

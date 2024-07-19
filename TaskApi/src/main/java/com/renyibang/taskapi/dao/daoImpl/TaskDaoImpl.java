@@ -223,4 +223,24 @@ public class TaskDaoImpl implements TaskDao {
     return taskCollectRepository.existsByCollectorIdAndAndTask(
         collectorId, taskRepository.findById(taskId).orElse(null));
   }
+
+  @Override
+  public Page<Task> getMyTask(long userId, Pageable pageable) {
+    return taskRepository.findByOwnerId(userId, pageable);
+  }
+
+  @Override
+  public Object getAccessedNumber(Task task) {
+    return taskAccessRepository.countByTask(task);
+  }
+
+  @Override
+  public Page<Task> getMyAccessedTask(long userId, Pageable pageable) {
+    return taskRepository.findByAccessorId(userId, pageable);
+  }
+
+  @Override
+  public Page<TaskAccess> getTaskAccessByTask(Task task, Pageable pageable) {
+    return taskAccessRepository.findByTask(task, pageable);
+  }
 }

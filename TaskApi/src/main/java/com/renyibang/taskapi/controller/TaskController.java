@@ -3,11 +3,12 @@ package com.renyibang.taskapi.controller;
 import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.taskapi.service.TaskService;
 import com.renyibang.taskapi.util.ResponseUtil;
-import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/task")
@@ -150,5 +151,22 @@ public class TaskController {
   @GetMapping("/{taskId}/ownerId")
   public JSONObject getTaskOwnerId(@PathVariable long taskId) {
     return taskService.getTaskOwnerId(taskId);
+  }
+
+  @GetMapping("/initiator/self")
+  public JSONObject getMyTask(int pageSize, int pageIndex, @RequestHeader long userId) {
+    if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
+    return taskService.getMyTask(PageRequest.of(pageIndex, pageSize), userId);
+  }
+
+  @GetMapping("/recipient/self")
+  public JSONObject getMyAccessedTask(int pageSize, int pageIndex, @RequestHeader long userId) {
+    if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
+    return taskService.getMyAccessedTask(PageRequest.of(pageIndex, pageSize), userId);
+  }
+
+  @GetMapping("/{taskId}/select/info")
+  public JSONObject getTaskAccessorInfo(@PathVariable long taskId, @RequestHeader long userId, int pageSize, int pageIndex) {
+    return taskService.getTaskAccessorInfo(taskId, userId, PageRequest.of(pageIndex, pageSize));
   }
 }

@@ -8,6 +8,7 @@ import com.renyibang.taskapi.dao.TaskCommentDao;
 import com.renyibang.taskapi.dao.TaskDao;
 import com.renyibang.taskapi.dao.TaskMessageDao;
 import com.renyibang.taskapi.entity.Task;
+import com.renyibang.taskapi.entity.TaskAccess;
 import com.renyibang.taskapi.entity.TaskComment;
 import com.renyibang.taskapi.entity.TaskMessage;
 import com.renyibang.taskapi.service.TaskService;
@@ -15,14 +16,15 @@ import com.renyibang.taskapi.util.DateTimeUtil;
 import com.renyibang.taskapi.util.PriceUtil;
 import com.renyibang.taskapi.util.ResponseUtil;
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author asus
@@ -447,5 +449,93 @@ public class TaskServiceImpl implements TaskService {
     }
 
     return ResponseUtil.success(task.getOwnerId());
+  }
+
+  @Override
+  public JSONObject getMyTask(Pageable pageable, long userId) {
+      try {
+          JSONArray result = new JSONArray();
+          Page<Task> searchResult = taskDao.getMyTask(userId, pageable);
+
+          List<Task> taskList = searchResult.getContent();
+
+          for(Task task : taskList) {
+              JSONObject taskJson = task.toSelfJSON();
+              taskJson.put("accessedNumber", taskDao.getAccessedNumber(task));
+              result.add(taskJson);
+          }
+
+          JSONObject returnRes = new JSONObject();
+
+          returnRes.put("total", searchResult.getTotalElements());
+          returnRes.put("items", result);
+
+          return ResponseUtil.success(returnRes);
+      } catch (Exception e) {
+          return ResponseUtil.error(String.valueOf(e));
+      }
+  }
+
+  @Override
+  public JSONObject getMyAccessedTask(Pageable pageable, long userId) {
+    try {
+      JSONArray result = new JSONArray();
+      Page<Task> searchResult = taskDao.getMyAccessedTask(userId, pageable);
+
+      List<Task> taskList = searchResult.getContent();
+
+      for(Task task : taskList) {
+        JSONObject taskJson = task.toSelfJSON();
+        result.add(taskJson);
+      }
+
+      JSONObject returnRes = new JSONObject();
+
+      returnRes.put("total", searchResult.getTotalElements());
+      returnRes.put("items", result);
+
+      return ResponseUtil.success(returnRes);
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
+
+  @Override
+  public JSONObject getTaskAccessorInfo(long taskId, long userId, Pageable pageable) {
+    try {
+      JSONObject result = new JSONObject();
+      Task task = taskDao.findById(taskId);
+      if (task == null) {
+        return ResponseUtil.error("任务不存在！");
+      }
+
+      if(task.getOwnerId() != userId) {
+        return ResponseUtil.error("您不是任务发布者！");
+      }
+
+      Page<TaskAccess> taskAccessPage = taskDao.getTaskAccessByTask(task, pageable);
+      if(taskAccessPage == null) {
+        return ResponseUtil.error("获取接取信息失败！");
+      }
+
+      List<Long> userIds = new ArrayList<>();
+      for (TaskAccess taskAccess : taskAccessPage) userIds.add(taskAccess.getAccessorId());
+
+      if (userIds.isEmpty()) {
+        result.put("items", new JSONArray());
+        return ResponseUtil.success(result);
+      }
+
+      JSONObject userInfos = userClient.getAccessorInfos(userIds);
+      if (Objects.equals(false, userInfos.get("ok"))) return ResponseUtil.error("用户信息获取失败！");
+      ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
+
+      result.put("total", taskAccessPage.getTotalElements());
+      result.put("items", userInfosArray);
+
+      return ResponseUtil.success(result);
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
   }
 }

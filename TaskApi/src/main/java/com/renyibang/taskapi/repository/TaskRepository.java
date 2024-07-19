@@ -37,4 +37,10 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
                                                      @Param("endDateTime") LocalDateTime endDateTime,
                                                      @Param("status") TaskStatus status,
                                                      Pageable pageable);
+
+    Page<Task> findByOwnerId(long userId, Pageable pageable);
+
+    @Query("SELECT t FROM Task t WHERE t.taskId IN " +
+            "(SELECT ta.task.taskId FROM TaskAccess ta WHERE ta.accessorId = :userId)")
+    Page<Task> findByAccessorId(@Param("userId") long userId, Pageable pageable);
 }
