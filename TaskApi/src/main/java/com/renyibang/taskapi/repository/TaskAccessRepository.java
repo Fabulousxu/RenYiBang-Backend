@@ -14,5 +14,5 @@ public interface TaskAccessRepository extends JpaRepository<TaskAccess, Long> {
     TaskAccess findByTaskAndAccessorId(Task task, long accessorId);
     Object countByTask(Task task);
 
-    Page<TaskAccess> findByTaskAnAndTaskAccessStatus(Task task, Pageable pageable, TaskAccessStatus taskAccessStatus);
+    Page<TaskAccess> findByTaskAndTaskAccessStatus(Task task, Pageable pageable, TaskAccessStatus taskAccessStatus);
 }

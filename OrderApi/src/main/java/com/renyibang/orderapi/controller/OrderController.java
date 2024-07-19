@@ -34,7 +34,9 @@ public class OrderController {
   public JSONObject createTaskOrder(@RequestBody JSONObject data, @RequestHeader("userId") Long userId) {
     long taskId = data.getLong("taskId");
     long ownerId = data.getLong("ownerId");
-    long accessorId = data.getLong("accessorId");
+    // accessor是一个列表
+    // List<Long> accessors
+    List<Long> accessors = data.getJSONArray("accessors").toJavaList(Long.class);
     long cost = data.getLong("cost");
     // 校验ownerId是否为当前用户
     if (ownerId != userId) {
@@ -43,7 +45,7 @@ public class OrderController {
 
     // 创建订单
     try{
-      orderService.createOrder(taskId, ownerId, accessorId, cost, (byte) 0);
+      orderService.createOrder(taskId, ownerId, accessors, cost, (byte) 0);
     } catch (Exception e) {
       return ResponseUtil.error(e.getMessage());
     }
@@ -54,7 +56,7 @@ public class OrderController {
   public JSONObject createServiceOrder(@RequestBody JSONObject data, @RequestHeader("userId") Long userId) {
     long serviceId = data.getLong("serviceId");
     long ownerId = data.getLong("ownerId");
-    long accessorId = data.getLong("accessorId");
+    List<Long> accessors = data.getJSONArray("accessors").toJavaList(Long.class);
     long cost = data.getLong("cost");
     // 校验ownerId是否为当前用户
     if (ownerId != userId) {
@@ -63,7 +65,7 @@ public class OrderController {
 
     // 创建订单
     try{
-      orderService.createOrder(serviceId, ownerId, accessorId, cost, (byte) 1);
+      orderService.createOrder(serviceId, ownerId, accessors, cost, (byte) 1);
     } catch (Exception e) {
       return ResponseUtil.error(e.getMessage());
     }

@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -60,11 +61,11 @@ public class OrderControllerTest {
 	@Test
 	@DisplayName("Should create task order successfully")
 	public void createTaskOrderSuccessfully() throws Exception {
-		when(orderService.createOrder(anyLong(), anyLong(), anyLong(), anyLong(), any(Byte.class))).thenReturn(true);
+		when(orderService.createOrder(anyLong(), anyLong(), List.of(anyLong()), anyLong(), any(Byte.class))).thenReturn(true);
 
 		mockMvc.perform(put("/api/order/task/create")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"taskId\":1,\"ownerId\":1,\"accessorId\":2,\"cost\":100}")
+						.content("{\"taskId\":1,\"ownerId\":1,\"accessors\":[2],\"cost\":100}")
 						.header("userId", 1))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.ok").value(true))
@@ -76,7 +77,7 @@ public class OrderControllerTest {
 	public void failToCreateTaskOrderDueToMismatchedOwnerId() throws Exception {
 		mockMvc.perform(put("/api/order/task/create")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"taskId\":1,\"ownerId\":2,\"accessorId\":2,\"cost\":100}")
+						.content("{\"taskId\":1,\"ownerId\":2,\"accessors\":[2],\"cost\":100}")
 						.header("userId", 1))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.ok").value(false))
@@ -86,11 +87,11 @@ public class OrderControllerTest {
 	@Test
 	@DisplayName("Should fail to create task order due to exception")
 	public void failToCreateTaskOrderDueToException() throws Exception {
-		when(orderService.createOrder(anyLong(), anyLong(), anyLong(), anyLong(), any(Byte.class))).thenThrow(new RuntimeException("订单创建失败"));
+		when(orderService.createOrder(anyLong(), anyLong(), anyList(), anyLong(), any(Byte.class))).thenThrow(new RuntimeException("订单创建失败"));
 
 		mockMvc.perform(put("/api/order/task/create")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"taskId\":1,\"ownerId\":1,\"accessorId\":2,\"cost\":100}")
+						.content("{\"taskId\":1,\"ownerId\":1,\"accessors\":[2],\"cost\":100}")
 						.header("userId", 1))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.ok").value(false))
@@ -100,11 +101,11 @@ public class OrderControllerTest {
 	@Test
 	@DisplayName("Should create service order successfully")
 	public void createServiceOrderSuccessfully() throws Exception {
-		when(orderService.createOrder(anyLong(), anyLong(), anyLong(), anyLong(), any(Byte.class))).thenReturn(true);
+		when(orderService.createOrder(anyLong(), anyLong(), List.of(anyLong()), anyLong(), any(Byte.class))).thenReturn(true);
 
 		mockMvc.perform(put("/api/order/service/create")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"serviceId\":2,\"ownerId\":1,\"accessorId\":2,\"cost\":100}")
+						.content("{\"serviceId\":2,\"ownerId\":1,\"accessors\":[2],\"cost\":100}")
 						.header("userId", 1))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.ok").value(true))
@@ -116,7 +117,7 @@ public class OrderControllerTest {
 	public void failToCreateServiceOrderDueToMismatchedOwnerId() throws Exception {
 		mockMvc.perform(put("/api/order/service/create")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"serviceId\":2,\"ownerId\":2,\"accessorId\":2,\"cost\":100}")
+						.content("{\"serviceId\":2,\"ownerId\":2,\"accessors\":[2],\"cost\":100}")
 						.header("userId", 1))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.ok").value(false))
@@ -126,11 +127,11 @@ public class OrderControllerTest {
 	@Test
 	@DisplayName("Should fail to create service order due to exception")
 	public void failToCreateServiceOrderDueToException() throws Exception {
-		when(orderService.createOrder(anyLong(), anyLong(), anyLong(), anyLong(), any(Byte.class))).thenThrow(new RuntimeException("订单创建失败"));
+		when(orderService.createOrder(anyLong(), anyLong(), anyList(), anyLong(), any(Byte.class))).thenThrow(new RuntimeException("订单创建失败"));
 
 		mockMvc.perform(put("/api/order/service/create")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"serviceId\":2,\"ownerId\":1,\"accessorId\":2,\"cost\":100}")
+						.content("{\"serviceId\":2,\"ownerId\":1,\"accessors\":[2],\"cost\":100}")
 						.header("userId", 1))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.ok").value(false))

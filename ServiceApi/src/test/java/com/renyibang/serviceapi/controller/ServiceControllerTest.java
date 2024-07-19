@@ -1,28 +1,19 @@
 package com.renyibang.serviceapi.controller;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.renyibang.global.dto.ServiceDTO;
-import com.renyibang.global.dto.TaskDTO;
-import com.renyibang.global.dto.UserDTO;
-import com.renyibang.global.util.ResponseUtil;
 import com.renyibang.serviceapi.service.ServiceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -49,13 +40,14 @@ public class ServiceControllerTest {
         JSONObject expectedResponse = new JSONObject();
         expectedResponse.put("success", true);
         // 配置模拟对象的行为
-        when(serviceService.searchServiceByPaging(anyString(), any(Pageable.class), anyString(), anyString(), anyLong(), anyLong())).thenReturn(expectedResponse);
+        when(serviceService.searchServiceByPaging(anyString(), any(Pageable.class), anyString(), anyString(), anyLong(), anyLong(), anyLong())).thenReturn(expectedResponse);
         // 执行测试
         mockMvc.perform(get("/api/service/search")
                         .param("keyword", "test")
                         .param("pageSize", "10")
                         .param("pageIndex", "0")
-                        .param("order", "time"))
+                        .param("order", "time")
+                        .header("userId", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ok").value(true));
     }
@@ -66,13 +58,14 @@ public class ServiceControllerTest {
         JSONObject expectedResponse = new JSONObject();
         expectedResponse.put("success", true);
         // 配置模拟对象的行为
-        when(serviceService.searchServiceByPaging(anyString(), any(Pageable.class), anyString(), anyString(), anyLong(), anyLong())).thenReturn(expectedResponse);
+        when(serviceService.searchServiceByPaging(anyString(), any(Pageable.class), anyString(), anyString(), anyLong(), anyLong(), anyLong())).thenReturn(expectedResponse);
         // 执行测试
         mockMvc.perform(get("/api/service/search")
                         .param("keyword", "test")
                         .param("pageSize", "10")
                         .param("pageIndex", "0")
-                        .param("order", "rating"))
+                        .param("order", "rating")
+                        .header("userId", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ok").value(true));
     }
@@ -95,7 +88,7 @@ public class ServiceControllerTest {
         JSONObject expectedResponse = new JSONObject();
         expectedResponse.put("success", true);
         // 配置模拟对象的行为
-        when(serviceService.getServiceInfo(anyLong())).thenReturn(expectedResponse);
+        when(serviceService.getServiceInfo(anyLong(), anyLong())).thenReturn(expectedResponse);
         // 执行测试
         mockMvc.perform(get("/api/service/1"))
                 .andExpect(status().isOk())
@@ -108,12 +101,13 @@ public class ServiceControllerTest {
         JSONObject expectedResponse = new JSONObject();
         expectedResponse.put("success", true);
         // 配置模拟对象的行为
-        when(serviceService.getServiceComments(anyLong(), any(Pageable.class))).thenReturn(expectedResponse);
+        when(serviceService.getServiceComments(anyLong(), any(Pageable.class), anyLong())).thenReturn(expectedResponse);
         // 执行测试
         mockMvc.perform(get("/api/service/1/comment")
                         .param("pageSize", "10")
                         .param("pageIndex", "0")
-                        .param("order", "likes"))
+                        .param("order", "likes")
+                        .header("userId", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ok").value(true));
     }
@@ -124,12 +118,13 @@ public class ServiceControllerTest {
         JSONObject expectedResponse = new JSONObject();
         expectedResponse.put("success", true);
         // 配置模拟对象的行为
-        when(serviceService.getServiceComments(anyLong(), any(Pageable.class))).thenReturn(expectedResponse);
+        when(serviceService.getServiceComments(anyLong(), any(Pageable.class), anyLong())).thenReturn(expectedResponse);
         // 执行测试
         mockMvc.perform(get("/api/service/1/comment")
                         .param("pageSize", "10")
                         .param("pageIndex", "0")
-                        .param("order", "time"))
+                        .param("order", "time")
+                        .header("userId", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ok").value(true));
     }
@@ -151,12 +146,13 @@ public class ServiceControllerTest {
         JSONObject expectedResponse = new JSONObject();
         expectedResponse.put("success", true);
         // 配置模拟对象的行为
-        when(serviceService.getServiceMessages(anyLong(), any(Pageable.class))).thenReturn(expectedResponse);
+        when(serviceService.getServiceMessages(anyLong(), any(Pageable.class), anyLong())).thenReturn(expectedResponse);
         // 执行测试
         mockMvc.perform(get("/api/service/1/message")
                         .param("pageSize", "10")
                         .param("pageIndex", "0")
-                        .param("order", "likes"))
+                        .param("order", "likes")
+                        .header("userId", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ok").value(true));
     }
@@ -167,12 +163,13 @@ public class ServiceControllerTest {
         JSONObject expectedResponse = new JSONObject();
         expectedResponse.put("success", true);
         // 配置模拟对象的行为
-        when(serviceService.getServiceMessages(anyLong(), any(Pageable.class))).thenReturn(expectedResponse);
+        when(serviceService.getServiceMessages(anyLong(), any(Pageable.class), anyLong())).thenReturn(expectedResponse);
         // 执行测试
         mockMvc.perform(get("/api/service/1/message")
                         .param("pageSize", "10")
                         .param("pageIndex", "0")
-                        .param("order", "time"))
+                        .param("order", "time")
+                        .header("userId", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ok").value(true));
     }

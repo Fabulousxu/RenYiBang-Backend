@@ -693,20 +693,20 @@ public class OrderServiceImplTest {
     public void createOrderAllValidInputsTypeZero() {
         long taskId = 1L;
         long ownerId = 1L;
-        long accessorId = 5L;
+        List<Long> accessors = List.of(5L);
         long cost = 100L;
         Byte type = 0;
 
         when(taskClient.getTaskById(taskId)).thenReturn(ResponseUtil.success("获取任务信息成功！", validTask));
         when(userClient.getUserById(ownerId)).thenReturn(ResponseUtil.success("获取当前用户信息成功！", validOwner));
-        when(userClient.getUserById(accessorId)).thenReturn(ResponseUtil.success("获取当前用户信息成功！", validAccessor));
+        when(userClient.getUserById(accessors.getFirst())).thenReturn(ResponseUtil.success("获取当前用户信息成功！", validAccessor));
 
-        boolean result = orderService.createOrder(taskId, ownerId, accessorId, cost, type);
+        boolean result = orderService.createOrder(taskId, ownerId, accessors, cost, type);
 
         assertTrue(result);
         verify(taskClient, times(1)).getTaskById(taskId);
         verify(userClient, times(1)).getUserById(ownerId);
-        verify(userClient, times(1)).getUserById(accessorId);
+        verify(userClient, times(1)).getUserById(accessors.getFirst());
         verify(orderDao, times(1)).save(any(Order.class));
     }
 
@@ -715,20 +715,20 @@ public class OrderServiceImplTest {
     public void createOrderAllValidInputsTypeNonZero() {
         long taskId = 1L;
         long ownerId = 1L;
-        long accessorId = 5L;
+        List<Long> accessors = List.of(5L);
         long cost = 100L;
         Byte type = 1;
 
         when(serviceClient.getServiceById(taskId)).thenReturn(ResponseUtil.success("获取服务信息成功！", validService));
         when(userClient.getUserById(ownerId)).thenReturn(ResponseUtil.success("获取当前用户信息成功！", validOwner));
-        when(userClient.getUserById(accessorId)).thenReturn(ResponseUtil.success("获取当前用户信息成功！", validAccessor));
+        when(userClient.getUserById(accessors.getFirst())).thenReturn(ResponseUtil.success("获取当前用户信息成功！", validAccessor));
 
-        boolean result = orderService.createOrder(taskId, ownerId, accessorId, cost, type);
+        boolean result = orderService.createOrder(taskId, ownerId, accessors, cost, type);
 
         assertTrue(result);
         verify(serviceClient, times(1)).getServiceById(taskId);
         verify(userClient, times(1)).getUserById(ownerId);
-        verify(userClient, times(1)).getUserById(accessorId);
+        verify(userClient, times(1)).getUserById(accessors.getFirst());
         verify(orderDao, times(1)).save(any(Order.class));
     }
 
@@ -737,13 +737,13 @@ public class OrderServiceImplTest {
     public void createOrderTaskNotFoundTypeZero() {
         long taskId = 99999999L;
         long ownerId = 1L;
-        long accessorId = 5L;
+        List<Long> accessors = List.of(5L);
         long cost = 100L;
         Byte type = 0;
 
         when(taskClient.getTaskById(taskId)).thenReturn(ResponseUtil.error("任务不存在！"));
 
-        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(taskId, ownerId, accessorId, cost, type));
+        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(taskId, ownerId, accessors, cost, type));
     }
 
     @Test
@@ -751,13 +751,13 @@ public class OrderServiceImplTest {
     public void createOrderServiceNotFoundTypeNonZero() {
         long taskId = 99999999L;
         long ownerId = 1L;
-        long accessorId = 5L;
+        List<Long> accessors = List.of(5L);
         long cost = 100L;
         Byte type = 1;
 
         when(serviceClient.getServiceById(taskId)).thenReturn(ResponseUtil.error("服务不存在！"));
 
-        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(taskId, ownerId, accessorId, cost, type));
+        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(taskId, ownerId, accessors, cost, type));
     }
 
     @Test
@@ -765,14 +765,14 @@ public class OrderServiceImplTest {
     public void createOrderOwnerNotFound() {
         long taskId = 1L;
         long ownerId = 99999999L;
-        long accessorId = 5L;
+        List<Long> accessors = List.of(5L);
         long cost = 100L;
         Byte type = 0;
 
         when(taskClient.getTaskById(taskId)).thenReturn(ResponseUtil.success("获取任务信息成功！", validTask));
         when(userClient.getUserById(ownerId)).thenReturn(ResponseUtil.error("用户不存在！"));
 
-        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(taskId, ownerId, accessorId, cost, type));
+        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(taskId, ownerId, accessors, cost, type));
     }
 
     @Test
@@ -780,15 +780,15 @@ public class OrderServiceImplTest {
     public void createOrderAccessorNotFound() {
         long taskId = 1L;
         long ownerId = 1L;
-        long accessorId = 99999999L;
+        List<Long> accessors = List.of(99999999L);
         long cost = 100L;
         Byte type = 0;
 
         when(taskClient.getTaskById(taskId)).thenReturn(ResponseUtil.success("获取任务信息成功！", validTask));
         when(userClient.getUserById(ownerId)).thenReturn(ResponseUtil.success("获取当前用户信息成功！", validOwner));
-        when(userClient.getUserById(accessorId)).thenReturn(ResponseUtil.error("用户不存在！"));
+        when(userClient.getUserById(accessors.getFirst())).thenReturn(ResponseUtil.error("用户不存在！"));
 
-        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(taskId, ownerId, accessorId, cost, type));
+        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(taskId, ownerId, accessors, cost, type));
     }
 
     @Test
@@ -796,15 +796,14 @@ public class OrderServiceImplTest {
     public void createOrderCostNotPositive() {
         long taskId = 1L;
         long ownerId = 1L;
-        long accessorId = 5L;
+        List<Long> accessors = List.of(5L);
         long cost = 0L;
         Byte type = 0;
 
         when(taskClient.getTaskById(taskId)).thenReturn(ResponseUtil.success("获取任务信息成功！", validTask));
         when(userClient.getUserById(ownerId)).thenReturn(ResponseUtil.success("获取当前用户信息成功！", validOwner));
-        when(userClient.getUserById(accessorId)).thenReturn(ResponseUtil.success("获取当前用户信息成功！", validAccessor));
 
-        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(taskId, ownerId, accessorId, cost, type));
+        assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(taskId, ownerId, accessors, cost, type));
     }
 
     // setOrderStatusForce
