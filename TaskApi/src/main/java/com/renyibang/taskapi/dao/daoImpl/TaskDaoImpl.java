@@ -248,7 +248,7 @@ public class TaskDaoImpl implements TaskDao {
 
   @Override
   public Page<TaskAccess> getTaskAccessByTask(Task task, Pageable pageable) {
-    return taskAccessRepository.findByTaskAnAndTaskAccessStatus(task, pageable, TaskAccessStatus.ACCESSING);
+    return taskAccessRepository.findByTaskAndTaskAccessStatus(task, pageable, TaskAccessStatus.ACCESSING);
   }
 
   @Override
