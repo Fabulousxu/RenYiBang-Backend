@@ -35,4 +35,8 @@ public interface TaskDao {
   Page<Task> getMyAccessedTask(long userId, Pageable pageable);
 
   Page<TaskAccess> getTaskAccessByTask(Task task, Pageable pageable);
+
+  String cancelTask(long taskId, long userId);
+
+  String confirmAccessors(long taskId, long userId, List<Long> accessors);
 }

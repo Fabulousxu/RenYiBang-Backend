@@ -430,7 +430,7 @@ Doctor others dream prove. Price bring trouble guy.", 298800, '2024-06-30 10:21:
 Shake result not administration. Size really for performance ago state president. Soon relationship live city visit ten.",
 409300, '2023-12-29 05:33:18', 6, 2, 6649, 1);
 
-INSERT INTO renyibang_task.task_access (task_id, accessor_id, created_at, valid)
+INSERT INTO renyibang_task.task_access (task_id, accessor_id, created_at, status)
 VALUES (15, 5, '2023-07-31 23:37:43', 1),
 (51, 15, '2023-10-27 19:42:37', 0),
 (97, 7, '2023-10-27 14:16:57', 0),

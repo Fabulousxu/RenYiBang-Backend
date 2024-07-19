@@ -538,4 +538,37 @@ public class TaskServiceImpl implements TaskService {
       return ResponseUtil.error(String.valueOf(e));
     }
   }
+
+  @Override
+  public JSONObject cancelTask(long taskId, long userId) {
+    try {
+      String result = taskDao.cancelTask(taskId, userId);
+      if ("取消任务成功！".equals(result)) {
+        return ResponseUtil.success(result);
+      } else {
+        return ResponseUtil.error(result);
+      }
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
+
+  @Override
+  public JSONObject confirmAccessors(long taskId, long userId, JSONObject body) {
+    try {
+      List<Long> accessors = body.getJSONArray("userList").toJavaList(Long.class);
+      if (accessors.isEmpty()) {
+        return ResponseUtil.error("接取者列表为空！");
+      }
+
+      String result = taskDao.confirmAccessors(taskId, userId, accessors);
+      if ("确认接取者成功！".equals(result)) {
+        return ResponseUtil.success(result);
+      } else {
+        return ResponseUtil.error(result);
+      }
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
 }
