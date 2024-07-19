@@ -1,6 +1,7 @@
 package com.renyibang.taskapi.dao.daoImpl;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.renyibang.global.client.OrderClient;
 import com.renyibang.global.client.UserClient;
 import com.renyibang.taskapi.dao.TaskDao;
 import com.renyibang.taskapi.entity.Task;
@@ -321,7 +322,7 @@ public class TaskDaoImpl implements TaskDao {
     orderRequest.put("accessors", accessors);
     orderRequest.put("cost", task.getPrice());
 
-    JSONObject result = orderClient.createOrder(orderRequest);
+    JSONObject result = orderClient.createTaskOrder(orderRequest);
     if(Objects.equals(false, result.get("ok")))
     {
       return "创建订单失败！";

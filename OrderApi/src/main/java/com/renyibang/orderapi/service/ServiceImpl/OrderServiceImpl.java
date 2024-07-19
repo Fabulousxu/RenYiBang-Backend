@@ -148,7 +148,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public boolean createOrder(long taskId, long ownerId, long accessorId, long cost, Byte type) {
+  public boolean createOrder(long taskId, long ownerId, List<Long> accessors, long cost, Byte type) {
     // 校验：是否存在
     // 任务， owner, accessor
     // cost是否为正数
@@ -166,22 +166,25 @@ public class OrderServiceImpl implements OrderService {
     JSONObject result = userClient.getUserById(ownerId);
     if(!result.getBoolean("ok")) throw new IllegalArgumentException("发起者不存在");
 
-    result = userClient.getUserById(accessorId);
-    if(!result.getBoolean("ok")) throw new IllegalArgumentException("接收者不存在");
-
     if (cost <= 0) throw new IllegalArgumentException("金额必须为正数");
 
-    // Create a new Order
-    Order order = new Order();
-    order.setItemId(taskId);
-    order.setOwnerId(ownerId);
-    order.setAccessorId(accessorId);
-    order.setCost(cost);
-    order.setStatus(OrderStatus.UNPAID);
-    order.setType(type);
+    for(long accessorId : accessors) {
+      result = userClient.getUserById(accessorId);
+      if(!result.getBoolean("ok")) throw new IllegalArgumentException("接收者不存在");
 
-    // Save the Order and return its ID
-    orderDao.save(order);
+      // Create a new Order
+      Order order = new Order();
+      order.setItemId(taskId);
+      order.setOwnerId(ownerId);
+      order.setAccessorId(accessorId);
+      order.setCost(cost);
+      order.setStatus(OrderStatus.UNPAID);
+      order.setType(type);
+
+      // Save the Order and return its ID
+      orderDao.save(order);
+    }
+
     return true;
   }
 
