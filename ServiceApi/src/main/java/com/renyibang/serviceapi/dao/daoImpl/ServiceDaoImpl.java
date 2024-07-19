@@ -1,11 +1,13 @@
 package com.renyibang.serviceapi.dao.daoImpl;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.global.client.UserClient;
 import com.renyibang.serviceapi.dao.ServiceDao;
 import com.renyibang.serviceapi.entity.Service;
 import com.renyibang.serviceapi.entity.ServiceAccess;
 import com.renyibang.serviceapi.entity.ServiceCollect;
 import com.renyibang.serviceapi.enums.ServiceStatus;
+import com.renyibang.serviceapi.enums.ServiceAccessStatus;
 import com.renyibang.serviceapi.repository.ServiceAccessRepository;
 import com.renyibang.serviceapi.repository.ServiceCollectRepository;
 import com.renyibang.serviceapi.repository.ServiceRepository;
@@ -18,16 +20,26 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
 @Repository
 public class ServiceDaoImpl implements ServiceDao {
-  @Autowired ServiceRepository serviceRepository;
+  @Autowired
+  ServiceRepository serviceRepository;
 
-  @Autowired ServiceCollectRepository serviceCollectRepository;
+  @Autowired
+  ServiceCollectRepository serviceCollectRepository;
 
-  @Autowired ServiceAccessRepository serviceAccessRepository;
+  @Autowired
+  ServiceAccessRepository serviceAccessRepository;
 
-  @Autowired UserClient userClient;
+  @Autowired
+  UserClient userClient;
+
+  @Autowired
+  OrderClient orderClient;
 
   @Override
   public Service findById(long serviceId) {
@@ -44,10 +56,10 @@ public class ServiceDaoImpl implements ServiceDao {
       long priceHigh) {
     if (!keyword.isEmpty()) {
       return serviceRepository.searchServices(
-          keyword, priceLow, priceHigh, beginDateTime, endDateTime, ServiceStatus.DELETE, pageable);
+              keyword, priceLow, priceHigh, beginDateTime, endDateTime, ServiceStatus.DELETE, pageable);
     } else {
       return serviceRepository.findByPriceBetweenAndCreatedAtBetweenAndStatusNot(
-          priceLow, priceHigh, beginDateTime, endDateTime, ServiceStatus.DELETE, pageable);
+              priceLow, priceHigh, beginDateTime, endDateTime, ServiceStatus.DELETE, pageable);
     }
   }
 
@@ -102,7 +114,7 @@ public class ServiceDaoImpl implements ServiceDao {
       }
 
       ServiceCollect serviceCollect =
-          serviceCollectRepository.findByServiceAndCollectorId(service, uncollectorId);
+              serviceCollectRepository.findByServiceAndCollectorId(service, uncollectorId);
       if (serviceCollect == null) {
         return "用户未收藏该服务！";
       }
@@ -181,7 +193,7 @@ public class ServiceDaoImpl implements ServiceDao {
       }
 
       ServiceAccess serviceAccess =
-          serviceAccessRepository.findByServiceAndAccessorId(service, unaccessorId);
+              serviceAccessRepository.findByServiceAndAccessorId(service, unaccessorId);
       if (serviceAccess == null) {
         return "用户未接取该服务！";
       }
@@ -195,7 +207,7 @@ public class ServiceDaoImpl implements ServiceDao {
 
   @Override
   public String publishService(
-      long userId, String title, String description, long price, List<String> requestImages) {
+          long userId, String title, String description, long price, List<String> requestImages) {
     try {
       if (!userClient.getUserExist(userId)) {
         return "用户不存在！";
@@ -221,12 +233,109 @@ public class ServiceDaoImpl implements ServiceDao {
   @Override
   public boolean isCollected(long serviceId, long collectorId) {
     return serviceCollectRepository.existsByCollectorIdAndAndService(
-        collectorId, serviceRepository.findById(serviceId).orElse(null));
+            collectorId, serviceRepository.findById(serviceId).orElse(null));
   }
 
   @Override
   public boolean isAccessed(long serviceId, long ownerId) {
     return serviceAccessRepository.existsByAccessorIdAndService(
-        ownerId, serviceRepository.findById(serviceId).orElse(null));
+            ownerId, serviceRepository.findById(serviceId).orElse(null));
+  }
+
+  @Override
+  public Page<Service> getMyService(long userId, Pageable pageable) {
+    return serviceRepository.findByOwnerId(userId, pageable);
+  }
+
+  @Override
+  public Object getAccessedNumber(Service service) {
+    return serviceAccessRepository.countByService(service);
+  }
+
+  @Override
+  public Page<Service> getMyAccessedService(long userId, Pageable pageable) {
+    return serviceRepository.findByAccessorId(userId, pageable);
+  }
+
+  @Override
+  public Page<ServiceAccess> getServiceAccessByService(Service service, Pageable pageable) {
+    return serviceAccessRepository.findByServiceAndServiceAccessStatus(service, pageable);
+  }
+
+  @Override
+  public String cancelService(long serviceId, long userId) {
+    Service service = serviceRepository.findById(serviceId).orElse(null);
+    if (service == null) {
+      return "服务不存在！";
+    }
+
+    if (service.getOwnerId() != userId) {
+      return "只有服务发布者才能取消该服务！";
+    }
+
+    if (service.getStatus() == ServiceStatus.DELETE) {
+      return "该服务已被删除！";
+    }
+
+    service.setStatus(ServiceStatus.DELETE);
+    serviceRepository.save(service);
+
+    return "取消服务成功！";
+  }
+
+  @Override
+  public String confirmAccessors(long serviceId, long userId, List<Long> accessors) {
+    Service service = serviceRepository.findById(serviceId).orElse(null);
+    if (service == null) {
+      return "服务不存在！";
+    }
+
+    if (service.getOwnerId() != userId) {
+      return "只有服务发布者才能确认接取者！";
+    }
+
+    if (service.getStatus() == ServiceStatus.DELETE) {
+      return "该服务已被删除！";
+    }
+
+    if (service.getStatus() == ServiceStatus.REMOVE) {
+      return "该服务已被下架！";
+    }
+
+    if (service.getMaxAccess() < accessors.size()) {
+      return "接取者数量超过最大接取数！";
+    }
+
+    Set<ServiceAccess> confirmAccessors = new HashSet<>();
+
+    for (long accessorId : accessors) {
+      ServiceAccess serviceAccess = serviceAccessRepository.findByServiceAndAccessorId(service, accessorId);
+      if (serviceAccess == null) {
+        return "接取者" + accessorId + "不存在！";
+      }
+
+      else if (serviceAccess.getServiceAccessStatus() != ServiceAccessStatus.ACCESSING) {
+        return "接取者状态异常！";
+      }
+
+      confirmAccessors.add(serviceAccess);
+    }
+
+    JSONObject orderRequest = new JSONObject();
+    orderRequest.put("serviceId", serviceId);
+    orderRequest.put("ownerId", userId);
+    orderRequest.put("accessors", accessors);
+    orderRequest.put("cost", service.getPrice());
+
+    JSONObject result = orderClient.createOrder(orderRequest);
+    if(Objects.equals(false, result.get("ok"))) {
+      return "创建订单失败！";
+    }
+
+    for (ServiceAccess serviceAccess : confirmAccessors) {
+      serviceAccess.setServiceAccessStatus(ServiceAccessStatus.ACCESS_SUCCESS);
+      serviceAccessRepository.save(serviceAccess);
+    }
+    return "确认接取者成功！";
   }
 }

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
+import com.renyibang.serviceapi.enums.ServiceAccessStatus;
 
 @Entity
 @Table(name = "service_access")
@@ -30,6 +31,6 @@ public class ServiceAccess {
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime createdAt; // 服务接取时间
 
-  @Column(name = "valid")
-  private boolean valid = true; //接取候选是否有效
+  @Column(name = "status")
+  private ServiceAccessStatus serviceAccessStatus; // 服务接取状态
 }

@@ -2,6 +2,7 @@ package com.renyibang.serviceapi.dao;
 
 import com.renyibang.serviceapi.entity.Service;
 
+import com.renyibang.serviceapi.entity.ServiceAccess;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -26,5 +27,18 @@ public interface ServiceDao {
   String publishService(long userId, String title, String description, long price, List<String> requestImages);
 
   boolean isCollected(long serviceId, long collectorId);
+
 	boolean isAccessed(long serviceId, long ownerId);
+
+  Page<Service> getMyService(long userId, Pageable pageable);
+
+  Object getAccessedNumber(Service service);
+
+  Page<Service> getMyAccessedService(long userId, Pageable pageable);
+
+  Page<ServiceAccess> getServiceAccessByService(Service service, Pageable pageable);
+
+  String cancelService(long serviceId, long userId);
+
+  String confirmAccessors(long serviceId, long userId, List<Long> accessors);
 }

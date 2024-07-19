@@ -8,6 +8,7 @@ import com.renyibang.serviceapi.dao.ServiceCommentDao;
 import com.renyibang.serviceapi.dao.ServiceDao;
 import com.renyibang.serviceapi.dao.ServiceMessageDao;
 import com.renyibang.serviceapi.entity.Service;
+import com.renyibang.serviceapi.entity.ServiceAccess;
 import com.renyibang.serviceapi.entity.ServiceComment;
 import com.renyibang.serviceapi.entity.ServiceMessage;
 import com.renyibang.serviceapi.service.ServiceService;
@@ -509,5 +510,130 @@ public class ServiceServiceImpl implements ServiceService {
     }
 
     return ResponseUtil.success(service.getOwnerId());
+  }
+
+  @Override
+  public JSONObject getMyService(Pageable pageable, long userId) {
+    try {
+      JSONArray result = new JSONArray();
+      Page<Service> searchResult = serviceDao.getMyService(userId, pageable);
+
+      List<Service> serviceList = searchResult.getContent();
+
+      for (Service service : serviceList) {
+        JSONObject serviceJson = service.toJSON();
+        serviceJson.put("accessedNumber", serviceDao.getAccessedNumber(service));
+        result.add(serviceJson);
+      }
+
+      JSONObject returnRes = new JSONObject();
+
+      returnRes.put("total", searchResult.getTotalElements());
+      returnRes.put("items", result);
+
+      return ResponseUtil.success(returnRes);
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
+
+  @Override
+  public JSONObject getMyAccessedService(Pageable pageable, long userId) {
+    try {
+      JSONArray result = new JSONArray();
+      Page<Service> searchResult = serviceDao.getMyAccessedService(userId, pageable);
+
+      List<Service> serviceList = searchResult.getContent();
+
+      for (Service service : serviceList) {
+        JSONObject serviceJson = service.toJSON();
+        result.add(serviceJson);
+      }
+
+      JSONObject returnRes = new JSONObject();
+
+      returnRes.put("total", searchResult.getTotalElements());
+      returnRes.put("items", result);
+
+      return ResponseUtil.success(returnRes);
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
+
+  @Override
+  public JSONObject getServiceAccessorInfo(long serviceId, long userId, Pageable pageable) {
+    try {
+      JSONObject result = new JSONObject();
+      Service service = serviceDao.findById(serviceId);
+      if (service == null) {
+        return ResponseUtil.error("服务不存在！");
+      }
+
+      if (service.getOwnerId() != userId) {
+        return ResponseUtil.error("您不是服务发布者！");
+      }
+
+      Page<ServiceAccess> serviceAccessPage = serviceDao.getServiceAccessByService(service, pageable);
+      if(serviceAccessPage == null) {
+        return ResponseUtil.error("获取接取信息失败！");
+      }
+
+      List<Long> userIds = new ArrayList<>();
+      for (ServiceAccess serviceAccess : serviceAccessPage.getContent()) {
+        userIds.add(serviceAccess.getAccessorId());
+      }
+
+      if (userIds.isEmpty()) {
+        result.put("items", new Vector<>());
+        return ResponseUtil.success(result);
+      }
+
+      JSONObject userInfos = userClient.getAccessorInfos(userIds);
+      if (Objects.equals(false, userInfos.get("ok"))) {
+        return ResponseUtil.error("用户信息获取失败！");
+      }
+      ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
+
+      result.put("total", serviceAccessPage.getTotalElements());
+      result.put("items", userInfosArray);
+
+      return ResponseUtil.success(result);
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
+
+  @Override
+  public JSONObject cancelService(long serviceId, long userId) {
+    try {
+      String result = serviceDao.cancelService(serviceId, userId);
+      if ("取消服务成功！".equals(result)) {
+        return ResponseUtil.success(result);
+      } else {
+        return ResponseUtil.error(result);
+      }
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
+
+  @Override
+  public JSONObject confirmAccessors(long serviceId, long userId, JSONObject body) {
+    try {
+      List<Long> accessors = body.getJSONArray("userList").toJavaList(Long.class);
+      if (accessors.isEmpty()) {
+        return ResponseUtil.error("接取者列表为空！");
+      }
+
+      String result = serviceDao.confirmAccessors(serviceId, userId, accessors);
+      if ("确认接取者成功！".equals(result)) {
+        return ResponseUtil.success(result);
+      } else {
+        return ResponseUtil.error(result);
+      }
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
   }
 }
