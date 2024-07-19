@@ -27,7 +27,7 @@ public class TaskController {
       long priceHigh,
       @RequestHeader long userId) {
     Sort sort;
-    if (Objects.equals(order, "time")) sort = Sort.by("createdAt").descending();
+    if (Objects.equals(order, "time")) sort = Sort.by("created_at").descending();
     else if (Objects.equals(order, "rating")) sort = Sort.by("rating").descending();
     else return ResponseUtil.error("排序类型错误");
     if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
@@ -165,18 +165,18 @@ public class TaskController {
     return taskService.getMyAccessedTask(PageRequest.of(pageIndex, pageSize), userId);
   }
 
-  @GetMapping("/{taskId}/select/info")
-  public JSONObject getTaskAccessorInfo(@PathVariable long taskId, @RequestHeader long userId, int pageSize, int pageIndex) {
-    return taskService.getTaskAccessorInfo(taskId, userId, PageRequest.of(pageIndex, pageSize));
-  }
+//  @GetMapping("/{taskId}/select/info")
+//  public JSONObject getTaskAccessorInfo(@PathVariable long taskId, @RequestHeader long userId, int pageSize, int pageIndex) {
+//    return taskService.getTaskAccessorInfo(taskId, userId, PageRequest.of(pageIndex, pageSize));
+//  }
 
   @DeleteMapping("/{taskId}/cancel")
   public JSONObject cancelTask(@PathVariable long taskId, @RequestHeader long userId) {
     return taskService.cancelTask(taskId, userId);
   }
 
-  @PutMapping("/{taskId}/select/confirm")
-  public JSONObject confirmAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
-    return taskService.confirmAccessors(taskId, userId, body);
-  }
+//  @PutMapping("/{taskId}/select/confirm")
+//  public JSONObject confirmAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
+//    return taskService.confirmAccessors(taskId, userId, body);
+//  }
 }

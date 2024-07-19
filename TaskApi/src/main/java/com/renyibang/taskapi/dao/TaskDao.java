@@ -40,5 +40,5 @@ public interface TaskDao {
 
   String cancelTask(long taskId, long userId);
 
-  String confirmAccessors(long taskId, long userId, List<Long> accessors);
+//  String confirmAccessors(long taskId, long userId, List<Long> accessors);
 }

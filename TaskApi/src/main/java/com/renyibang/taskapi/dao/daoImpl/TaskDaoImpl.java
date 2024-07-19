@@ -19,10 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 @Repository
 public class TaskDaoImpl implements TaskDao {
@@ -34,7 +31,7 @@ public class TaskDaoImpl implements TaskDao {
 
   @Autowired UserClient userClient;
 
-  @Autowired OrderClient orderClient;
+//  @Autowired OrderClient orderClient;
 
   @Override
   public Task findById(long taskId) {
@@ -51,7 +48,7 @@ public class TaskDaoImpl implements TaskDao {
       long priceHigh) {
     if (!keyword.isEmpty()) {
       return taskRepository.searchTasks(
-              keyword, priceLow, priceHigh, beginDateTime, endDateTime, TaskStatus.DELETE, pageable);
+              keyword + "*", priceLow, priceHigh, beginDateTime, endDateTime, TaskStatus.DELETE, pageable);
     } else {
       return taskRepository.findByPriceBetweenAndCreatedAtBetweenAndStatusNot(
           priceLow, priceHigh, beginDateTime, endDateTime, TaskStatus.DELETE, pageable);
