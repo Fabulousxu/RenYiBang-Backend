@@ -2,6 +2,7 @@ package com.renyibang.taskapi.dao;
 
 import com.renyibang.taskapi.entity.Task;
 
+import com.renyibang.taskapi.entity.TaskAccess;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -28,4 +29,16 @@ public interface TaskDao {
   boolean isCollected(long taskId, long collectorId);
 
   boolean isAccessed(long taskId, long userId);
+  
+  Page<Task> getMyTask(long userId, Pageable pageable);
+
+  Object getAccessedNumber(Task task);
+
+  Page<Task> getMyAccessedTask(long userId, Pageable pageable);
+
+  Page<TaskAccess> getTaskAccessByTask(Task task, Pageable pageable);
+
+  String cancelTask(long taskId, long userId);
+
+  String confirmAccessors(long taskId, long userId, List<Long> accessors);
 }

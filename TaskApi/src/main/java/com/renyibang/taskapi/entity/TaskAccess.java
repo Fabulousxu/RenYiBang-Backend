@@ -1,12 +1,14 @@
 package com.renyibang.taskapi.entity;
 
+import com.renyibang.taskapi.enums.TaskAccessStatus;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "task_access")
@@ -30,6 +32,6 @@ public class TaskAccess {
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime createdAt; // 任务接取时间
 
-  @Column(name = "valid")
-  private boolean valid = true; //接取候选是否有效
+  @Column(name = "status")
+  private TaskAccessStatus taskAccessStatus; // 任务接取状态
 }
