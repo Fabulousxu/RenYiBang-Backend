@@ -2,7 +2,7 @@ package com.renyibang.serviceapi.repository;
 
 import com.renyibang.serviceapi.entity.Service;
 import com.renyibang.serviceapi.entity.ServiceAccess;
-import com.renyibang.serviceapi.entity.ServiceCollect;
+import com.renyibang.serviceapi.enums.ServiceAccessStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +13,5 @@ public interface ServiceAccessRepository extends JpaRepository<ServiceAccess, Lo
     boolean existsByAccessorIdAndService(long accessorId, Service service);
     ServiceAccess findByServiceAndAccessorId(Service service, long accessorId);
     Object countByService(Service service);
-    Page<ServiceAccess> findByServiceAndServiceAccessStatus(Service service, Pageable pageable);
+    Page<ServiceAccess> findByServiceAndServiceAccessStatus(Service service, Pageable pageable, ServiceAccessStatus serviceAccessStatus);
 }

@@ -260,7 +260,7 @@ public class ServiceDaoImpl implements ServiceDao {
 
   @Override
   public Page<ServiceAccess> getServiceAccessByService(Service service, Pageable pageable) {
-    return serviceAccessRepository.findByServiceAndServiceAccessStatus(service, pageable);
+    return serviceAccessRepository.findByServiceAndServiceAccessStatus(service, pageable, ServiceAccessStatus.ACCESSING);
   }
 
   @Override
