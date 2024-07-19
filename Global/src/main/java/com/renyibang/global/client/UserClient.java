@@ -25,4 +25,7 @@ public interface UserClient {
 
   @PostMapping("/api/user/update")
   JSONObject updateUser(@RequestBody UserDTO userDTO);
+
+  @GetMapping("/api/user/accessor/{userIds}")
+  JSONObject getAccessorInfos(List<Long> userIds);
 }
