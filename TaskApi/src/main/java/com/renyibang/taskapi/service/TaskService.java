@@ -55,9 +55,9 @@ public interface TaskService {
 
   JSONObject getMyAccessedTask(Pageable pageable, long userId);
 
-//  JSONObject getTaskAccessorInfo(long taskId, long userId, Pageable pageable);
+  JSONObject getTaskAccessorInfo(long taskId, long userId, Pageable pageable);
 
   JSONObject cancelTask(long taskId, long userId);
 
-//  JSONObject confirmAccessors(long taskId, long userId, JSONObject body);
+  JSONObject confirmAccessors(long taskId, long userId, JSONObject body);
 }

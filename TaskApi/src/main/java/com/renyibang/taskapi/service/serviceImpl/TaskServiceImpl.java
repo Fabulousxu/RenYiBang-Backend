@@ -8,6 +8,7 @@ import com.renyibang.taskapi.dao.TaskCommentDao;
 import com.renyibang.taskapi.dao.TaskDao;
 import com.renyibang.taskapi.dao.TaskMessageDao;
 import com.renyibang.taskapi.entity.Task;
+import com.renyibang.taskapi.entity.TaskAccess;
 import com.renyibang.taskapi.entity.TaskComment;
 import com.renyibang.taskapi.entity.TaskMessage;
 import com.renyibang.taskapi.service.TaskService;
@@ -501,44 +502,44 @@ public class TaskServiceImpl implements TaskService {
     }
   }
 
-//  @Override
-//  public JSONObject getTaskAccessorInfo(long taskId, long userId, Pageable pageable) {
-//    try {
-//      JSONObject result = new JSONObject();
-//      Task task = taskDao.findById(taskId);
-//      if (task == null) {
-//        return ResponseUtil.error("任务不存在！");
-//      }
-//
-//      if(task.getOwnerId() != userId) {
-//        return ResponseUtil.error("您不是任务发布者！");
-//      }
-//
-//      Page<TaskAccess> taskAccessPage = taskDao.getTaskAccessByTask(task, pageable);
-//      if(taskAccessPage == null) {
-//        return ResponseUtil.error("获取接取信息失败！");
-//      }
-//
-//      List<Long> userIds = new ArrayList<>();
-//      for (TaskAccess taskAccess : taskAccessPage) userIds.add(taskAccess.getAccessorId());
-//
-//      if (userIds.isEmpty()) {
-//        result.put("items", new JSONArray());
-//        return ResponseUtil.success(result);
-//      }
-//
-//      JSONObject userInfos = userClient.getAccessorInfos(userIds);
-//      if (Objects.equals(false, userInfos.get("ok"))) return ResponseUtil.error("用户信息获取失败！");
-//      ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
-//
-//      result.put("total", taskAccessPage.getTotalElements());
-//      result.put("items", userInfosArray);
-//
-//      return ResponseUtil.success(result);
-//    } catch (Exception e) {
-//      return ResponseUtil.error(String.valueOf(e));
-//    }
-//  }
+  @Override
+  public JSONObject getTaskAccessorInfo(long taskId, long userId, Pageable pageable) {
+    try {
+      JSONObject result = new JSONObject();
+      Task task = taskDao.findById(taskId);
+      if (task == null) {
+        return ResponseUtil.error("任务不存在！");
+      }
+
+      if(task.getOwnerId() != userId) {
+        return ResponseUtil.error("您不是任务发布者！");
+      }
+
+      Page<TaskAccess> taskAccessPage = taskDao.getTaskAccessByTask(task, pageable);
+      if(taskAccessPage == null) {
+        return ResponseUtil.error("获取接取信息失败！");
+      }
+
+      List<Long> userIds = new ArrayList<>();
+      for (TaskAccess taskAccess : taskAccessPage) userIds.add(taskAccess.getAccessorId());
+
+      if (userIds.isEmpty()) {
+        result.put("items", new JSONArray());
+        return ResponseUtil.success(result);
+      }
+
+      JSONObject userInfos = userClient.getAccessorInfos(userIds);
+      if (Objects.equals(false, userInfos.get("ok"))) return ResponseUtil.error("用户信息获取失败！");
+      ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
+
+      result.put("total", taskAccessPage.getTotalElements());
+      result.put("items", userInfosArray);
+
+      return ResponseUtil.success(result);
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
 
   @Override
   public JSONObject cancelTask(long taskId, long userId) {
@@ -554,22 +555,22 @@ public class TaskServiceImpl implements TaskService {
     }
   }
 
-//  @Override
-//  public JSONObject confirmAccessors(long taskId, long userId, JSONObject body) {
-//    try {
-//      List<Long> accessors = body.getJSONArray("userList").toJavaList(Long.class);
-//      if (accessors.isEmpty()) {
-//        return ResponseUtil.error("接取者列表为空！");
-//      }
-//
-//      String result = taskDao.confirmAccessors(taskId, userId, accessors);
-//      if ("确认接取者成功！".equals(result)) {
-//        return ResponseUtil.success(result);
-//      } else {
-//        return ResponseUtil.error(result);
-//      }
-//    } catch (Exception e) {
-//      return ResponseUtil.error(String.valueOf(e));
-//    }
-//  }
+  @Override
+  public JSONObject confirmAccessors(long taskId, long userId, JSONObject body) {
+    try {
+      List<Long> accessors = body.getJSONArray("userList").toJavaList(Long.class);
+      if (accessors.isEmpty()) {
+        return ResponseUtil.error("接取者列表为空！");
+      }
+
+      String result = taskDao.confirmAccessors(taskId, userId, accessors);
+      if ("确认接取者成功！".equals(result)) {
+        return ResponseUtil.success(result);
+      } else {
+        return ResponseUtil.error(result);
+      }
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
 }

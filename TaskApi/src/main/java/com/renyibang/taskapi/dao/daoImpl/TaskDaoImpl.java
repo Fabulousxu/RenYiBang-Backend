@@ -19,7 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Repository
 public class TaskDaoImpl implements TaskDao {
@@ -31,7 +34,7 @@ public class TaskDaoImpl implements TaskDao {
 
   @Autowired UserClient userClient;
 
-//  @Autowired OrderClient orderClient;
+  @Autowired OrderClient orderClient;
 
   @Override
   public Task findById(long taskId) {
