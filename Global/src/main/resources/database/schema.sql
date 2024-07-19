@@ -69,8 +69,11 @@ create table task
 )
     comment '任务表';
 
-alter table task add fulltext index title (title) with parser ngram;
-alter table task add fulltext index description (description) with parser ngram;
+ALTER TABLE task ADD FULLTEXT INDEX title_description (title, description) WITH PARSER ngram;
+ALTER TABLE task DROP INDEX title_description;
+ALTER TABLE task ADD FULLTEXT INDEX title_description (title, description);
+
+
 
 create table task_access
 (
@@ -272,4 +275,3 @@ create table service_message_like
     constraint service_message_like_service_message_service_message_id_fk
         foreign key (service_message_id) references service_message (service_message_id)
 );
-

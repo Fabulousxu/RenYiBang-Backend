@@ -17,12 +17,12 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Override
     Page<Task> findAll(Pageable pageable);
 
-    @Query("SELECT t FROM Task t WHERE " +
-            "(LOWER(t.title) LIKE LOWER(CONCAT('%', :searchText, '%')) OR " +
-            "LOWER(t.description) LIKE LOWER(CONCAT('%', :searchText, '%'))) AND " +
+    @Query(value = "SELECT * FROM task t WHERE " +
+            "(MATCH(t.title, t.description) AGAINST (:searchText IN BOOLEAN MODE)) AND " +
             "t.price BETWEEN :priceLow AND :priceHigh AND " +
-            "t.createdAt BETWEEN :beginDateTime AND :endDateTime AND " +
-            "t.status != :status")
+            "t.created_at BETWEEN :beginDateTime AND :endDateTime AND " +
+            "t.status != :status",
+            nativeQuery = true)
     Page<Task> searchTasks(@Param("searchText") String searchText,
                            @Param("priceLow") long priceLow,
                            @Param("priceHigh") long priceHigh,
@@ -30,6 +30,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
                            @Param("endDateTime") LocalDateTime endDateTime,
                            @Param("status") TaskStatus status,
                            Pageable pageable);
+
+
 
     Page<Task> findByPriceBetweenAndCreatedAtBetweenAndStatusNot(@Param("priceLow") long priceLow,
                                                      @Param("priceHigh") long priceHigh,
