@@ -2,12 +2,13 @@ package com.renyibang.global.client;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.global.dto.UserDTO;
-import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 @FeignClient(name = "UserApi")
 public interface UserClient {
@@ -27,5 +28,5 @@ public interface UserClient {
   JSONObject updateUser(@RequestBody UserDTO userDTO);
 
   @GetMapping("/api/user/accessor/{userIds}")
-  JSONObject getAccessorInfos(List<Long> userIds);
+  JSONObject getAccessorInfos(@PathVariable List<Long> userIds);
 }

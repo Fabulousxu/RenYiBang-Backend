@@ -165,18 +165,18 @@ public class TaskController {
     return taskService.getMyAccessedTask(PageRequest.of(pageIndex, pageSize), userId);
   }
 
-//  @GetMapping("/{taskId}/select/info")
-//  public JSONObject getTaskAccessorInfo(@PathVariable long taskId, @RequestHeader long userId, int pageSize, int pageIndex) {
-//    return taskService.getTaskAccessorInfo(taskId, userId, PageRequest.of(pageIndex, pageSize));
-//  }
+  @GetMapping("/{taskId}/select/info")
+  public JSONObject getTaskAccessorInfo(@PathVariable long taskId, @RequestHeader long userId, int pageSize, int pageIndex) {
+    return taskService.getTaskAccessorInfo(taskId, userId, PageRequest.of(pageIndex, pageSize));
+  }
 
   @DeleteMapping("/{taskId}/cancel")
   public JSONObject cancelTask(@PathVariable long taskId, @RequestHeader long userId) {
     return taskService.cancelTask(taskId, userId);
   }
 
-//  @PutMapping("/{taskId}/select/confirm")
-//  public JSONObject confirmAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
-//    return taskService.confirmAccessors(taskId, userId, body);
-//  }
+  @PutMapping("/{taskId}/select/confirm")
+  public JSONObject confirmAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
+    return taskService.confirmAccessors(taskId, userId, body);
+  }
 }
