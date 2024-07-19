@@ -2,6 +2,7 @@ package com.renyibang.serviceapi.dao.daoImpl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.global.client.UserClient;
+import com.renyibang.global.client.OrderClient;
 import com.renyibang.serviceapi.dao.ServiceDao;
 import com.renyibang.serviceapi.entity.Service;
 import com.renyibang.serviceapi.entity.ServiceAccess;
@@ -327,7 +328,7 @@ public class ServiceDaoImpl implements ServiceDao {
     orderRequest.put("accessors", accessors);
     orderRequest.put("cost", service.getPrice());
 
-    JSONObject result = orderClient.createOrder(orderRequest);
+    JSONObject result = orderClient.createServiceOrder(orderRequest);
     if(Objects.equals(false, result.get("ok"))) {
       return "创建订单失败！";
     }
