@@ -201,4 +201,38 @@ public class ServiceController {
     {
         return serviceService.getServiceOwnerId(serviceId);
     }
+
+    @GetMapping("/initiator/self")
+    public JSONObject getMyTask(int pageSize, int pageIndex, @RequestHeader long userId)
+    {
+        if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
+        Pageable pageable = PageRequest.of(pageIndex, pageSize);
+        return serviceService.getMyService(pageable, userId);
+    }
+
+    @GetMapping("/recipient/self")
+    public JSONObject getMyAccessedTask(int pageSize, int pageIndex, @RequestHeader long userId)
+    {
+        if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
+        Pageable pageable = PageRequest.of(pageIndex, pageSize);
+        return serviceService.getMyAccessedService(pageable, userId);
+    }
+
+    @GetMapping("/{serviceId}/select/info")
+    public JSONObject getServiceAccessorInfo(@PathVariable long serviceId, @RequestHeader long userId, int pageSize, int pageIndex)
+    {
+        return serviceService.getServiceAccessorInfo(serviceId, userId, PageRequest.of(pageIndex, pageSize));
+    }
+
+    @DeleteMapping("/{serviceId}/cancel")
+    public JSONObject cancelTask(@PathVariable long serviceId, @RequestHeader long userId)
+    {
+        return serviceService.cancelService(serviceId, userId);
+    }
+
+    @PutMapping("/{serviceId}/select/confirm")
+    public JSONObject confirmAccessors(@PathVariable long serviceId, @RequestHeader long userId, @RequestBody JSONObject body)
+    {
+        return serviceService.confirmAccessors(serviceId, userId, body);
+    }
 }

@@ -43,4 +43,14 @@ public interface ServiceService {
     JSONObject getServiceDtoById(Long serviceId);
 
     JSONObject getServiceOwnerId(long serviceId);
+
+    JSONObject getMyService(Pageable pageable, long userId);
+
+    JSONObject getMyAccessedService(Pageable pageable, long userId);
+
+    JSONObject getServiceAccessorInfo(long serviceId, long userId, Pageable pageable);
+
+    JSONObject cancelService(long serviceId, long userId);
+
+    JSONObject confirmAccessors(long serviceId, long userId, JSONObject body);
 }

@@ -87,6 +87,21 @@ public class Service {
         return jsonObject;
     }
 
+    public JSONObject toSelfJson()
+    {
+        JSONObject result = new JSONObject();
+        result.put("serviceId", serviceId);
+        result.put("title", title);
+        result.put("price", price);
+        result.put("maxAccess", maxAccess);
+        result.put("rating", rating);
+        result.put("createdAt", DateTimeUtil.formatDateTime(createdAt));
+        result.put("collectedNumber", collectedNumber);
+        result.put("status", status.toString());
+
+        return result;
+    }
+
     public boolean accessNotFull() {
         return accesses.size() < maxAccess;
     }
