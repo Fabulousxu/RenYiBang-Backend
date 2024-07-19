@@ -26,4 +26,5 @@ public interface ServiceDao {
   String publishService(long userId, String title, String description, long price, List<String> requestImages);
 
   boolean isCollected(long serviceId, long collectorId);
+	boolean isAccessed(long serviceId, long ownerId);
 }

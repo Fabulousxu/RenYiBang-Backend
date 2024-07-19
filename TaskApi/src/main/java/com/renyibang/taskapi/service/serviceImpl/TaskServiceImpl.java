@@ -75,6 +75,7 @@ public class TaskServiceImpl implements TaskService {
         JSONObject taskJson = task.toJSON();
         taskJson.put("owner", userInfosArray.get(i));
         taskJson.put("collected", taskDao.isCollected(task.getTaskId(), userId));
+        taskJson.put("accessed", taskDao.isAccessed(task.getTaskId(), userId));
         result.add(taskJson);
       }
       JSONObject returnRes = new JSONObject();
@@ -96,6 +97,7 @@ public class TaskServiceImpl implements TaskService {
       if (Objects.equals(false, response.get("ok"))) return ResponseUtil.error("用户信息获取失败！");
       taskJson.put("owner", response.get("data"));
       taskJson.put("collected", taskDao.isCollected(taskId, userId));
+      taskJson.put("accessed", taskDao.isAccessed(taskId, userId));
       return ResponseUtil.success(taskJson);
     } catch (Exception e) {
       return ResponseUtil.error(String.valueOf(e));

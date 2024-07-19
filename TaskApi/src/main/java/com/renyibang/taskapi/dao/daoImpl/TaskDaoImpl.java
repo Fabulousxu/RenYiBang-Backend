@@ -222,4 +222,9 @@ public class TaskDaoImpl implements TaskDao {
     return taskCollectRepository.existsByCollectorIdAndAndTask(
         collectorId, taskRepository.findById(taskId).orElse(null));
   }
+
+  @Override
+  public boolean isAccessed(long taskId, long userId) {
+    return taskAccessRepository.existsByAccessorIdAndTask(userId, taskRepository.findById(taskId).orElse(null));
+  }
 }
