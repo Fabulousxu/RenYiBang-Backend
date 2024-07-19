@@ -47,4 +47,9 @@ public class UserController {
   public Response updateUserInfo(@RequestBody UserDTO userDTO) {
     return userService.updateUserInfo_compatible(userDTO);
   }
+
+  @GetMapping("/accessor/{userIds}")
+  public Response getUserInfos_accessor(@PathVariable List<Long> userIds) {
+    return userService.getUserInfos_accessor(userIds);
+  }
 }

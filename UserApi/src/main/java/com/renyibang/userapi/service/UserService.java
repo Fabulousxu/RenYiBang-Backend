@@ -21,4 +21,6 @@ public interface UserService {
   Response updateUserInfo_compatible(UserDTO userDTO);
 
   Response getUserDTO(long userId);
+
+  Response getUserInfos_accessor(List<Long> userIds);
 }

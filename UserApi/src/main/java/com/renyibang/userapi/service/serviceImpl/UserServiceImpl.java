@@ -1,5 +1,6 @@
 package com.renyibang.userapi.service.serviceImpl;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.global.dto.UserDTO;
 import com.renyibang.global.util.Response;
 import com.renyibang.userapi.dao.UserRepository;
@@ -70,5 +71,21 @@ public class UserServiceImpl implements UserService {
     userDTO.setNickname(user.getNickname());
     userDTO.setAvatar(user.getAvatar());
     return Response.success(userDTO);
+  }
+
+  @Override
+  public Response getUserInfos_accessor(List<Long> userIds) {
+    List<JSONObject> users = new ArrayList<>();
+    for (long userId : userIds) {
+      User user = userRepository.findById(userId).orElse(null);
+      if (user == null) return Response.error("用户不存在");
+      JSONObject userJson = new JSONObject();
+      userJson.put("userId", user.getUserId());
+      userJson.put("nickname", user.getNickname());
+      userJson.put("avatar", user.getAvatar());
+      userJson.put("rating", user.getRating());
+      users.add(userJson);
+    }
+    return Response.success(users);
   }
 }
