@@ -1,18 +1,19 @@
 package com.renyibang.taskapi.entity;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.renyibang.taskapi.enums.TaskStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.renyibang.taskapi.enums.TaskStatus;
 import com.renyibang.taskapi.util.DateTimeUtil;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 @Entity
 @Table(name = "task")
@@ -80,6 +81,21 @@ public class Task {
     result.put("images", imageList);
     result.put("cover", imageList.getFirst());
     result.put("description", description);
+    result.put("price", price);
+    result.put("maxAccess", maxAccess);
+    result.put("rating", rating);
+    result.put("createdAt", DateTimeUtil.formatDateTime(createdAt));
+    result.put("collectedNumber", collectedNumber);
+    result.put("status", status.toString());
+
+    return result;
+  }
+
+  public JSONObject toSelfJSON()
+  {
+    JSONObject result = new JSONObject();
+    result.put("taskId", taskId);
+    result.put("title", title);
     result.put("price", price);
     result.put("maxAccess", maxAccess);
     result.put("rating", rating);
