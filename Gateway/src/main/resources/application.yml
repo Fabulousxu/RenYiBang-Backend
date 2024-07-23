@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: Gateway
+  main:
+    web-application-type: reactive
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR}
+      config:
+        import-check:
+          enabled: false
+    openfeign:
+      okhttp:
+        enabled: true
+    sentinel:
+      transport:
+        dashboard: ${DASHBOARD_PORT}
+      http-method-specify: true
+    gateway:
+      routes:
+        - id: UserApi
+          uri: http://localhost:${API_USER_PORT}
+          predicates:
+            - Path=/api/user/**
+        - id: TaskApi
+          uri: http://localhost:${API_TASK_PORT}
+          predicates:
+            - Path=/api/task/**
+        - id: ServiceApi
+          uri: http://localhost:${API_SERVICE_PORT}
+          predicates:
+            - Path=/api/service/**
+        - id: OrderApi
+          uri: http://localhost:${API_ORDER_PORT}
+          predicates:
+            - Path=/api/order/**
+        - id: ChatApi
+          uri: http://localhost:${API_CHAT_PORT}
+          predicates:
+            - Path=/api/chat/**
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allow-credentials: true
+            allowed-origin-patterns: "*"
+            allowed-headers: "*"
+            allowedMethods:
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            max-age: 3600
+      httpclient:
+        pool:
+          max-connections: 1000
+          acquire-timeout: 5000
+server:
+  port: ${GATEWAY_PORT}
