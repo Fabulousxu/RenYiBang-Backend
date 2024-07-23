@@ -27,7 +27,7 @@ public class TaskController {
       long priceHigh,
       @RequestHeader long userId) {
     Sort sort;
-    if (Objects.equals(order, "time")) sort = Sort.by("created_at").descending();
+    if (Objects.equals(order, "time")) sort = Sort.by("createdAt").descending();
     else if (Objects.equals(order, "rating")) sort = Sort.by("rating").descending();
     else return ResponseUtil.error("排序类型错误");
     if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
