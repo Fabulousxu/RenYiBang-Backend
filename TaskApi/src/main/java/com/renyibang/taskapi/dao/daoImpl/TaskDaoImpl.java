@@ -51,7 +51,7 @@ public class TaskDaoImpl implements TaskDao {
       long priceHigh) {
     if (!keyword.isEmpty()) {
       return taskRepository.searchTasks(
-              keyword, priceLow, priceHigh, beginDateTime, endDateTime, TaskStatus.DELETE, pageable);
+              keyword + "*", priceLow, priceHigh, beginDateTime, endDateTime, TaskStatus.DELETE, pageable);
     } else {
       return taskRepository.findByPriceBetweenAndCreatedAtBetweenAndStatusNot(
           priceLow, priceHigh, beginDateTime, endDateTime, TaskStatus.DELETE, pageable);
