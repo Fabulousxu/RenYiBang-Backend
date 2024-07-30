@@ -169,6 +169,7 @@ public class ServiceDaoImpl implements ServiceDao {
       serviceAccess.setAccessorId(accessorId);
       serviceAccess.setService(service);
       serviceAccess.setCreatedAt(LocalDateTime.now());
+      serviceAccess.setServiceAccessStatus(ServiceAccessStatus.ACCESS_SUCCESS);
 
       serviceAccessRepository.save(serviceAccess);
       return "接取服务成功！";

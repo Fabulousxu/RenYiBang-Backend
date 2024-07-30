@@ -163,6 +163,7 @@ public class TaskDaoImpl implements TaskDao {
       taskAccess.setTask(task);
       taskAccess.setAccessorId(accessorId);
       taskAccess.setCreatedAt(LocalDateTime.now());
+      taskAccess.setTaskAccessStatus(TaskAccessStatus.ACCESS_SUCCESS);
 
       taskAccessRepository.save(taskAccess);
       return "接取任务成功！";
