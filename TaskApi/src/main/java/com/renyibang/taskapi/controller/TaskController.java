@@ -171,6 +171,16 @@ public class TaskController {
     return taskService.getTaskAccessorInfo(taskId, userId, PageRequest.of(pageIndex, pageSize));
   }
 
+  @GetMapping("/{taskId}/select/success")
+  public JSONObject getTaskAccessorSuccess(@PathVariable long taskId, @RequestHeader long userId, int pageSize, int pageIndex) {
+    return taskService.getTaskAccessorSuccess(taskId, userId, PageRequest.of(pageIndex, pageSize));
+  }
+
+  @GetMapping("/{taskId}/select/fail")
+  public JSONObject getTaskAccessorFail(@PathVariable long taskId, @RequestHeader long userId, int pageSize, int pageIndex) {
+    return taskService.getTaskAccessorFail(taskId, userId, PageRequest.of(pageIndex, pageSize));
+  }
+
   @DeleteMapping("/{taskId}/cancel")
   public JSONObject cancelTask(@PathVariable long taskId, @RequestHeader long userId) {
     return taskService.cancelTask(taskId, userId);
@@ -179,5 +189,10 @@ public class TaskController {
   @PutMapping("/{taskId}/select/confirm")
   public JSONObject confirmAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
     return taskService.confirmAccessors(taskId, userId, body);
+  }
+
+  @PutMapping("/{taskId}/select/deny")
+  public JSONObject denyAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
+    return taskService.denyAccessors(taskId, userId, body);
   }
 }
