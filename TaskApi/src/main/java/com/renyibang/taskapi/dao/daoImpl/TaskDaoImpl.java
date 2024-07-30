@@ -341,10 +341,6 @@ public class TaskDaoImpl implements TaskDao {
       taskAccessRepository.save(taskAccess);
     }
 
-    // 将任务状态设置为已下架
-    task.setStatus(TaskStatus.REMOVE);
-    taskRepository.save(task);
-
     return "确认接取者成功！";
   }
 }

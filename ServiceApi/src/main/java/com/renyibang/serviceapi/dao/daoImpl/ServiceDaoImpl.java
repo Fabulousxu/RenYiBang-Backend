@@ -346,9 +346,6 @@ public class ServiceDaoImpl implements ServiceDao {
       serviceAccessRepository.save(serviceAccess);
     }
 
-    // 将服务状态设置为已下架
-    service.setStatus(ServiceStatus.REMOVE);
-
     return "确认接取者成功！";
   }
 }
