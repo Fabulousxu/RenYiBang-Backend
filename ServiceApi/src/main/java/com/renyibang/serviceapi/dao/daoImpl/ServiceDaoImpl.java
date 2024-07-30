@@ -13,9 +13,11 @@ import com.renyibang.serviceapi.repository.ServiceAccessRepository;
 import com.renyibang.serviceapi.repository.ServiceCollectRepository;
 import com.renyibang.serviceapi.repository.ServiceRepository;
 import com.renyibang.serviceapi.util.ImageUtil;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -169,7 +171,7 @@ public class ServiceDaoImpl implements ServiceDao {
       serviceAccess.setAccessorId(accessorId);
       serviceAccess.setService(service);
       serviceAccess.setCreatedAt(LocalDateTime.now());
-      serviceAccess.setServiceAccessStatus(ServiceAccessStatus.ACCESS_SUCCESS);
+      serviceAccess.setServiceAccessStatus(ServiceAccessStatus.ACCESSING);
 
       serviceAccessRepository.save(serviceAccess);
       return "接取服务成功！";
@@ -209,7 +211,7 @@ public class ServiceDaoImpl implements ServiceDao {
 
   @Override
   public String publishService(
-          long userId, String title, String description, long price, List<String> requestImages) {
+          long userId, String title, String description, long price, int maxAccess, List<String> requestImages) {
     try {
       if (!userClient.getUserExist(userId)) {
         return "用户不存在！";
@@ -224,6 +226,7 @@ public class ServiceDaoImpl implements ServiceDao {
       service.setPrice(price);
       service.setImages(imagesURL);
       service.setCreatedAt(LocalDateTime.now());
+      service.setMaxAccess(maxAccess);
 
       serviceRepository.save(service);
       return "服务发布成功！";
@@ -246,7 +249,11 @@ public class ServiceDaoImpl implements ServiceDao {
 
   @Override
   public Page<Service> getMyService(long userId, Pageable pageable) {
-    return serviceRepository.findByOwnerId(userId, pageable);
+    Page<Service> page = serviceRepository.findByOwnerId(userId, pageable);
+    List<Service> filteredServices = page.stream()
+        .filter(Service -> Service.getStatus() == ServiceStatus.NORMAL)
+        .collect(Collectors.toList());
+    return new PageImpl<>(filteredServices, pageable, filteredServices.size());
   }
 
   @Override
@@ -329,7 +336,7 @@ public class ServiceDaoImpl implements ServiceDao {
     orderRequest.put("accessors", accessors);
     orderRequest.put("cost", service.getPrice());
 
-    JSONObject result = orderClient.createServiceOrder(orderRequest);
+    JSONObject result = orderClient.createServiceOrder(orderRequest, userId);
     if(Objects.equals(false, result.get("ok"))) {
       return "创建订单失败！";
     }
@@ -338,6 +345,10 @@ public class ServiceDaoImpl implements ServiceDao {
       serviceAccess.setServiceAccessStatus(ServiceAccessStatus.ACCESS_SUCCESS);
       serviceAccessRepository.save(serviceAccess);
     }
+
+    // 将服务状态设置为已下架
+    service.setStatus(ServiceStatus.REMOVE);
+
     return "确认接取者成功！";
   }
 }

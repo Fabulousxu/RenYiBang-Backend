@@ -24,7 +24,7 @@ public interface ServiceDao {
 
   String unaccessServiceByServiceId(long serviceId, long unaccessorId);
 
-  String publishService(long userId, String title, String description, long price, List<String> requestImages);
+  String publishService(long userId, String title, String description, long price, int maxAccess, List<String> requestImages);
 
   boolean isCollected(long serviceId, long collectorId);
 

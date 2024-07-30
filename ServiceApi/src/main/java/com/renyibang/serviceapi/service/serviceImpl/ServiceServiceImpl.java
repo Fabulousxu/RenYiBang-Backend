@@ -440,11 +440,14 @@ public class ServiceServiceImpl implements ServiceService {
       Object requestDescription = body.get("description");
       Object requestPrice = body.get("price");
       Object requestImages = body.get("images");
+      Object maxAccess = body.get("maxAccess");
 
       if (requestTitle == null
           || requestDescription == null
           || requestPrice == null
-          || requestImages == null) {
+          || requestImages == null
+          || maxAccess == null
+      ) {
         return ResponseUtil.error("请求体不完整！");
       }
 
@@ -472,9 +475,15 @@ public class ServiceServiceImpl implements ServiceService {
         return ResponseUtil.error("价格不能为负数！");
       }
 
+      if (maxAccess.getClass() != Integer.class) {
+        return ResponseUtil.error("非法的最大接取数类型！");
+      } else if (body.getInteger("maxAccess") < 0) {
+        return ResponseUtil.error("最大接取数不能为负数！");
+      }
+
       String result =
           serviceDao.publishService(
-              userId, title, description, price, (List<String>) requestImages);
+              userId, title, description, price, (Integer)maxAccess, (List<String>) requestImages);
 
       if ("服务发布成功！".equals(result)) {
         return ResponseUtil.success(result);

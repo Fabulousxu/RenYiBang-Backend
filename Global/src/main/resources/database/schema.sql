@@ -193,7 +193,7 @@ create table service_access
     service_id        bigint                              not null comment '服务id',
     accessor_id       bigint                              not null comment '接取者id',
     created_at        timestamp default CURRENT_TIMESTAMP not null comment '接取时间',
-    valid             tinyint(1)                          not null comment '接取者是否被拒绝',
+    status            tinyint default 0                  not null comment '接取服务状态',
     constraint service_access_ibfk_1
         foreign key (service_id) references service (service_id)
             on update cascade
