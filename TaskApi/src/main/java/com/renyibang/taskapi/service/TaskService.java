@@ -59,5 +59,15 @@ public interface TaskService {
 
   JSONObject cancelTask(long taskId, long userId);
 
+<<<<<<< Updated upstream
 //  JSONObject confirmAccessors(long taskId, long userId, JSONObject body);
+=======
+  JSONObject confirmAccessors(long taskId, long userId, JSONObject body);
+
+  JSONObject getTaskAccessorSuccess(long taskId, long userId, Pageable pageable);
+
+  JSONObject getTaskAccessorFail(long taskId, long userId, Pageable pageable);
+
+  JSONObject denyAccessors(long taskId, long userId, JSONObject body);
+>>>>>>> Stashed changes
 }

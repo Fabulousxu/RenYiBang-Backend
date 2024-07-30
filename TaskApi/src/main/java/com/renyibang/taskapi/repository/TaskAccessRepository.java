@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 public interface TaskAccessRepository extends JpaRepository<TaskAccess, Long> {
     boolean existsByAccessorIdAndTask(long accessorId, Task task);
     TaskAccess findByTaskAndAccessorId(Task task, long accessorId);
-    Object countByTask(Task task);
+    Object countByTaskAndTaskAccessStatus(Task task, TaskAccessStatus taskAccessStatus);
 
     Page<TaskAccess> findByTaskAndTaskAccessStatus(Task task, Pageable pageable, TaskAccessStatus taskAccessStatus);
 }

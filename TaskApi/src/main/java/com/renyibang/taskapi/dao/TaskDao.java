@@ -30,13 +30,27 @@ public interface TaskDao {
 
   Page<Task> getMyTask(long userId, Pageable pageable);
 
-  Object getAccessedNumber(Task task);
+  Object getAccessingNumber(Task task);
+
+  Object getSucceedNumber(Task task);
+
+  Object getFailedNumber(Task task);
 
   Page<Task> getMyAccessedTask(long userId, Pageable pageable);
 
   Page<TaskAccess> getTaskAccessByTask(Task task, Pageable pageable);
 
+  Page<TaskAccess> getTaskAccessSuccessByTask(Task task, Pageable pageable);
+
+  Page<TaskAccess> getTaskAccessFailByTask(Task task, Pageable pageable);
+
   String cancelTask(long taskId, long userId);
 
+<<<<<<< Updated upstream
 //  String confirmAccessors(long taskId, long userId, List<Long> accessors);
+=======
+  String confirmAccessors(long taskId, long userId, List<Long> accessors);
+
+  String denyAccessors(long taskId, long userId, List<Long> accessors);
+>>>>>>> Stashed changes
 }
