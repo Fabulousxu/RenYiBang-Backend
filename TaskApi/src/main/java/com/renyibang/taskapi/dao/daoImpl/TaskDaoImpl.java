@@ -1,5 +1,6 @@
 package com.renyibang.taskapi.dao.daoImpl;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.renyibang.global.client.UserClient;
 import com.renyibang.taskapi.dao.TaskDao;
 import com.renyibang.taskapi.entity.Task;
@@ -17,14 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
-<<<<<<< Updated upstream
-=======
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
->>>>>>> Stashed changes
-
 @Repository
 public class TaskDaoImpl implements TaskDao {
   @Autowired TaskRepository taskRepository;
@@ -35,7 +32,7 @@ public class TaskDaoImpl implements TaskDao {
 
   @Autowired UserClient userClient;
 
-//  @Autowired OrderClient orderClient;
+  @Autowired OrderClient orderClient;
 
   @Override
   public Task findById(long taskId) {
@@ -294,64 +291,6 @@ public class TaskDaoImpl implements TaskDao {
     return "取消任务成功！";
   }
 
-<<<<<<< Updated upstream
-//  @Override
-//  public String confirmAccessors(long taskId, long userId, List<Long> accessors) {
-//    Task task = taskRepository.findById(taskId).orElse(null);
-//    if (task == null) {
-//      return "任务不存在！";
-//    }
-//
-//    if (task.getOwnerId() != userId) {
-//      return "只有任务发布者才能确认接取者！";
-//    }
-//
-//    if (task.getStatus() == TaskStatus.DELETE) {
-//      return "该任务已被删除！";
-//    }
-//
-//    if (task.getStatus() == TaskStatus.REMOVE) {
-//      return "该任务已被下架！";
-//    }
-//
-//    if (task.getMaxAccess() < accessors.size()) {
-//      return "接取者数量超过最大接取数！";
-//    }
-//
-//    Set<TaskAccess> confirmAccessors = new HashSet<>();
-//
-//    for (long accessorId : accessors) {
-//      TaskAccess taskAccess = taskAccessRepository.findByTaskAndAccessorId(task, accessorId);
-//      if (taskAccess == null) {
-//        return "接取者" + accessorId +"不存在！";
-//      }
-//
-//      else if (taskAccess.getTaskAccessStatus() != TaskAccessStatus.ACCESSING) {
-//        return "接取者状态异常！";
-//      }
-//
-//      confirmAccessors.add(taskAccess);
-//    }
-//
-//    JSONObject orderRequest = new JSONObject();
-//    orderRequest.put("taskId", taskId);
-//    orderRequest.put("ownerId", userId);
-//    orderRequest.put("accessors", accessors);
-//    orderRequest.put("cost", task.getPrice());
-//
-//    JSONObject result = orderClient.createOrder(orderRequest);
-//    if(Objects.equals(false, result.get("ok")))
-//    {
-//      return "创建订单失败！";
-//    }
-//
-//    for (TaskAccess taskAccess : confirmAccessors) {
-//      taskAccess.setTaskAccessStatus(TaskAccessStatus.ACCESS_SUCCESS);
-//      taskAccessRepository.save(taskAccess);
-//    }
-//    return "确认接取者成功！";
-//  }
-=======
   @Override
   public String confirmAccessors(long taskId, long userId, List<Long> accessors) {
     Task task = taskRepository.findById(taskId).orElse(null);
@@ -445,5 +384,4 @@ public class TaskDaoImpl implements TaskDao {
 
     return "拒绝接取者成功！";
   }
->>>>>>> Stashed changes
 }

@@ -185,12 +185,6 @@ public class TaskController {
     return taskService.cancelTask(taskId, userId);
   }
 
-<<<<<<< Updated upstream
-//  @PutMapping("/{taskId}/select/confirm")
-//  public JSONObject confirmAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
-//    return taskService.confirmAccessors(taskId, userId, body);
-//  }
-=======
   @PutMapping("/{taskId}/select/confirm")
   public JSONObject confirmAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
     return taskService.confirmAccessors(taskId, userId, body);
@@ -200,6 +194,4 @@ public class TaskController {
   public JSONObject denyAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
     return taskService.denyAccessors(taskId, userId, body);
   }
-
->>>>>>> Stashed changes
 }

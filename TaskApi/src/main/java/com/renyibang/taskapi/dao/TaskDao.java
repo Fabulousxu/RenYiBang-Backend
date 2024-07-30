@@ -46,11 +46,7 @@ public interface TaskDao {
 
   String cancelTask(long taskId, long userId);
 
-<<<<<<< Updated upstream
-//  String confirmAccessors(long taskId, long userId, List<Long> accessors);
-=======
   String confirmAccessors(long taskId, long userId, List<Long> accessors);
 
   String denyAccessors(long taskId, long userId, List<Long> accessors);
->>>>>>> Stashed changes
 }
