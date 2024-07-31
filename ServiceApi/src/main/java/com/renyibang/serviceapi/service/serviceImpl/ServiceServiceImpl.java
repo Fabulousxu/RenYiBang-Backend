@@ -118,9 +118,9 @@ public class ServiceServiceImpl implements ServiceService {
   }
 
   @Override
-  public JSONObject getServiceInfo(long taskId, long userId) {
+  public JSONObject getServiceInfo(long serviceId, long userId) {
     try {
-      Service result = serviceDao.findById(taskId);
+      Service result = serviceDao.findById(serviceId);
 
       if (result == null) {
         return ResponseUtil.error("任务信息为null");
@@ -531,7 +531,9 @@ public class ServiceServiceImpl implements ServiceService {
 
       for (Service service : serviceList) {
         JSONObject serviceJson = service.toJSON();
-        serviceJson.put("accessedNumber", serviceDao.getAccessedNumber(service));
+        serviceJson.put("accessingNumber", serviceDao.getAccessingNumber(service));
+        serviceJson.put("succeedNumber", serviceDao.getSucceedNumber(service));
+        serviceJson.put("failedNumber", serviceDao.getFailedNumber(service));
         result.add(serviceJson);
       }
 
@@ -614,10 +616,88 @@ public class ServiceServiceImpl implements ServiceService {
   }
 
   @Override
+  public JSONObject getServiceAccessorSuccess(long serviceId, long userId, Pageable pageable){
+    try {
+      JSONObject result = new JSONObject();
+      Service service = serviceDao.findById(serviceId);
+      if (service == null) {
+        return ResponseUtil.error("任务不存在！");
+      }
+
+      if(service.getOwnerId() != userId) {
+        return ResponseUtil.error("您不是任务发布者！");
+      }
+
+      Page<ServiceAccess> serviceAccessPage = serviceDao.getServiceAccessSuccessByService(service, pageable);
+      if(serviceAccessPage == null) {
+        return ResponseUtil.error("获取接取信息失败！");
+      }
+
+      List<Long> userIds = new ArrayList<>();
+      for (ServiceAccess serviceAccess : serviceAccessPage) userIds.add(serviceAccess.getAccessorId());
+
+      if (userIds.isEmpty()) {
+        result.put("items", new JSONArray());
+        return ResponseUtil.success(result);
+      }
+
+      JSONObject userInfos = userClient.getAccessorInfos(userIds);
+      if (Objects.equals(false, userInfos.get("ok"))) return ResponseUtil.error("用户信息获取失败！");
+      ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
+
+      result.put("total", serviceAccessPage.getTotalElements());
+      result.put("items", userInfosArray);
+
+      return ResponseUtil.success(result);
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
+
+  @Override
+  public JSONObject getServiceAccessorFail(long serviceId, long userId, Pageable pageable){
+    try {
+      JSONObject result = new JSONObject();
+      Service service = serviceDao.findById(serviceId);
+      if (service == null) {
+        return ResponseUtil.error("任务不存在！");
+      }
+
+      if(service.getOwnerId() != userId) {
+        return ResponseUtil.error("您不是任务发布者！");
+      }
+
+      Page<ServiceAccess> serviceAccessPage = serviceDao.getServiceAccessFailByService(service, pageable);
+      if(serviceAccessPage == null) {
+        return ResponseUtil.error("获取接取信息失败！");
+      }
+
+      List<Long> userIds = new ArrayList<>();
+      for (ServiceAccess serviceAccess : serviceAccessPage) userIds.add(serviceAccess.getAccessorId());
+
+      if (userIds.isEmpty()) {
+        result.put("items", new JSONArray());
+        return ResponseUtil.success(result);
+      }
+
+      JSONObject userInfos = userClient.getAccessorInfos(userIds);
+      if (Objects.equals(false, userInfos.get("ok"))) return ResponseUtil.error("用户信息获取失败！");
+      ArrayList<JSONObject> userInfosArray = (ArrayList<JSONObject>) userInfos.get("data");
+
+      result.put("total", serviceAccessPage.getTotalElements());
+      result.put("items", userInfosArray);
+
+      return ResponseUtil.success(result);
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
+
+  @Override
   public JSONObject cancelService(long serviceId, long userId) {
     try {
       String result = serviceDao.cancelService(serviceId, userId);
-      if ("取消服务成功！".equals(result)) {
+      if ("取消任务成功！".equals(result)) {
         return ResponseUtil.success(result);
       } else {
         return ResponseUtil.error(result);
@@ -637,6 +717,25 @@ public class ServiceServiceImpl implements ServiceService {
 
       String result = serviceDao.confirmAccessors(serviceId, userId, accessors);
       if ("确认接取者成功！".equals(result)) {
+        return ResponseUtil.success(result);
+      } else {
+        return ResponseUtil.error(result);
+      }
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
+
+  @Override
+  public JSONObject denyAccessors(long serviceId, long userId, JSONObject body) {
+    try {
+      List<Long> accessors = body.getJSONArray("userList").toJavaList(Long.class);
+      if (accessors.isEmpty()) {
+        return ResponseUtil.error("接取者列表为空！");
+      }
+
+      String result = serviceDao.denyAccessors(serviceId, userId, accessors);
+      if ("拒绝接取者成功！".equals(result)) {
         return ResponseUtil.success(result);
       } else {
         return ResponseUtil.error(result);

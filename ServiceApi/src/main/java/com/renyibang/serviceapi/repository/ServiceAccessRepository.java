@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface ServiceAccessRepository extends JpaRepository<ServiceAccess, Long> {
     boolean existsByAccessorIdAndService(long accessorId, Service service);
     ServiceAccess findByServiceAndAccessorId(Service service, long accessorId);
-    Object countByService(Service service);
+    Object countByServiceAndServiceAccessStatus(Service service, ServiceAccessStatus serviceAccessStatus);
     Page<ServiceAccess> findByServiceAndServiceAccessStatus(Service service, Pageable pageable, ServiceAccessStatus serviceAccessStatus);
 }

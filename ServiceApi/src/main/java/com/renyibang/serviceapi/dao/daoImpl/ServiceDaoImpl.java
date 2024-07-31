@@ -257,8 +257,18 @@ public class ServiceDaoImpl implements ServiceDao {
   }
 
   @Override
-  public Object getAccessedNumber(Service service) {
-    return serviceAccessRepository.countByService(service);
+  public Object getAccessingNumber(Service service) {
+    return serviceAccessRepository.countByServiceAndServiceAccessStatus(service, ServiceAccessStatus.ACCESSING);
+  }
+
+  @Override
+  public Object getSucceedNumber(Service service) {
+    return serviceAccessRepository.countByServiceAndServiceAccessStatus(service, ServiceAccessStatus.ACCESS_SUCCESS);
+  }
+
+  @Override
+  public Object getFailedNumber(Service service) {
+    return serviceAccessRepository.countByServiceAndServiceAccessStatus(service, ServiceAccessStatus.ACCESS_FAIL);
   }
 
   @Override
@@ -269,6 +279,16 @@ public class ServiceDaoImpl implements ServiceDao {
   @Override
   public Page<ServiceAccess> getServiceAccessByService(Service service, Pageable pageable) {
     return serviceAccessRepository.findByServiceAndServiceAccessStatus(service, pageable, ServiceAccessStatus.ACCESSING);
+  }
+
+  @Override
+  public Page<ServiceAccess> getServiceAccessSuccessByService(Service service, Pageable pageable) {
+    return serviceAccessRepository.findByServiceAndServiceAccessStatus(service, pageable, ServiceAccessStatus.ACCESS_SUCCESS);
+  }
+
+  @Override
+  public Page<ServiceAccess> getServiceAccessFailByService(Service service, Pageable pageable) {
+    return serviceAccessRepository.findByServiceAndServiceAccessStatus(service, pageable, ServiceAccessStatus.ACCESS_FAIL);
   }
 
   @Override
@@ -347,5 +367,41 @@ public class ServiceDaoImpl implements ServiceDao {
     }
 
     return "确认接取者成功！";
+  }
+
+  @Override
+  public String denyAccessors(long serviceId, long userId, List<Long> accessors){
+    Service service = serviceRepository.findById(serviceId).orElse(null);
+    if (service == null) {
+      return "任务不存在！";
+    }
+
+    if (service.getOwnerId() != userId) {
+      return "只有任务发布者才能拒绝接取者！";
+    }
+
+    if (service.getStatus() == ServiceStatus.DELETE) {
+      return "该任务已被删除！";
+    }
+
+    if (service.getStatus() == ServiceStatus.REMOVE) {
+      return "该任务已被下架！";
+    }
+
+    for (long accessorId : accessors) {
+      ServiceAccess serviceAccess = serviceAccessRepository.findByServiceAndAccessorId(service, accessorId);
+      if (serviceAccess == null) {
+        return "接取者" + accessorId +"不存在！";
+      }
+
+      else if (serviceAccess.getServiceAccessStatus() != ServiceAccessStatus.ACCESSING) {
+        return "接取者状态异常！";
+      }
+
+      serviceAccess.setServiceAccessStatus(ServiceAccessStatus.ACCESS_FAIL);
+      serviceAccessRepository.save(serviceAccess);
+    }
+
+    return "拒绝接取者成功！";
   }
 }
