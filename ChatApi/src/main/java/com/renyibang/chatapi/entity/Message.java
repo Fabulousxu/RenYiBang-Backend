@@ -1,5 +1,8 @@
 package com.renyibang.chatapi.entity;
 
+import com.alibaba.fastjson2.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,12 +17,19 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Document("message")
 public class Message {
   @MongoId private String messageId;
-  @Indexed private String chatId;
+
+  @Indexed
+  @JsonIgnore
+  @JSONField(serialize = false)
+  private String chatId;
+
   private long senderId;
   private String content;
 
   @CreatedDate
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  @JSONField(format = "yyyy-MM-dd HH:mm:ss")
   @Indexed
   private LocalDateTime createdAt;
 

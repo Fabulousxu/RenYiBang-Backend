@@ -46,15 +46,6 @@ public class ChatServiceImpl implements ChatService {
     return chatJson;
   }
 
-  private JSONObject getMessageJson(Message message) {
-    JSONObject messageJson = new JSONObject();
-    messageJson.put("messageId", message.getMessageId());
-    messageJson.put("senderId", message.getSenderId());
-    messageJson.put("content", message.getContent());
-    messageJson.put("createdAt", message.getCreatedAt().format(formatter));
-    return messageJson;
-  }
-
   @Override
   public Response getChats(long userId) {
     List<Chat> chats =
@@ -90,12 +81,10 @@ public class ChatServiceImpl implements ChatService {
       return Response.error("无权查看聊天记录");
     Message lastMessage = messageRepository.findById(lastMessageId).orElse(null);
     LocalDateTime lastMessageCreatedAt =
-        lastMessage == null ? chat.getLastMessageCreatedAt() : lastMessage.getCreatedAt();
+        lastMessage == null ? LocalDateTime.now() : lastMessage.getCreatedAt();
     Page<Message> messages =
         messageRepository.findByChatIdAndCreatedAtBeforeOrderByCreatedAtDesc(
             chatId, lastMessageCreatedAt, PageRequest.of(0, count));
-    JSONArray messageArray = new JSONArray();
-    for (Message message : messages) messageArray.add(getMessageJson(message));
-    return Response.success(messageArray);
+    return Response.success(messages.stream().toList());
   }
 }
