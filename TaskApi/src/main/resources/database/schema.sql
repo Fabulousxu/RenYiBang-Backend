@@ -26,7 +26,7 @@ create table task_access
     task_id        bigint                              not null comment '任务id',
     accessor_id    bigint                              not null comment '接取者id',
     created_at     timestamp default CURRENT_TIMESTAMP not null comment '接取时间',
-    valid          tinyint(1)                          not null comment '接取者是否被拒绝',
+    status          tinyint(1)                          not null comment '接取者是否被拒绝',
     constraint task_access_ibfk_1
         foreign key (task_id) references task (task_id)
             on update cascade

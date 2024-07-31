@@ -1,0 +1,112 @@
+upstream userbackend {
+    server localhost:8081;
+    server localhost:8082;
+    server localhost:8083;
+}
+
+upstream taskbackend {
+    server localhost:8084;
+    server localhost:8085;
+    server localhost:8086;
+}
+
+upstream servicebackend {
+    server localhost:8087;
+    server localhost:8088;
+    server localhost:8089;
+}
+
+upstream orderbackend {
+    server localhost:8090;
+    server localhost:8091;
+    server localhost:8092;
+}
+
+upstream chatbackend {
+    server localhost:8093;
+    server localhost:8094;
+    server localhost:8095;
+}
+
+server {
+    listen 8080;
+    server_name 121.36.248.81;
+
+    location /api/user/ {
+        add_header 'Access-Control-Allow-Origin' 'http://121.36.248.81:3000';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE, PUT, PATCH';
+        add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization, jwt';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
+
+        proxy_pass http://userbackend;
+    }
+
+    location /api/task/ {
+        add_header 'Access-Control-Allow-Origin' 'http://121.36.248.81:3000';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE, PUT, PATCH';
+        add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization, jwt';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
+
+        proxy_pass http://taskbackend;
+    }
+
+    location /api/service/ {
+        add_header 'Access-Control-Allow-Origin' 'http://121.36.248.81:3000';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE, PUT, PATCH';
+        add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization, jwt';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
+
+        proxy_pass http://servicebackend;
+    }
+
+    location /api/order/ {
+        add_header 'Access-Control-Allow-Origin' 'http://121.36.248.81:3000';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE, PUT, PATCH';
+        add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization, jwt';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
+
+        proxy_pass http://orderbackend;
+    }
+
+    location /api/chat/ {
+        add_header 'Access-Control-Allow-Origin' 'http://121.36.248.81:3000';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE, PUT, PATCH';
+        add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization, jwt';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
+
+        proxy_pass http://chatbackend;
+    }
+
+    location /api/ {
+        add_header 'Access-Control-Allow-Origin' 'http://121.36.248.81:3000';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE, PUT, PATCH';
+        add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization, jwt';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
+
+        proxy_pass http://localhost:8080;
+    }
+}

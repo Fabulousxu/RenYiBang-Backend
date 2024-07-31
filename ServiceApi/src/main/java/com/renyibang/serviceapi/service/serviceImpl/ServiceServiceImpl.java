@@ -118,9 +118,9 @@ public class ServiceServiceImpl implements ServiceService {
   }
 
   @Override
-  public JSONObject getServiceInfo(long taskId, long userId) {
+  public JSONObject getServiceInfo(long serviceId, long userId) {
     try {
-      Service result = serviceDao.findById(taskId);
+      Service result = serviceDao.findById(serviceId);
 
       if (result == null) {
         return ResponseUtil.error("任务信息为null");
