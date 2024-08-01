@@ -12,7 +12,6 @@ import com.renyibang.global.client.TaskClient;
 import com.renyibang.global.client.UserClient;
 import com.renyibang.global.util.Response;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,8 +20,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ChatServiceImpl implements ChatService {
-  private static final DateTimeFormatter formatter =
-      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
   @Autowired private ChatRepository chatRepository;
   @Autowired private MessageRepository messageRepository;
   @Autowired private UserClient userClient;
@@ -34,15 +31,11 @@ public class ChatServiceImpl implements ChatService {
     JSONObject chatterJson = new JSONObject();
     JSONObject res = userClient.getUserInfo(chatterId);
     if (res.getBooleanValue("ok")) chatterJson = res.getJSONObject("data");
-    JSONObject chatJson = new JSONObject();
-    chatJson.put("chatId", chat.getChatId());
+    JSONObject chatJson = JSONObject.from(chat);
     chatJson.put("type", chat.getType() == 0 ? "task" : "service");
     chatJson.put("ofId", chat.getOfId());
     chatJson.put("chatter", chatterJson);
-    chatJson.put(
-        "unreadCount", userId == chat.getLastMessageSenderId() ? 0 : chat.getUnreadCount());
-    chatJson.put("lastMessageContent", chat.getLastMessageContent());
-    chatJson.put("lastMessageCreatedAt", chat.getLastMessageCreatedAt().format(formatter));
+    if (userId == chat.getLastMessageSenderId()) chatJson.put("unreadCount", 0);
     return chatJson;
   }
 
@@ -79,9 +72,17 @@ public class ChatServiceImpl implements ChatService {
     if (chat == null) return Response.error("聊天不存在");
     if (chat.getOfOwnerId() != userId && chat.getChatterId() != userId)
       return Response.error("无权查看聊天记录");
-    Message lastMessage = messageRepository.findById(lastMessageId).orElse(null);
-    LocalDateTime lastMessageCreatedAt =
-        lastMessage == null ? LocalDateTime.now() : lastMessage.getCreatedAt();
+    LocalDateTime lastMessageCreatedAt = null;
+    if (lastMessageId.isEmpty()) {
+      lastMessageCreatedAt = LocalDateTime.now();
+      if (chat.getLastMessageSenderId() != userId) {
+        chat.setUnreadCount(0);
+        chatRepository.save(chat);
+      }
+    } else {
+      Message lastMessage = messageRepository.findById(lastMessageId).orElse(null);
+      lastMessageCreatedAt = lastMessage == null ? LocalDateTime.now() : lastMessage.getCreatedAt();
+    }
     Page<Message> messages =
         messageRepository.findByChatIdAndCreatedAtBeforeOrderByCreatedAtDesc(
             chatId, lastMessageCreatedAt, PageRequest.of(0, count));
