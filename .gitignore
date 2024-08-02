@@ -4,10 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 nacos/
-nginx/
 work/
 logs/
 derby.log
+nginx/nginx.exe
 
 ### STS ###
 .apt_generated
