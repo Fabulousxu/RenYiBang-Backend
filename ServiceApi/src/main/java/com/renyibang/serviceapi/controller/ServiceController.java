@@ -31,7 +31,7 @@ public class ServiceController {
 
         if(Objects.equals(order, "time") && !keyword.isEmpty())
         {
-            sort = Sort.by("createdAt").descending();
+            sort = Sort.by("created_at").descending();
         } else if(Objects.equals(order, "time"))
         {
             sort = Sort.by("createdAt").descending();
