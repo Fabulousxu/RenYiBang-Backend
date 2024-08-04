@@ -41,8 +41,17 @@ public class UserControllerTest {
   }
 
   @Test
-  public void getUserInfoTest() throws Exception {
+  public void getUserDTOTest() throws Exception {
     when(userService.getUserDTO(anyLong())).thenReturn(Response.success());
+    mockMvc
+        .perform(get("/api/user/1/dto"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.ok").value(true));
+  }
+
+  @Test
+  public void getUserInfoTest() throws Exception {
+    when(userService.getUserInfo(anyLong())).thenReturn(Response.success());
     mockMvc
         .perform(get("/api/user/1"))
         .andExpect(status().isOk())
@@ -89,6 +98,15 @@ public class UserControllerTest {
             post("/api/user/update")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"id\":1,\"nickname\":\"nickname\",\"avatar\":\"avatar\"}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.ok").value(true));
+  }
+
+  @Test
+  public void getUserInfos_accessorTest() throws Exception {
+    when(userService.getUserInfos_accessor(any())).thenReturn(Response.success());
+    mockMvc
+        .perform(get("/api/user/accessor/1,2"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.ok").value(true));
   }

@@ -132,4 +132,18 @@ public class ChatServiceTest {
     when(chatRepository.findById(anyString())).thenReturn(Optional.empty());
     Response res = chatService.getChatHistory(1, "1", "1", 1);
   }
+
+  @Test
+  public void getChatHistoryTest5() throws Exception {
+    when(chatRepository.findById(anyString())).thenReturn(Optional.ofNullable(taskChat));
+    when(messageRepository.findById(anyString())).thenReturn(Optional.ofNullable(message));
+    Response res = chatService.getChatHistory(1, "1", "", 1);
+  }
+
+  @Test
+  public void getChatHistoryTest6() throws Exception {
+    when(chatRepository.findById(anyString())).thenReturn(Optional.ofNullable(taskChat));
+    when(messageRepository.findById(anyString())).thenReturn(Optional.ofNullable(message));
+    Response res = chatService.getChatHistory(2, "1", "", 1);
+  }
 }

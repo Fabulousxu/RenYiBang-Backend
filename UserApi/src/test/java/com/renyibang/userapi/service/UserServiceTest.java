@@ -90,4 +90,16 @@ public class UserServiceTest {
     when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
     Response response = userService.updateUserInfo_compatible(new UserDTO());
   }
+
+  @Test
+  public void getUserInfos_accessorTest1() {
+    when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
+    Response response = userService.getUserInfos_accessor(List.of(1L));
+  }
+
+  @Test
+  public void getUserInfos_accessorTest2() {
+    when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+    Response response = userService.getUserInfos_accessor(List.of(1L));
+  }
 }
