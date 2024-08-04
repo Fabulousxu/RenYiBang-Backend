@@ -621,11 +621,11 @@ public class ServiceServiceImpl implements ServiceService {
       JSONObject result = new JSONObject();
       Service service = serviceDao.findById(serviceId);
       if (service == null) {
-        return ResponseUtil.error("任务不存在！");
+        return ResponseUtil.error("服务不存在！");
       }
 
       if(service.getOwnerId() != userId) {
-        return ResponseUtil.error("您不是任务发布者！");
+        return ResponseUtil.error("您不是服务发布者！");
       }
 
       Page<ServiceAccess> serviceAccessPage = serviceDao.getServiceAccessSuccessByService(service, pageable);
@@ -660,11 +660,11 @@ public class ServiceServiceImpl implements ServiceService {
       JSONObject result = new JSONObject();
       Service service = serviceDao.findById(serviceId);
       if (service == null) {
-        return ResponseUtil.error("任务不存在！");
+        return ResponseUtil.error("服务不存在！");
       }
 
       if(service.getOwnerId() != userId) {
-        return ResponseUtil.error("您不是任务发布者！");
+        return ResponseUtil.error("您不是服务发布者！");
       }
 
       Page<ServiceAccess> serviceAccessPage = serviceDao.getServiceAccessFailByService(service, pageable);
