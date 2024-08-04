@@ -29,7 +29,10 @@ public class ServiceController {
     {
         Sort sort;
 
-        if(Objects.equals(order, "time"))
+        if(Objects.equals(order, "time") && !keyword.isEmpty())
+        {
+            sort = Sort.by("createdAt").descending();
+        } else if(Objects.equals(order, "time"))
         {
             sort = Sort.by("createdAt").descending();
         }
@@ -203,7 +206,7 @@ public class ServiceController {
     }
 
     @GetMapping("/initiator/self")
-    public JSONObject getMyTask(int pageSize, int pageIndex, @RequestHeader long userId)
+    public JSONObject getMyService(int pageSize, int pageIndex, @RequestHeader long userId)
     {
         if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
@@ -211,7 +214,7 @@ public class ServiceController {
     }
 
     @GetMapping("/recipient/self")
-    public JSONObject getMyAccessedTask(int pageSize, int pageIndex, @RequestHeader long userId)
+    public JSONObject getMyAccessedService(int pageSize, int pageIndex, @RequestHeader long userId)
     {
         if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
@@ -224,15 +227,28 @@ public class ServiceController {
         return serviceService.getServiceAccessorInfo(serviceId, userId, PageRequest.of(pageIndex, pageSize));
     }
 
+    @GetMapping("/{serviceId}/select/success")
+    public JSONObject getServiceAccessorSuccess(@PathVariable long serviceId, @RequestHeader long userId, int pageSize, int pageIndex) {
+        return serviceService.getServiceAccessorSuccess(serviceId, userId, PageRequest.of(pageIndex, pageSize));
+    }
+
+    @GetMapping("/{serviceId}/select/fail")
+    public JSONObject getServiceAccessorFail(@PathVariable long serviceId, @RequestHeader long userId, int pageSize, int pageIndex) {
+        return serviceService.getServiceAccessorFail(serviceId, userId, PageRequest.of(pageIndex, pageSize));
+    }
+
     @DeleteMapping("/{serviceId}/cancel")
-    public JSONObject cancelTask(@PathVariable long serviceId, @RequestHeader long userId)
-    {
+    public JSONObject cancelService(@PathVariable long serviceId, @RequestHeader long userId) {
         return serviceService.cancelService(serviceId, userId);
     }
 
     @PutMapping("/{serviceId}/select/confirm")
-    public JSONObject confirmAccessors(@PathVariable long serviceId, @RequestHeader long userId, @RequestBody JSONObject body)
-    {
+    public JSONObject confirmAccessors(@PathVariable long serviceId, @RequestHeader long userId, @RequestBody JSONObject body) {
         return serviceService.confirmAccessors(serviceId, userId, body);
+    }
+
+    @PutMapping("/{serviceId}/select/deny")
+    public JSONObject denyAccessors(@PathVariable long serviceId, @RequestHeader long userId, @RequestBody JSONObject body) {
+        return serviceService.denyAccessors(serviceId, userId, body);
     }
 }

@@ -24,7 +24,7 @@ public interface TaskDao {
 
   String unaccessTaskByTaskId(long taskId, long unaccessorId);
 
-  String publishTask(long userId, String title, String description, long price, List<String> requestImages);
+  String publishTask(long userId, String title, String description, long price, int maxAccess, List<String> requestImages);
 
   boolean isCollected(long taskId, long collectorId);
 
@@ -32,13 +32,23 @@ public interface TaskDao {
   
   Page<Task> getMyTask(long userId, Pageable pageable);
 
-  Object getAccessedNumber(Task task);
+  Object getAccessingNumber(Task task);
+
+  Object getSucceedNumber(Task task);
+
+  Object getFailedNumber(Task task);
 
   Page<Task> getMyAccessedTask(long userId, Pageable pageable);
 
   Page<TaskAccess> getTaskAccessByTask(Task task, Pageable pageable);
 
+  Page<TaskAccess> getTaskAccessSuccessByTask(Task task, Pageable pageable);
+
+  Page<TaskAccess> getTaskAccessFailByTask(Task task, Pageable pageable);
+
   String cancelTask(long taskId, long userId);
 
   String confirmAccessors(long taskId, long userId, List<Long> accessors);
+
+  String denyAccessors(long taskId, long userId, List<Long> accessors);
 }

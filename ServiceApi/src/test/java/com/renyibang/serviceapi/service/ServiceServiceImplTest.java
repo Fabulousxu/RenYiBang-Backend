@@ -433,7 +433,7 @@ public class ServiceServiceImplTest {
         body.put("price", 1000);
         body.put("maxAccess", 1);
         body.put("images", "test");
-        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务成功！");
+        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务成功！");
         JSONObject result = serviceService.publishService(1, body);
         assert result.get("ok").equals(true);
     }
@@ -446,7 +446,7 @@ public class ServiceServiceImplTest {
         body.put("price", 1000);
         body.put("maxAccess", 1);
         body.put("images", "test");
-        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
+        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
         JSONObject result = serviceService.publishService(1, body);
         assert result.get("ok").equals(false);
     }
@@ -454,7 +454,7 @@ public class ServiceServiceImplTest {
     @Test
     public void testPublishServiceWithEmptyBody() {
         JSONObject body = new JSONObject();
-        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
+        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
         JSONObject result = serviceService.publishService(1, body);
         assert result.get("ok").equals(false);
     }
@@ -467,7 +467,7 @@ public class ServiceServiceImplTest {
         body.put("price", 1000);
         body.put("maxAccess", 1);
         body.put("images", "test");
-        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
+        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
         JSONObject result = serviceService.publishService(1, body);
         assert result.get("ok").equals(false);
     }
@@ -480,7 +480,7 @@ public class ServiceServiceImplTest {
         body.put("price", 1000);
         body.put("maxAccess", 1);
         body.put("images", "test");
-        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
+        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
         JSONObject result = serviceService.publishService(1, body);
         assert result.get("ok").equals(false);
     }
@@ -493,7 +493,7 @@ public class ServiceServiceImplTest {
         body.put("price", 0);
         body.put("maxAccess", 1);
         body.put("images", "test");
-        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
+        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
         JSONObject result = serviceService.publishService(1, body);
         assert result.get("ok").equals(false);
     }
@@ -506,7 +506,7 @@ public class ServiceServiceImplTest {
         body.put("price", 10000000000000L);
         body.put("maxAccess", 1);
         body.put("images", "test");
-        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
+        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
         JSONObject result = serviceService.publishService(1, body);
         assert result.get("ok").equals(false);
     }
@@ -519,7 +519,7 @@ public class ServiceServiceImplTest {
         body.put("price", "test");
         body.put("maxAccess", 1);
         body.put("images", "test");
-        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
+        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
         JSONObject result = serviceService.publishService(1, body);
         assert result.get("ok").equals(false);
     }
@@ -532,7 +532,7 @@ public class ServiceServiceImplTest {
         body.put("price", -1);
         body.put("maxAccess", 1);
         body.put("images", "test");
-        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
+        when(serviceDao.publishService(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布服务失败！");
         JSONObject result = serviceService.publishService(1, body);
         assert result.get("ok").equals(false);
     }

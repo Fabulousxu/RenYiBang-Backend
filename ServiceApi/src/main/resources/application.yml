@@ -1,6 +1,8 @@
 spring:
   application:
     name: ServiceApi
+  profiles:
+    active: instance1
   datasource:
     driver-class-name: ${MYSQL_DRIVER_CLASS_NAME}
     url: ${MYSQL_URL}/renyibang_service
@@ -27,5 +29,3 @@ spring:
       transport:
         dashboard: ${DASHBOARD_PORT}
       http-method-specify: true
-server:
-  port: ${API_SERVICE_PORT}

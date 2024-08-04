@@ -24,7 +24,7 @@ public interface ServiceDao {
 
   String unaccessServiceByServiceId(long serviceId, long unaccessorId);
 
-  String publishService(long userId, String title, String description, long price, List<String> requestImages);
+  String publishService(long userId, String title, String description, long price, int maxAccess, List<String> requestImages);
 
   boolean isCollected(long serviceId, long collectorId);
 
@@ -32,13 +32,23 @@ public interface ServiceDao {
 
   Page<Service> getMyService(long userId, Pageable pageable);
 
-  Object getAccessedNumber(Service service);
+  Object getAccessingNumber(Service service);
+
+  Object getSucceedNumber(Service service);
+
+  Object getFailedNumber(Service service);
 
   Page<Service> getMyAccessedService(long userId, Pageable pageable);
 
   Page<ServiceAccess> getServiceAccessByService(Service service, Pageable pageable);
 
+  Page<ServiceAccess> getServiceAccessSuccessByService(Service service, Pageable pageable);
+
+  Page<ServiceAccess> getServiceAccessFailByService(Service service, Pageable pageable);
+  
   String cancelService(long serviceId, long userId);
 
   String confirmAccessors(long serviceId, long userId, List<Long> accessors);
+
+  String denyAccessors(long serviceId, long userId, List<Long> accessors);
 }

@@ -13,8 +13,10 @@ import com.renyibang.taskapi.repository.TaskAccessRepository;
 import com.renyibang.taskapi.repository.TaskCollectRepository;
 import com.renyibang.taskapi.repository.TaskRepository;
 import com.renyibang.taskapi.util.ImageUtil;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -163,6 +165,7 @@ public class TaskDaoImpl implements TaskDao {
       taskAccess.setTask(task);
       taskAccess.setAccessorId(accessorId);
       taskAccess.setCreatedAt(LocalDateTime.now());
+      taskAccess.setTaskAccessStatus(TaskAccessStatus.ACCESSING);
 
       taskAccessRepository.save(taskAccess);
       return "接取任务成功！";
@@ -202,7 +205,7 @@ public class TaskDaoImpl implements TaskDao {
 
   @Override
   public String publishTask(
-      long userId, String title, String description, long price, List<String> requestImages) {
+      long userId, String title, String description, long price, int maxAccess, List<String> requestImages) {
     try {
       if (!userClient.getUserExist(userId)) {
         return "用户不存在！";
@@ -217,6 +220,7 @@ public class TaskDaoImpl implements TaskDao {
       task.setImages(imagesURL);
       task.setDescription(description);
       task.setCreatedAt(LocalDateTime.now());
+      task.setMaxAccess(maxAccess);
 
       taskRepository.save(task);
 
@@ -239,12 +243,26 @@ public class TaskDaoImpl implements TaskDao {
 
   @Override
   public Page<Task> getMyTask(long userId, Pageable pageable) {
-    return taskRepository.findByOwnerId(userId, pageable);
+    Page<Task> page = taskRepository.findByOwnerId(userId, pageable);
+    List<Task> filteredTasks = page.stream()
+        .filter(task -> task.getStatus() == TaskStatus.NORMAL)
+        .collect(Collectors.toList());
+    return new PageImpl<>(filteredTasks, pageable, filteredTasks.size());
   }
 
   @Override
-  public Object getAccessedNumber(Task task) {
-    return taskAccessRepository.countByTask(task);
+  public Object getAccessingNumber(Task task) {
+    return taskAccessRepository.countByTaskAndTaskAccessStatus(task, TaskAccessStatus.ACCESSING);
+  }
+
+  @Override
+  public Object getSucceedNumber(Task task) {
+    return taskAccessRepository.countByTaskAndTaskAccessStatus(task, TaskAccessStatus.ACCESS_SUCCESS);
+  }
+
+  @Override
+  public Object getFailedNumber(Task task) {
+    return taskAccessRepository.countByTaskAndTaskAccessStatus(task, TaskAccessStatus.ACCESS_FAIL);
   }
 
   @Override
@@ -255,6 +273,16 @@ public class TaskDaoImpl implements TaskDao {
   @Override
   public Page<TaskAccess> getTaskAccessByTask(Task task, Pageable pageable) {
     return taskAccessRepository.findByTaskAndTaskAccessStatus(task, pageable, TaskAccessStatus.ACCESSING);
+  }
+
+  @Override
+  public Page<TaskAccess> getTaskAccessSuccessByTask(Task task, Pageable pageable) {
+    return taskAccessRepository.findByTaskAndTaskAccessStatus(task, pageable, TaskAccessStatus.ACCESS_SUCCESS);
+  }
+
+  @Override
+  public Page<TaskAccess> getTaskAccessFailByTask(Task task, Pageable pageable) {
+    return taskAccessRepository.findByTaskAndTaskAccessStatus(task, pageable, TaskAccessStatus.ACCESS_FAIL);
   }
 
   @Override
@@ -322,7 +350,7 @@ public class TaskDaoImpl implements TaskDao {
     orderRequest.put("accessors", accessors);
     orderRequest.put("cost", task.getPrice());
 
-    JSONObject result = orderClient.createTaskOrder(orderRequest);
+    JSONObject result = orderClient.createTaskOrder(orderRequest, userId);
     if(Objects.equals(false, result.get("ok")))
     {
       return "创建订单失败！";
@@ -332,6 +360,43 @@ public class TaskDaoImpl implements TaskDao {
       taskAccess.setTaskAccessStatus(TaskAccessStatus.ACCESS_SUCCESS);
       taskAccessRepository.save(taskAccess);
     }
+
     return "确认接取者成功！";
+  }
+
+  @Override
+  public String denyAccessors(long taskId, long userId, List<Long> accessors){
+    Task task = taskRepository.findById(taskId).orElse(null);
+    if (task == null) {
+      return "任务不存在！";
+    }
+
+    if (task.getOwnerId() != userId) {
+      return "只有任务发布者才能拒绝接取者！";
+    }
+
+    if (task.getStatus() == TaskStatus.DELETE) {
+      return "该任务已被删除！";
+    }
+
+    if (task.getStatus() == TaskStatus.REMOVE) {
+      return "该任务已被下架！";
+    }
+
+    for (long accessorId : accessors) {
+      TaskAccess taskAccess = taskAccessRepository.findByTaskAndAccessorId(task, accessorId);
+      if (taskAccess == null) {
+        return "接取者" + accessorId +"不存在！";
+      }
+
+      else if (taskAccess.getTaskAccessStatus() != TaskAccessStatus.ACCESSING) {
+        return "接取者状态异常！";
+      }
+
+      taskAccess.setTaskAccessStatus(TaskAccessStatus.ACCESS_FAIL);
+      taskAccessRepository.save(taskAccess);
+    }
+
+    return "拒绝接取者成功！";
   }
 }

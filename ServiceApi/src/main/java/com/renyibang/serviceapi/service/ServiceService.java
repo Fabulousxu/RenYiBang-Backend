@@ -53,4 +53,10 @@ public interface ServiceService {
     JSONObject cancelService(long serviceId, long userId);
 
     JSONObject confirmAccessors(long serviceId, long userId, JSONObject body);
+
+    JSONObject getServiceAccessorSuccess(long taskId, long userId, Pageable pageable);
+
+    JSONObject getServiceAccessorFail(long taskId, long userId, Pageable pageable);
+
+    JSONObject denyAccessors(long taskId, long userId, JSONObject body);
 }

@@ -1,6 +1,8 @@
 spring:
   application:
     name: UserApi
+  profiles:
+    active: instance1
   datasource:
     driver-class-name: ${MYSQL_DRIVER_CLASS_NAME}
     url: ${MYSQL_URL}/renyibang_user
@@ -20,5 +22,3 @@ spring:
       transport:
         dashboard: ${DASHBOARD_PORT}
       http-method-specify: true
-server:
-  port: ${API_USER_PORT}

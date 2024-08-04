@@ -27,7 +27,8 @@ public class TaskController {
       long priceHigh,
       @RequestHeader long userId) {
     Sort sort;
-    if (Objects.equals(order, "time")) sort = Sort.by("createdAt").descending();
+    if (Objects.equals(order, "time") && !keyword.isEmpty()) sort = Sort.by("created_at").descending();
+    else if (Objects.equals(order, "time")) sort = Sort.by("createdAt").descending();
     else if (Objects.equals(order, "rating")) sort = Sort.by("rating").descending();
     else return ResponseUtil.error("排序类型错误");
     if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
@@ -170,6 +171,16 @@ public class TaskController {
     return taskService.getTaskAccessorInfo(taskId, userId, PageRequest.of(pageIndex, pageSize));
   }
 
+  @GetMapping("/{taskId}/select/success")
+  public JSONObject getTaskAccessorSuccess(@PathVariable long taskId, @RequestHeader long userId, int pageSize, int pageIndex) {
+    return taskService.getTaskAccessorSuccess(taskId, userId, PageRequest.of(pageIndex, pageSize));
+  }
+
+  @GetMapping("/{taskId}/select/fail")
+  public JSONObject getTaskAccessorFail(@PathVariable long taskId, @RequestHeader long userId, int pageSize, int pageIndex) {
+    return taskService.getTaskAccessorFail(taskId, userId, PageRequest.of(pageIndex, pageSize));
+  }
+
   @DeleteMapping("/{taskId}/cancel")
   public JSONObject cancelTask(@PathVariable long taskId, @RequestHeader long userId) {
     return taskService.cancelTask(taskId, userId);
@@ -178,5 +189,10 @@ public class TaskController {
   @PutMapping("/{taskId}/select/confirm")
   public JSONObject confirmAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
     return taskService.confirmAccessors(taskId, userId, body);
+  }
+
+  @PutMapping("/{taskId}/select/deny")
+  public JSONObject denyAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
+    return taskService.denyAccessors(taskId, userId, body);
   }
 }

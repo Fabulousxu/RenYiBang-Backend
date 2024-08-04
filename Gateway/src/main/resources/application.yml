@@ -1,6 +1,8 @@
 spring:
   application:
     name: Gateway
+  profiles:
+    active: instance1
   main:
     web-application-type: reactive
     allow-bean-definition-overriding: true
@@ -21,23 +23,23 @@ spring:
     gateway:
       routes:
         - id: UserApi
-          uri: http://localhost:${API_USER_PORT}
+          uri: lb://UserApi
           predicates:
             - Path=/api/user/**
         - id: TaskApi
-          uri: http://localhost:${API_TASK_PORT}
+          uri: lb://TaskApi
           predicates:
             - Path=/api/task/**
         - id: ServiceApi
-          uri: http://localhost:${API_SERVICE_PORT}
+          uri: lb://ServiceApi
           predicates:
             - Path=/api/service/**
         - id: OrderApi
-          uri: http://localhost:${API_ORDER_PORT}
+          uri: lb://OrderApi
           predicates:
             - Path=/api/order/**
         - id: ChatApi
-          uri: http://localhost:${API_CHAT_PORT}
+          uri: lb://ChatApi
           predicates:
             - Path=/api/chat/**
       globalcors:
@@ -57,5 +59,3 @@ spring:
         pool:
           max-connections: 1000
           acquire-timeout: 5000
-server:
-  port: ${GATEWAY_PORT}

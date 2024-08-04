@@ -437,7 +437,7 @@ public class TaskServiceTest {
       body.put("price", 1000);
       body.put("maxAccess", 1);
       body.put("images", "test");
-      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务成功！");
+      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务成功！");
       JSONObject result = taskService.publishTask(1L, body);
       assert result.get("ok").equals(true);
     }
@@ -450,7 +450,7 @@ public class TaskServiceTest {
       body.put("price", 1000);
       body.put("maxAccess", 1);
       body.put("images", "test");
-      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
+      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
       JSONObject result = taskService.publishTask(1L, body);
       assert result.get("ok").equals(false);
     }
@@ -458,7 +458,7 @@ public class TaskServiceTest {
     @Test
     public void testPublishTaskWithEmptyBody() {
       JSONObject body = new JSONObject();
-      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
+      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
       JSONObject result = taskService.publishTask(1L, body);
       assert result.get("ok").equals(false);
     }
@@ -471,7 +471,7 @@ public class TaskServiceTest {
       body.put("price", 1000);
       body.put("maxAccess", 1);
       body.put("images", "test");
-      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
+      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
       JSONObject result = taskService.publishTask(1L, body);
       assert result.get("ok").equals(false);
     }
@@ -484,7 +484,7 @@ public class TaskServiceTest {
       body.put("price", 1000);
       body.put("maxAccess", 1);
       body.put("images", "test");
-      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
+      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
       JSONObject result = taskService.publishTask(1L, body);
       assert result.get("ok").equals(false);
     }
@@ -497,7 +497,7 @@ public class TaskServiceTest {
       body.put("price", 10000L);
       body.put("maxAccess", 1);
       body.put("images", "test");
-      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
+      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
       JSONObject result = taskService.publishTask(1L, body);
       assert result.get("ok").equals(false);
     }
@@ -510,7 +510,7 @@ public class TaskServiceTest {
       body.put("price", 10000000000L);
       body.put("maxAccess", 1);
       body.put("images", "test");
-      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
+      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
       JSONObject result = taskService.publishTask(1L, body);
       assert result.get("ok").equals(false);
     }
@@ -523,7 +523,7 @@ public class TaskServiceTest {
       body.put("price", "test");
       body.put("maxAccess", 1);
       body.put("images", "test");
-      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
+      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
       JSONObject result = taskService.publishTask(1L, body);
       assert result.get("ok").equals(false);
     }
@@ -536,7 +536,7 @@ public class TaskServiceTest {
       body.put("price", -1000);
       body.put("maxAccess", 1);
       body.put("images", "test");
-      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
+      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
       JSONObject result = taskService.publishTask(1L, body);
       assert result.get("ok").equals(false);
     }
