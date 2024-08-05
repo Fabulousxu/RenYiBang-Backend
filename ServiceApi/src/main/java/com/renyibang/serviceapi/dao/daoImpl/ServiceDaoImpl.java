@@ -404,4 +404,11 @@ public class ServiceDaoImpl implements ServiceDao {
 
     return "拒绝接取者成功！";
   }
+
+  @Override
+  public Page<Service> getMyCollect(long userId, Pageable pageable) {
+    Page<ServiceCollect> serviceCollects = serviceCollectRepository.findByCollectorId(userId, pageable);
+    List<Service> services = serviceCollects.stream().map(ServiceCollect::getService).collect(Collectors.toList());
+    return new PageImpl<>(services, pageable, services.size());
+  }
 }

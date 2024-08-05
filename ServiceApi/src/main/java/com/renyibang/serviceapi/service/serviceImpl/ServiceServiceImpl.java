@@ -744,4 +744,30 @@ public class ServiceServiceImpl implements ServiceService {
       return ResponseUtil.error(String.valueOf(e));
     }
   }
+
+  @Override
+  public JSONObject getMyCollect(Pageable pageable, long userId) {
+    try {
+      JSONArray result = new JSONArray();
+      Page<Service> searchResult = serviceDao.getMyCollect(userId, pageable);
+
+      List<Service> serviceList = searchResult.getContent();
+
+      for (Service service : serviceList) {
+        JSONObject serviceJson = service.toJSON();
+        serviceJson.put("collected", serviceDao.isCollected(service.getServiceId(), userId));
+        serviceJson.put("accessed", serviceDao.isAccessed(service.getServiceId(), userId));
+        result.add(serviceJson);
+      }
+
+      JSONObject returnRes = new JSONObject();
+
+      returnRes.put("total", searchResult.getTotalElements());
+      returnRes.put("items", result);
+
+      return ResponseUtil.success(returnRes);
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
 }

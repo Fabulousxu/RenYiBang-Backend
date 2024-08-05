@@ -59,4 +59,6 @@ public interface ServiceService {
     JSONObject getServiceAccessorFail(long taskId, long userId, Pageable pageable);
 
     JSONObject denyAccessors(long taskId, long userId, JSONObject body);
+
+    JSONObject getMyCollect(Pageable pageable, long userId);
 }
