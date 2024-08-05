@@ -7,7 +7,6 @@ nacos/
 work/
 logs/
 derby.log
-nginx/nginx.exe
 out/
 **/META-INF/
 
