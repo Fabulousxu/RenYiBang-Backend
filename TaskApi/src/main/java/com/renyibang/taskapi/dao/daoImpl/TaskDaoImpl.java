@@ -106,9 +106,9 @@ public class TaskDaoImpl implements TaskDao {
         return "任务不存在！";
       }
 
-      if (task.getStatus() == TaskStatus.DELETE) {
-        return "该任务已被删除！";
-      }
+//      if (task.getStatus() == TaskStatus.DELETE) {
+//        return "该任务已被删除！";
+//      }
 
       TaskCollect taskCollect = taskCollectRepository.findByTaskAndCollectorId(task, uncollectorId);
 
@@ -182,9 +182,9 @@ public class TaskDaoImpl implements TaskDao {
         return "任务不存在！";
       }
 
-      if (task.getStatus() == TaskStatus.DELETE) {
-        return "该任务已被删除！";
-      }
+//      if (task.getStatus() == TaskStatus.DELETE) {
+//        return "该任务已被删除！";
+//      }
 
       if (!userClient.getUserExist(unaccessorId)) {
         return "用户不存在！";
