@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 @Repository
 public class TaskDaoImpl implements TaskDao {
   @Autowired TaskRepository taskRepository;
@@ -383,5 +385,13 @@ public class TaskDaoImpl implements TaskDao {
     }
 
     return "拒绝接取者成功！";
+  }
+
+  @Override
+  public Page<Task> getMyCollect(long userId, Pageable pageable)
+  {
+    Page<TaskCollect> taskCollects = taskCollectRepository.findByCollectorId(userId, pageable);
+    List<Task> tasks = taskCollects.stream().map(TaskCollect::getTask).collect(Collectors.toList());
+    return new PageImpl<>(tasks, pageable, tasks.size());
   }
 }

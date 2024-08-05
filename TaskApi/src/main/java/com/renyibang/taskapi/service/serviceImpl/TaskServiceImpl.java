@@ -670,4 +670,32 @@ public class TaskServiceImpl implements TaskService {
       return ResponseUtil.error(String.valueOf(e));
     }
   }
+
+  @Override
+  public JSONObject getMyCollect(Pageable pageable, long userId)
+  {
+    try {
+      JSONArray result = new JSONArray();
+      Page<Task> searchResult = taskDao.getMyCollect(userId, pageable);
+
+      List<Task> taskList = searchResult.getContent();
+
+      for(Task task : taskList) {
+        JSONObject taskJson = task.toJSON();
+
+        taskJson.put("collected", taskDao.isCollected(task.getTaskId(), userId));
+        taskJson.put("accessed", taskDao.isAccessed(task.getTaskId(), userId));
+        result.add(taskJson);
+      }
+
+      JSONObject returnRes = new JSONObject();
+
+      returnRes.put("total", searchResult.getTotalElements());
+      returnRes.put("items", result);
+
+      return ResponseUtil.success(returnRes);
+    } catch (Exception e) {
+      return ResponseUtil.error(String.valueOf(e));
+    }
+  }
 }

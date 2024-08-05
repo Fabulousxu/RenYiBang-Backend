@@ -194,4 +194,10 @@ public class TaskController {
   public JSONObject denyAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
     return taskService.denyAccessors(taskId, userId, body);
   }
+
+  @GetMapping("/mycollect")
+  public JSONObject getMyCollect(int pageSize, int pageIndex, @RequestHeader long userId) {
+    if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
+    return taskService.getMyCollect(PageRequest.of(pageIndex, pageSize), userId);
+  }
 }
