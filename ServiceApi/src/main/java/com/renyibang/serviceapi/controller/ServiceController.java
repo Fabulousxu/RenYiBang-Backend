@@ -251,4 +251,10 @@ public class ServiceController {
     public JSONObject denyAccessors(@PathVariable long serviceId, @RequestHeader long userId, @RequestBody JSONObject body) {
         return serviceService.denyAccessors(serviceId, userId, body);
     }
+
+    @GetMapping("/mycollect")
+    public JSONObject getMyCollect(int pageSize, int pageIndex, @RequestHeader long userId) {
+        if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
+        return serviceService.getMyCollect(PageRequest.of(pageIndex, pageSize), userId);
+    }
 }

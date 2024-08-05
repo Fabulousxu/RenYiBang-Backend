@@ -51,4 +51,6 @@ public interface ServiceDao {
   String confirmAccessors(long serviceId, long userId, List<Long> accessors);
 
   String denyAccessors(long serviceId, long userId, List<Long> accessors);
+
+  Page<Service> getMyCollect(long userId, Pageable pageable);
 }
