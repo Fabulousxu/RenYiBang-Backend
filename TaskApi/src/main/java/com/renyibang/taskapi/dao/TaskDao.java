@@ -51,4 +51,6 @@ public interface TaskDao {
   String confirmAccessors(long taskId, long userId, List<Long> accessors);
 
   String denyAccessors(long taskId, long userId, List<Long> accessors);
+
+  Page<Task> getMyCollect(long userId, Pageable pageable);
 }

@@ -66,4 +66,6 @@ public interface TaskService {
   JSONObject getTaskAccessorFail(long taskId, long userId, Pageable pageable);
 
   JSONObject denyAccessors(long taskId, long userId, JSONObject body);
+
+  JSONObject getMyCollect(Pageable pageable, long userId);
 }
