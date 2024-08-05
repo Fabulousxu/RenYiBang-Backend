@@ -8,4 +8,5 @@ public class Register {
   private String nickname;
   private String phone;
   private String email;
+  private String intro;
 }

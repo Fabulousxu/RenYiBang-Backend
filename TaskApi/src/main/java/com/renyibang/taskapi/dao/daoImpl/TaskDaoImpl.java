@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 public class TaskDaoImpl implements TaskDao {
@@ -106,9 +107,9 @@ public class TaskDaoImpl implements TaskDao {
         return "任务不存在！";
       }
 
-      if (task.getStatus() == TaskStatus.DELETE) {
-        return "该任务已被删除！";
-      }
+//      if (task.getStatus() == TaskStatus.DELETE) {
+//        return "该任务已被删除！";
+//      }
 
       TaskCollect taskCollect = taskCollectRepository.findByTaskAndCollectorId(task, uncollectorId);
 
@@ -182,9 +183,9 @@ public class TaskDaoImpl implements TaskDao {
         return "任务不存在！";
       }
 
-      if (task.getStatus() == TaskStatus.DELETE) {
-        return "该任务已被删除！";
-      }
+//      if (task.getStatus() == TaskStatus.DELETE) {
+//        return "该任务已被删除！";
+//      }
 
       if (!userClient.getUserExist(unaccessorId)) {
         return "用户不存在！";
@@ -398,5 +399,13 @@ public class TaskDaoImpl implements TaskDao {
     }
 
     return "拒绝接取者成功！";
+  }
+
+  @Override
+  public Page<Task> getMyCollect(long userId, Pageable pageable)
+  {
+    Page<TaskCollect> taskCollects = taskCollectRepository.findByCollectorId(userId, pageable);
+    List<Task> tasks = taskCollects.stream().map(TaskCollect::getTask).collect(Collectors.toList());
+    return new PageImpl<>(tasks, pageable, tasks.size());
   }
 }

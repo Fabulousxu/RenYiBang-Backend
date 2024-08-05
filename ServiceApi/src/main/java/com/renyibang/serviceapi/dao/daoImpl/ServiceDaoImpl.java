@@ -112,9 +112,9 @@ public class ServiceDaoImpl implements ServiceDao {
         return "服务不存在！";
       }
 
-      if (service.getStatus() == ServiceStatus.DELETE) {
-        return "该服务已被删除！";
-      }
+//      if (service.getStatus() == ServiceStatus.DELETE) {
+//        return "该服务已被删除！";
+//      }
 
       ServiceCollect serviceCollect =
               serviceCollectRepository.findByServiceAndCollectorId(service, uncollectorId);
@@ -188,9 +188,9 @@ public class ServiceDaoImpl implements ServiceDao {
         return "服务不存在！";
       }
 
-      if (service.getStatus() == ServiceStatus.DELETE) {
-        return "该服务已被删除！";
-      }
+//      if (service.getStatus() == ServiceStatus.DELETE) {
+//        return "该服务已被删除！";
+//      }
 
       if (!userClient.getUserExist(unaccessorId)) {
         return "用户不存在！";
