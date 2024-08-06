@@ -7,9 +7,11 @@ import com.renyibang.taskapi.dao.TaskCommentDao;
 import com.renyibang.taskapi.dao.TaskDao;
 import com.renyibang.taskapi.dao.TaskMessageDao;
 import com.renyibang.taskapi.entity.Task;
+import com.renyibang.taskapi.entity.TaskAccess;
 import com.renyibang.taskapi.entity.TaskComment;
 import com.renyibang.taskapi.entity.TaskMessage;
 import com.renyibang.taskapi.service.serviceImpl.TaskServiceImpl;
+import com.renyibang.taskapi.enums.TaskAccessStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +29,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -56,10 +59,12 @@ public class TaskServiceTest {
     private DateTimeFormatter formatter;
     private List<Task> taskList;
     private Page<Task> taskPage;
-    private LocalDateTime begintime;
-    private LocalDateTime endtime;
     private JSONObject successResponse;
     private JSONObject errorResponse;
+    private JSONObject userInfosForTest;
+    private JSONObject userInfoForTest;
+    private ArrayList<JSONObject> userInfoList;
+
 
     @BeforeEach
     public void setUp() {
@@ -71,16 +76,25 @@ public class TaskServiceTest {
         task.setDescription("test");
         task.setPrice(1000);
         task.setCreatedAt(LocalDateTime.parse("2024-06-01 01:00:00", formatter));
+        task.setImages("test");
         taskList = new ArrayList<>();
         taskList.add(task);
         taskPage = new PageImpl<>(taskList);
         pageable = PageRequest.of(0, 10);
-      begintime = LocalDateTime.parse("2024-06-01 00:00:00", formatter);
-      endtime = LocalDateTime.parse("2024-06-02 00:00:00", formatter);
+
       successResponse = new JSONObject();
       errorResponse = new JSONObject();
       successResponse.put("ok", true);
+      successResponse.put("data", "111");
       errorResponse.put("ok", false);
+      errorResponse.put("data", "111");
+      userInfoForTest = new JSONObject();
+      userInfoForTest.put("ok", true);
+      userInfoList = new ArrayList<>();
+      userInfoList.add(userInfoForTest);
+      userInfosForTest = new JSONObject();
+      userInfosForTest.put("ok", true);
+      userInfosForTest.put("data", userInfoList);
     }
 
     @Test
@@ -90,11 +104,13 @@ public class TaskServiceTest {
       JSONObject userObject = new JSONObject();
       userObject.put("ok", true);
       userObject.put("data", userIds);
+      String formattedBegintime = "2024-07-01 00:00:00";
+      String formattedEndtime = "2024-07-02 00:00:00";
 
       when(taskDao.searchTaskByPaging(anyString(),any(Pageable.class),any(LocalDateTime.class),any(LocalDateTime.class),anyLong(),anyLong())).thenReturn(taskPage);
       when(userClient.getUserInfos(anyList())).thenReturn(userObject);
 
-      JSONObject result = taskService.searchTaskByPaging("test", pageable, begintime.toString(), endtime.toString(), 1L, 1000L, 1L);
+      JSONObject result = taskService.searchTaskByPaging("test", pageable, formattedBegintime, formattedEndtime, 1L, 1000L, 1L);
       assert result.get("ok").equals(true);
     }
 
@@ -104,11 +120,30 @@ public class TaskServiceTest {
       JSONObject userObject = new JSONObject();
       userObject.put("ok", true);
       userObject.put("data", userIds);
+      Page<Task> tasks = new PageImpl<>(Collections.emptyList());
+      String formattedBegintime = "2024-07-01 00:00:00";
+      String formattedEndtime = "2024-07-02 00:00:00";
+      when(taskDao.searchTaskByPaging(anyString(),any(Pageable.class),any(LocalDateTime.class),any(LocalDateTime.class),anyLong(),anyLong())).thenReturn(tasks);
+      when(userClient.getUserInfos(anyList())).thenReturn(userObject);
+
+      JSONObject result = taskService.searchTaskByPaging("test", pageable, formattedBegintime, formattedEndtime, 1L, 1000L, 1L);
+      assert result.get("ok").equals(true);
+    }
+
+    @Test
+    public void testSearchTaskByPagingWithErrorResponse() {
+      JSONArray userIds = new JSONArray();
+      userIds.add(1L);
+      JSONObject userObject = new JSONObject();
+      userObject.put("ok", false);
+      userObject.put("data", userIds);
+      String formattedBegintime = "2024-07-01 00:00:00";
+      String formattedEndtime = "2024-07-02 00:00:00";
 
       when(taskDao.searchTaskByPaging(anyString(),any(Pageable.class),any(LocalDateTime.class),any(LocalDateTime.class),anyLong(),anyLong())).thenReturn(taskPage);
       when(userClient.getUserInfos(anyList())).thenReturn(userObject);
 
-      JSONObject result = taskService.searchTaskByPaging("test", pageable, begintime.toString(), endtime.toString(), 1L, 1000L, 1L);
+      JSONObject result = taskService.searchTaskByPaging("test", pageable, formattedBegintime, formattedEndtime, 1L, 1000L, 1L);
       assert result.get("ok").equals(false);
     }
 
@@ -145,9 +180,14 @@ public class TaskServiceTest {
     public void testGetTaskComments() {
       TaskComment taskComment = new TaskComment();
       taskComment.setCommenterId(1L);
+      taskComment.setTask(task);
+      taskComment.setContent("test");
+      taskComment.setRating((byte) 50);
+      taskComment.setCreatedAt(LocalDateTime.parse("2024-06-01 01:00:00", formatter));
       Page<TaskComment> taskCommentPage = new PageImpl<>(List.of(taskComment));
       when(taskCommentDao.getTaskComments(anyLong(), any(Pageable.class))).thenReturn(taskCommentPage);
-      when(userClient.getUserInfo(anyLong())).thenReturn(successResponse);
+      when(userClient.getUserInfos(anyList())).thenReturn(userInfosForTest);
+      when(taskCommentDao.isLiked(anyLong(), anyLong())).thenReturn(true);
 
       JSONObject result = taskService.getTaskComments(1L, pageable, 1L);
       assert result.get("ok").equals(true);
@@ -155,11 +195,11 @@ public class TaskServiceTest {
 
     @Test
     public void testGetTaskCommentsWithEmptyComments() {
-      Page<TaskComment> taskCommentPage = new PageImpl<>(List.of());
+      Page<TaskComment> taskCommentPage = new PageImpl<>(Collections.emptyList());
       when(taskCommentDao.getTaskComments(anyLong(), any(Pageable.class))).thenReturn(taskCommentPage);
 
       JSONObject result = taskService.getTaskComments(1L, pageable, 1L);
-      assert result.get("ok").equals(false);
+      assert result.get("ok").equals(true);
     }
 
     @Test
@@ -178,9 +218,12 @@ public class TaskServiceTest {
     public void testGetTaskMessages() {
       TaskMessage taskMessage = new TaskMessage();
       taskMessage.setMessagerId(1L);
+      taskMessage.setTask(task);
+      taskMessage.setContent("test");
+      taskMessage.setCreatedAt(LocalDateTime.parse("2024-06-01 01:00:00", formatter));
       Page<TaskMessage> taskMessagePage = new PageImpl<>(List.of(taskMessage));
       when(taskMessageDao.getTaskMessages(anyLong(), any(Pageable.class))).thenReturn(taskMessagePage);
-      when(userClient.getUserInfo(anyLong())).thenReturn(successResponse);
+      when(userClient.getUserInfos(anyList())).thenReturn(userInfosForTest);
 
       JSONObject result = taskService.getTaskMessages(1L, pageable, 1L);
       assert result.get("ok").equals(true);
@@ -188,11 +231,12 @@ public class TaskServiceTest {
 
     @Test
     public void testGetTaskMessagesWithEmptyMessages() {
-      Page<TaskMessage> taskMessagePage = new PageImpl<>(List.of());
+      TaskMessage taskMessage = new TaskMessage();
+      Page<TaskMessage> taskMessagePage = new PageImpl<>(Collections.emptyList());
       when(taskMessageDao.getTaskMessages(anyLong(), any(Pageable.class))).thenReturn(taskMessagePage);
 
       JSONObject result = taskService.getTaskMessages(1L, pageable, 1L);
-      assert result.get("ok").equals(false);
+      assert result.get("ok").equals(true);
     }
 
     @Test
@@ -431,25 +475,31 @@ public class TaskServiceTest {
 
     @Test
     public void testPublishTaskSuccess() {
+      String images = "test";
+      ArrayList<String> imageList = new ArrayList<>();
+      imageList.add(images);
       JSONObject body = new JSONObject();
       body.put("title", "test");
       body.put("description", "test");
       body.put("price", 1000);
       body.put("maxAccess", 1);
-      body.put("images", "test");
-      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务成功！");
+      body.put("images", imageList);
+      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("任务发布成功！");
       JSONObject result = taskService.publishTask(1L, body);
       assert result.get("ok").equals(true);
     }
 
     @Test
     public void testPublishTaskFailed() {
+      String images = "test";
+      ArrayList<String> imageList = new ArrayList<>();
+      imageList.add(images);
       JSONObject body = new JSONObject();
       body.put("title", "test");
       body.put("description", "test");
       body.put("price", 1000);
       body.put("maxAccess", 1);
-      body.put("images", "test");
+      body.put("images", imageList);
       when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
       JSONObject result = taskService.publishTask(1L, body);
       assert result.get("ok").equals(false);
@@ -542,6 +592,32 @@ public class TaskServiceTest {
     }
 
     @Test
+    public void testPublishTaskWithStringMaxAccess() {
+      JSONObject body = new JSONObject();
+      body.put("title", "test");
+      body.put("description", "test");
+      body.put("price", 1000);
+      body.put("maxAccess", "test");
+      body.put("images", "test");
+      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
+      JSONObject result = taskService.publishTask(1L, body);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testPublishTaskWithNegativeMaxAccess() {
+      JSONObject body = new JSONObject();
+      body.put("title", "test");
+      body.put("description", "test");
+      body.put("price", 1000);
+      body.put("maxAccess", -1);
+      body.put("images", "test");
+      when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("发布任务失败！");
+      JSONObject result = taskService.publishTask(1L, body);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
     public void testGetTaskDtoByIdSuccess() {
       when(taskDao.findById(anyLong())).thenReturn(task);
       when(userClient.getUserInfo(anyLong())).thenReturn(successResponse);
@@ -569,4 +645,627 @@ public class TaskServiceTest {
       JSONObject result = taskService.getTaskOwnerId(1L);
       assert result.get("ok").equals(false);
     }
+
+    @Test
+    public void testGetMyTask() {
+        when(taskDao.getMyTask(anyLong(), any(Pageable.class))).thenReturn(taskPage);
+        JSONObject result = taskService.getMyTask(pageable, 1L);
+        assert result.get("ok").equals(true);
+    }
+
+    @Test
+    public void testGetMyAccessedTask() {
+        when(taskDao.getMyAccessedTask(anyLong(), any(Pageable.class))).thenReturn(taskPage);
+        JSONObject result = taskService.getMyAccessedTask(pageable, 1L);
+        assert result.get("ok").equals(true);
+    }
+
+    @Test
+    public void testGetTaskAccessorInfo1() {
+      when(taskDao.findById(anyLong())).thenReturn(null);
+      JSONObject result = taskService.getTaskAccessorInfo(1L, 1L, pageable);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetTaskAccessorInfo2() {
+      Task newtask = new Task();
+      newtask.setOwnerId(2L);
+      when(taskDao.findById(anyLong())).thenReturn(newtask);
+      JSONObject result = taskService.getTaskAccessorInfo(1L, 1L, pageable);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetTaskAccessorInfo3() {
+      Task newtask = new Task();
+      newtask.setOwnerId(1L);
+      when(taskDao.findById(anyLong())).thenReturn(newtask);
+      when(taskDao.getTaskAccessByTask(any(Task.class), any(Pageable.class))).thenReturn(null);
+      JSONObject result = taskService.getTaskAccessorInfo(1L, 1L, pageable);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetTaskAccessorInfo4() {
+      Task newtask = new Task();
+      newtask.setOwnerId(1L);
+      when(taskDao.findById(anyLong())).thenReturn(newtask);
+
+      List<TaskAccess> taskAccessList = Collections.emptyList();
+      Page<TaskAccess> taskAccessPage = new PageImpl<>(taskAccessList);
+      when(taskDao.getTaskAccessByTask(any(Task.class), any(Pageable.class))).thenReturn(taskAccessPage);
+
+      JSONObject result = taskService.getTaskAccessorInfo(1L, 1L, pageable);
+      System.out.println(result);
+      assert result.get("ok").equals(true);
+    }
+
+    @Test
+    public void testGetTaskAccessorInfo5() {
+      Task newtask = new Task();
+      newtask.setOwnerId(1L);
+      when(taskDao.findById(anyLong())).thenReturn(newtask);
+      TaskAccess taskAccess = new TaskAccess();
+      taskAccess.setAccessorId(1L);
+      List<TaskAccess> taskAccessList = new ArrayList<>();
+      taskAccessList.add(taskAccess);
+      Page<TaskAccess> taskAccessPage = new PageImpl<>(taskAccessList);
+      when(taskDao.getTaskAccessByTask(any(Task.class), any(Pageable.class))).thenReturn(taskAccessPage);
+      when(userClient.getAccessorInfos(anyList())).thenReturn(errorResponse);
+      JSONObject result = taskService.getTaskAccessorInfo(1L, 1L, pageable);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetTaskAccessorInfo6() {
+      when(taskDao.findById(anyLong())).thenReturn(task);
+      TaskAccess taskAccess = new TaskAccess();
+      taskAccess.setAccessorId(1L);
+      taskAccess.setTaskAccessId(1L);
+      taskAccess.setTaskAccessStatus(TaskAccessStatus.ACCESSING);
+      List<TaskAccess> taskAccessList = new ArrayList<>();
+      taskAccessList.add(taskAccess);
+      Page<TaskAccess> taskAccessPage = new PageImpl<>(taskAccessList);
+      when(taskDao.getTaskAccessByTask(any(Task.class), any(Pageable.class))).thenReturn(taskAccessPage);
+
+      JSONObject newmessage = new JSONObject();
+      newmessage.put("ok", true);
+      newmessage.put("data", new ArrayList<>());
+      when(userClient.getAccessorInfos(anyList())).thenReturn(newmessage);
+      JSONObject result = taskService.getTaskAccessorInfo(1L, 1L, pageable);
+      assert result.get("ok").equals(true);
+    }
+
+    @Test
+    public void testGetTaskAccessorSuccess1() {
+      when(taskDao.findById(anyLong())).thenReturn(null);
+      JSONObject result = taskService.getTaskAccessorSuccess(1L, 1L, pageable);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetTaskAccessorSuccess2() {
+      Task newtask = new Task();
+      newtask.setOwnerId(2L);
+      when(taskDao.findById(anyLong())).thenReturn(newtask);
+      JSONObject result = taskService.getTaskAccessorSuccess(1L, 1L, pageable);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetTaskAccessorSuccess3() {
+      Task newtask = new Task();
+      newtask.setOwnerId(1L);
+      when(taskDao.findById(anyLong())).thenReturn(newtask);
+      when(taskDao.getTaskAccessSuccessByTask(any(Task.class), any(Pageable.class))).thenReturn(null);
+      JSONObject result = taskService.getTaskAccessorSuccess(1L, 1L, pageable);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetTaskAccessorSuccess4() {
+      Task newtask = new Task();
+      newtask.setOwnerId(1L);
+      when(taskDao.findById(anyLong())).thenReturn(newtask);
+
+      List<TaskAccess> taskAccessList = Collections.emptyList();
+      Page<TaskAccess> taskAccessPage = new PageImpl<>(taskAccessList);
+      when(taskDao.getTaskAccessSuccessByTask(any(Task.class), any(Pageable.class))).thenReturn(taskAccessPage);
+      JSONObject result = taskService.getTaskAccessorSuccess(1L, 1L, pageable);
+      assert result.get("ok").equals(true);
+    }
+
+    @Test
+    public void testGetTaskAccessorSuccess5() {
+      Task newtask = new Task();
+      newtask.setOwnerId(1L);
+      when(taskDao.findById(anyLong())).thenReturn(newtask);
+      TaskAccess taskAccess = new TaskAccess();
+      taskAccess.setAccessorId(1L);
+      List<TaskAccess> taskAccessList = new ArrayList<>();
+      taskAccessList.add(taskAccess);
+      Page<TaskAccess> taskAccessPage = new PageImpl<>(taskAccessList);
+      when(taskDao.getTaskAccessSuccessByTask(any(Task.class), any(Pageable.class))).thenReturn(taskAccessPage);
+      when(userClient.getAccessorInfos(anyList())).thenReturn(errorResponse);
+      JSONObject result = taskService.getTaskAccessorSuccess(1L, 1L, pageable);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetTaskAccessorSuccess6() {
+      when(taskDao.findById(anyLong())).thenReturn(task);
+      TaskAccess taskAccess = new TaskAccess();
+      taskAccess.setAccessorId(1L);
+      taskAccess.setTaskAccessId(1L);
+      taskAccess.setTaskAccessStatus(TaskAccessStatus.ACCESSING);
+      List<TaskAccess> taskAccessList = new ArrayList<>();
+      taskAccessList.add(taskAccess);
+      Page<TaskAccess> taskAccessPage = new PageImpl<>(taskAccessList);
+      when(taskDao.getTaskAccessSuccessByTask(any(Task.class), any(Pageable.class))).thenReturn(taskAccessPage);
+
+      JSONObject newmessage = new JSONObject();
+      newmessage.put("ok", true);
+      newmessage.put("data", new ArrayList<>());
+      when(userClient.getAccessorInfos(anyList())).thenReturn(newmessage);
+      JSONObject result = taskService.getTaskAccessorSuccess(1L, 1L, pageable);
+      System.out.println(result);
+      assert result.get("ok").equals(true);
+    }
+
+    @Test
+    public void testGetTaskAccessorFail1() {
+      when(taskDao.findById(anyLong())).thenReturn(null);
+      JSONObject result = taskService.getTaskAccessorFail(1L, 1L, pageable);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetTaskAccessorFail2() {
+      Task newtask = new Task();
+      newtask.setOwnerId(2L);
+      when(taskDao.findById(anyLong())).thenReturn(newtask);
+      JSONObject result = taskService.getTaskAccessorFail(1L, 1L, pageable);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetTaskAccessorFail3() {
+      Task newtask = new Task();
+      newtask.setOwnerId(1L);
+      when(taskDao.findById(anyLong())).thenReturn(newtask);
+      when(taskDao.getTaskAccessFailByTask(any(Task.class), any(Pageable.class))).thenReturn(null);
+      JSONObject result = taskService.getTaskAccessorFail(1L, 1L, pageable);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetTaskAccessorFail4() {
+      Task newtask = new Task();
+      newtask.setOwnerId(1L);
+      when(taskDao.findById(anyLong())).thenReturn(newtask);
+
+      List<TaskAccess> taskAccessList = Collections.emptyList();
+      Page<TaskAccess> taskAccessPage = new PageImpl<>(taskAccessList);
+      when(taskDao.getTaskAccessFailByTask(any(Task.class), any(Pageable.class))).thenReturn(taskAccessPage);
+      JSONObject result = taskService.getTaskAccessorFail(1L, 1L, pageable);
+      assert result.get("ok").equals(true);
+    }
+
+    @Test
+    public void testGetTaskAccessorFail5() {
+      Task newtask = new Task();
+      newtask.setOwnerId(1L);
+      when(taskDao.findById(anyLong())).thenReturn(newtask);
+      TaskAccess taskAccess = new TaskAccess();
+      taskAccess.setAccessorId(1L);
+      List<TaskAccess> taskAccessList = new ArrayList<>();
+      taskAccessList.add(taskAccess);
+      Page<TaskAccess> taskAccessPage = new PageImpl<>(taskAccessList);
+      when(taskDao.getTaskAccessFailByTask(any(Task.class), any(Pageable.class))).thenReturn(taskAccessPage);
+      when(userClient.getAccessorInfos(anyList())).thenReturn(errorResponse);
+      JSONObject result = taskService.getTaskAccessorFail(1L, 1L, pageable);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetTaskAccessorFail6() {
+      when(taskDao.findById(anyLong())).thenReturn(task);
+      TaskAccess taskAccess = new TaskAccess();
+      taskAccess.setAccessorId(1L);
+      taskAccess.setTaskAccessId(1L);
+      taskAccess.setTaskAccessStatus(TaskAccessStatus.ACCESSING);
+      List<TaskAccess> taskAccessList = new ArrayList<>();
+      taskAccessList.add(taskAccess);
+      Page<TaskAccess> taskAccessPage = new PageImpl<>(taskAccessList);
+      when(taskDao.getTaskAccessFailByTask(any(Task.class), any(Pageable.class))).thenReturn(taskAccessPage);
+
+      JSONObject newmessage = new JSONObject();
+      newmessage.put("ok", true);
+      newmessage.put("data", new ArrayList<>());
+      when(userClient.getAccessorInfos(anyList())).thenReturn(newmessage);
+      JSONObject result = taskService.getTaskAccessorFail(1L, 1L, pageable);
+      System.out.println(result);
+      assert result.get("ok").equals(true);
+    }
+
+    @Test
+    public void testCancelTaskSuccess() {
+      when(taskDao.cancelTask(anyLong(),anyLong())).thenReturn("取消任务成功！");
+      JSONObject result = taskService.cancelTask(1L, 1L);
+      assert result.get("ok").equals(true);
+    }
+
+    @Test
+    public void testCancelTaskFailed() {
+      when(taskDao.cancelTask(anyLong(),anyLong())).thenReturn("取消任务失败！");
+      JSONObject result = taskService.cancelTask(1L, 1L);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testConfirmAccessors1() {
+      JSONObject body = new JSONObject();
+      List<Long> userIds = Collections.emptyList();
+      body.put("userList", userIds);
+
+      JSONObject result = taskService.confirmAccessors(1L, 1L, body);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testConfirmAccessors2() {
+      long accessorId = 1L;
+      List<Long> accessors = new ArrayList<>();
+      accessors.add(accessorId);
+      JSONObject body = new JSONObject();
+      body.put("userList", accessors);
+      when(taskDao.confirmAccessors(anyLong(), anyLong(), anyList())).thenReturn("确认接取者成功！");
+      JSONObject result = taskService.confirmAccessors(1L, 1L, body);
+      assert result.get("ok").equals(true);
+    }
+
+    @Test
+    public void testConfirmAccessors3() {
+      long accessorId = 1L;
+      List<Long> accessors = new ArrayList<>();
+      accessors.add(accessorId);
+      JSONObject body = new JSONObject();
+      body.put("userList", accessors);
+      when(taskDao.confirmAccessors(anyLong(), anyLong(), anyList())).thenReturn("确认接取者失败！");
+      JSONObject result = taskService.confirmAccessors(1L, 1L, body);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testDenyAccessors1() {
+      JSONObject body = new JSONObject();
+      List<Long> userIds = Collections.emptyList();
+      body.put("userList", userIds);
+
+      JSONObject result = taskService.denyAccessors(1L, 1L, body);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testDenyAccessors2() {
+      long accessorId = 1L;
+      List<Long> accessors = new ArrayList<>();
+      accessors.add(accessorId);
+      JSONObject body = new JSONObject();
+      body.put("userList", accessors);
+      when(taskDao.denyAccessors(anyLong(), anyLong(), anyList())).thenReturn("拒绝接取者成功！");
+      JSONObject result = taskService.denyAccessors(1L, 1L, body);
+      assert result.get("ok").equals(true);
+    }
+
+    @Test
+    public void testDenyAccessors3() {
+      long accessorId = 1L;
+      List<Long> accessors = new ArrayList<>();
+      accessors.add(accessorId);
+      JSONObject body = new JSONObject();
+      body.put("userList", accessors);
+      when(taskDao.denyAccessors(anyLong(), anyLong(), anyList())).thenReturn("拒绝接取者失败！");
+      JSONObject result = taskService.denyAccessors(1L, 1L, body);
+      assert result.get("ok").equals(false);
+    }
+
+    @Test
+    public void testGetMyCollect() {
+      when(taskDao.getMyCollect(anyLong(), any(Pageable.class))).thenReturn(taskPage);
+      JSONObject result = taskService.getMyCollect(pageable, 1L);
+      assert result.get("ok").equals(true);
+    }
+
+  @Test
+  public void testSearchTaskByPagingWithException() {
+    String formattedBegintime = "2024-07-01 00:00:00";
+    String formattedEndtime = "2024-07-02 00:00:00";
+
+    // 模拟 taskDao.searchTaskByPaging 方法抛出异常
+    when(taskDao.searchTaskByPaging(anyString(), any(Pageable.class), any(LocalDateTime.class), any(LocalDateTime.class), anyLong(), anyLong()))
+            .thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.searchTaskByPaging("test", pageable, formattedBegintime, formattedEndtime, 1L, 1000L, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testGetTaskInfoWithException() {
+    // 模拟 taskDao.findById 方法抛出异常
+    when(taskDao.findById(anyLong())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.getTaskInfo(1L, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testGetTaskCommentsWithException() {
+    // 模拟 taskCommentDao.getTaskComments 方法抛出异常
+    when(taskCommentDao.getTaskComments(anyLong(), any(Pageable.class))).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.getTaskComments(1L, pageable, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testGetTaskMessagesWithException() {
+    // 模拟 taskMessageDao.getTaskMessages 方法抛出异常
+    when(taskMessageDao.getTaskMessages(anyLong(), any(Pageable.class))).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.getTaskMessages(1L, pageable, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testLikeCommentWithException() {
+    // 模拟 taskCommentDao.likeCommentByTaskCommentId 方法抛出异常
+    when(taskCommentDao.likeCommentByTaskCommentId(anyLong(), anyLong())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.likeComment(1L, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testUnlikeCommentWithException() {
+    // 模拟 taskCommentDao.unlikeCommentByTaskCommentId 方法抛出异常
+    when(taskCommentDao.unlikeCommentByTaskCommentId(anyLong(), anyLong())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.unlikeComment(1L, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testLikeMessageWithException() {
+    // 模拟 taskMessageDao.likeMessageByTaskMessageId 方法抛出异常
+    when(taskMessageDao.likeMessageByTaskMessageId(anyLong(), anyLong())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.likeMessage(1L, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testUnlikeMessageWithException() {
+    // 模拟 taskMessageDao.unlikeMessageByTaskMessageId 方法抛出异常
+    when(taskMessageDao.unlikeMessageByTaskMessageId(anyLong(), anyLong())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.unlikeMessage(1L, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testCollectTaskWithException() {
+    // 模拟 taskDao.collectTaskByTaskId 方法抛出异常
+    when(taskDao.collectTaskByTaskId(anyLong(), anyLong())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.collectTask(1L, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testUncollectTaskWithException() {
+    // 模拟 taskDao.uncollectTaskByTaskId 方法抛出异常
+    when(taskDao.uncollectTaskByTaskId(anyLong(), anyLong())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.uncollectTask(1L, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testAccessTaskWithException() {
+    // 模拟 taskDao.accessTaskByTaskId 方法抛出异常
+    when(taskDao.accessTaskByTaskId(anyLong(), anyLong())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.accessTask(1L, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testUnaccessTaskWithException() {
+    // 模拟 taskDao.unaccessTaskByTaskId 方法抛出异常
+    when(taskDao.unaccessTaskByTaskId(anyLong(), anyLong())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.unaccessTask(1L, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testPublishMessageWithException() {
+    // 模拟 taskMessageDao.putMessage 方法抛出异常
+    when(taskMessageDao.putMessage(anyLong(), anyLong(), anyString())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject body = new JSONObject();
+    body.put("content", "test");
+    JSONObject result = taskService.publishMessage(1L, 1L, body);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testDeleteMessageWithException() {
+    // 模拟 taskMessageDao.deleteMessage 方法抛出异常
+    when(taskMessageDao.deleteMessage(anyLong(), anyLong())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.deleteMessage(1L, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testPublishCommentWithException() {
+    // 模拟 taskCommentDao.putComment 方法抛出异常
+    when(taskCommentDao.putComment(anyLong(), anyLong(), anyString(), anyByte())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject body = new JSONObject();
+    body.put("content", "test");
+    body.put("rating", 1);
+    JSONObject result = taskService.publishComment(1L, 1L, body);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testDeleteCommentWithException() {
+    // 模拟 taskCommentDao.deleteComment 方法抛出异常
+    when(taskCommentDao.deleteComment(anyLong(), anyLong())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject result = taskService.deleteComment(1L, 1L);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+    assert result.get("message").toString().contains("模拟异常");
+  }
+
+  @Test
+  public void testPublishTaskWithException() {
+    // 模拟 taskDao.publishTask 方法抛出异常
+    when(taskDao.publishTask(anyLong(), anyString(), anyString(), anyLong(), anyInt(), anyList())).thenThrow(new RuntimeException("模拟异常"));
+
+    JSONObject body = new JSONObject();
+    body.put("title", "test");
+    body.put("description", "test");
+    body.put("price", 1000);
+    body.put("maxAccess", 1);
+    body.put("images", "test");
+    JSONObject result = taskService.publishTask(1L, body);
+
+    // 断言返回结��的 ok 属性为 false，并且包含异常信息
+    assert result.get("ok").equals(false);
+  }
+
+  @Test
+  public void testGetMyTaskWithException() {
+    // 模拟 taskDao.getMyTask 方法抛出异常
+    when(taskDao.getMyTask(anyLong(), any(Pageable.class))).thenThrow(new RuntimeException("模拟异常"));
+    JSONObject result = taskService.getMyTask(pageable, 1L);
+    assert result.get("ok").equals(false);
+  }
+
+  @Test
+  public void testMyAccessedTaskWithException() {
+    // 模拟 taskDao.getMyAccessedTask 方法抛出异常
+    when(taskDao.getMyAccessedTask(anyLong(), any(Pageable.class))).thenThrow(new RuntimeException("模拟异常"));
+    JSONObject result = taskService.getMyAccessedTask(pageable, 1L);
+    assert result.get("ok").equals(false);
+  }
+
+  @Test
+  public void testGetTaskAccessorInfoWithException() {
+    // 模拟 taskDao.findById 方法抛出异常
+    when(taskDao.findById(anyLong())).thenThrow(new RuntimeException("模拟异常"));
+    JSONObject result = taskService.getTaskAccessorInfo(1L, 1L, pageable);
+    assert result.get("ok").equals(false);
+  }
+
+  @Test
+  public void testGetTaskAccessorSuccessWithException() {
+    // 模拟 taskDao.findById 方法抛出异常
+    when(taskDao.findById(anyLong())).thenThrow(new RuntimeException("模拟异常"));
+    JSONObject result = taskService.getTaskAccessorSuccess(1L, 1L, pageable);
+    assert result.get("ok").equals(false);
+  }
+
+  @Test
+  public void testGetTaskAccessorFailWithException() {
+    // 模拟 taskDao.findById 方法抛出异常
+    when(taskDao.findById(anyLong())).thenThrow(new RuntimeException("模拟异常"));
+    JSONObject result = taskService.getTaskAccessorFail(1L, 1L, pageable);
+    assert result.get("ok").equals(false);
+  }
+
+  @Test
+  public void testCancelTaskWithException() {
+    // 模拟 taskDao.cancelTask 方法抛出异常
+    when(taskDao.cancelTask(anyLong(), anyLong())).thenThrow(new RuntimeException("模拟异常"));
+    JSONObject result = taskService.cancelTask(1L, 1L);
+    assert result.get("ok").equals(false);
+  }
+
+  @Test
+  public void testConfirmAccessorsWithException() {
+    // 模拟 taskDao.confirmAccessors 方法抛出异常
+    when(taskDao.confirmAccessors(anyLong(), anyLong(), anyList())).thenThrow(new RuntimeException("模拟异常"));
+    JSONObject result = taskService.confirmAccessors(1L, 1L, new JSONObject());
+    assert result.get("ok").equals(false);
+  }
+
+  @Test
+  public void testDenyAccessorsWithException() {
+    // 模拟 taskDao.denyAccessors 方法抛出异常
+    when(taskDao.denyAccessors(anyLong(), anyLong(), anyList())).thenThrow(new RuntimeException("模拟异常"));
+    JSONObject result = taskService.denyAccessors(1L, 1L, new JSONObject());
+    assert result.get("ok").equals(false);
+  }
+
+  @Test
+  public void testGetMyCollectWithException() {
+    // 模拟 taskDao.getMyCollect 方法抛出异常
+    when(taskDao.getMyCollect(anyLong(), any(Pageable.class))).thenThrow(new RuntimeException("模拟异常"));
+    JSONObject result = taskService.getMyCollect(pageable, 1L);
+    assert result.get("ok").equals(false);
+  }
+
 }

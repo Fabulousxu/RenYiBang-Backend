@@ -137,10 +137,33 @@ public class TaskControllerTest {
     }
 
     @Test
+    public void searchTaskTest6() throws Exception {
+        when(taskService.searchTaskByPaging(
+                anyString(), any(), anyString(), anyString(), anyLong(), anyLong(), anyLong()))
+                .thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/search")
+                                .param("keyword", "")
+                                .param("pageSize", "1")
+                                .param("pageIndex", "1")
+                                .param("order", "time")
+                                .param("timeBegin", "")
+                                .param("timeEnd", "")
+                                .param("priceLow", "0")
+                                .param("priceHigh", "-1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(true));
+    }
+
+    @Test
     public void getTaskInfoTest() throws Exception {
         when(taskService.getTaskInfo(anyLong(), anyLong())).thenReturn(ResponseUtil.success());
         mockMvc
-                .perform(get("/api/task/1"))
+                .perform(
+                        get("/api/task/1")
+                                .header("userId", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ok").value(true));
     }
@@ -433,5 +456,198 @@ public class TaskControllerTest {
                 .perform(get("/api/task/1/ownerId"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ok").value(true));
+    }
+
+    @Test
+    public void getMyTaskTest1() throws Exception {
+        when(taskService.getMyTask(any(), anyLong())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/initiator/self")
+                                .param("pageSize", "1")
+                                .param("pageIndex", "1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(true));
+    }
+
+    @Test
+    public void getMyTaskTest2() throws Exception {
+        when(taskService.getMyTask(any(), anyLong())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/initiator/self")
+                                .param("pageSize", "0")
+                                .param("pageIndex", "1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(false));
+    }
+
+    @Test
+    public void getMyTaskTest3() throws Exception {
+        when(taskService.getMyTask(any(), anyLong())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/initiator/self")
+                                .param("pageSize", "1")
+                                .param("pageIndex", "-1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(false));
+    }
+
+    @Test
+    public void getMyAccessedTaskTest1() throws Exception {
+        when(taskService.getMyAccessedTask(any(), anyLong())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/recipient/self")
+                                .param("pageSize", "1")
+                                .param("pageIndex", "1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(true));
+    }
+
+    @Test
+    public void getMyAccessedTaskTest2() throws Exception {
+        when(taskService.getMyAccessedTask(any(), anyLong())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/recipient/self")
+                                .param("pageSize", "0")
+                                .param("pageIndex", "1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(false));
+    }
+
+    @Test
+    public void getMyAccessedTaskTest3() throws Exception {
+        when(taskService.getMyAccessedTask(any(), anyLong())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/recipient/self")
+                                .param("pageSize", "1")
+                                .param("pageIndex", "-1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(false));
+    }
+
+    @Test
+    public void getTaskAccessorInfoTest() throws Exception {
+        when(taskService.getTaskAccessorInfo(anyLong(), anyLong(), any())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/1/select/info")
+                                .param("pageSize", "1")
+                                .param("pageIndex", "1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(true));
+    }
+
+    @Test
+    public void getTaskAccessorSuccessTest() throws Exception {
+        when(taskService.getTaskAccessorSuccess(anyLong(), anyLong(), any())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/1/select/success")
+                                .param("pageSize", "1")
+                                .param("pageIndex", "1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(true));
+    }
+
+    @Test
+    public void getTaskAccessorFailTest() throws Exception {
+        when(taskService.getTaskAccessorFail(anyLong(), anyLong(), any())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/1/select/fail")
+                                .param("pageSize", "1")
+                                .param("pageIndex", "1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(true));
+    }
+
+    @Test
+    public void cancelTaskTest() throws Exception {
+        when(taskService.cancelTask(anyLong(), anyLong())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(delete("/api/task/1/cancel").header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(true));
+    }
+
+    @Test
+    public void confirmAccessorsTest() throws Exception {
+        when(taskService.confirmAccessors(anyLong(), anyLong(), any(JSONObject.class)))
+                .thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        put("/api/task/1/select/confirm")
+                                .header("userId", 1L)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(true));
+    }
+
+    @Test
+    public void denyAccessorsTest() throws Exception {
+        when(taskService.denyAccessors(anyLong(), anyLong(), any(JSONObject.class)))
+                .thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        put("/api/task/1/select/deny")
+                                .header("userId", 1L)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(true));
+    }
+
+    @Test
+    public void getMyCollectTest1() throws Exception {
+        when(taskService.getMyCollect(any(), anyLong())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/mycollect")
+                                .param("pageSize", "1")
+                                .param("pageIndex", "1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(true));
+    }
+
+    @Test
+    public void getMyCollectTest2() throws Exception {
+        when(taskService.getMyCollect(any(), anyLong())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/mycollect")
+                                .param("pageSize", "0")
+                                .param("pageIndex", "1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(false));
+    }
+
+    @Test
+    public void getMyCollectTest3() throws Exception {
+        when(taskService.getMyCollect(any(), anyLong())).thenReturn(ResponseUtil.success());
+        mockMvc
+                .perform(
+                        get("/api/task/mycollect")
+                                .param("pageSize", "1")
+                                .param("pageIndex", "-1")
+                                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ok").value(false));
     }
 }

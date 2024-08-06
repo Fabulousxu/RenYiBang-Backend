@@ -697,7 +697,7 @@ public class ServiceServiceImpl implements ServiceService {
   public JSONObject cancelService(long serviceId, long userId) {
     try {
       String result = serviceDao.cancelService(serviceId, userId);
-      if ("取消任务成功！".equals(result)) {
+      if ("取消服务成功！".equals(result)) {
         return ResponseUtil.success(result);
       } else {
         return ResponseUtil.error(result);
