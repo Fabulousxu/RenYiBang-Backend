@@ -23,7 +23,7 @@ CREATE TABLE user
     type      TINYINT      DEFAULT 0  NOT NULL COMMENT '用户类型(0:普通用户,1:客服,2:管理员)',
     nickname  VARCHAR(16)  DEFAULT '' NOT NULL COMMENT '用户昵称',
     avatar    LONGTEXT                NOT NULL COMMENT '用户头像',
-    intro     TEXT                    NOT NULL COMMENT '用户介绍',
+    intro     TEXT         DEFAULT '' NOT NULL COMMENT '用户介绍',
     rating    TINYINT      DEFAULT 50 NOT NULL COMMENT '用户评分(存储10倍评分,范围0~100)',
     balance   BIGINT       DEFAULT 0  NOT NULL COMMENT '用户余额(存储100倍余额)',
     phone     VARCHAR(14)  DEFAULT '' NOT NULL COMMENT '用户手机号',
