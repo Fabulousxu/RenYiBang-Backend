@@ -59,8 +59,6 @@ public class TaskServiceTest {
     private DateTimeFormatter formatter;
     private List<Task> taskList;
     private Page<Task> taskPage;
-    private LocalDateTime begintime;
-    private LocalDateTime endtime;
     private JSONObject successResponse;
     private JSONObject errorResponse;
     private JSONObject userInfosForTest;
@@ -83,8 +81,7 @@ public class TaskServiceTest {
         taskList.add(task);
         taskPage = new PageImpl<>(taskList);
         pageable = PageRequest.of(0, 10);
-      begintime = LocalDateTime.parse("2024-06-01 00:00:00", formatter);
-      endtime = LocalDateTime.parse("2024-06-02 00:00:00", formatter);
+
       successResponse = new JSONObject();
       errorResponse = new JSONObject();
       successResponse.put("ok", true);
@@ -114,7 +111,6 @@ public class TaskServiceTest {
       when(userClient.getUserInfos(anyList())).thenReturn(userObject);
 
       JSONObject result = taskService.searchTaskByPaging("test", pageable, formattedBegintime, formattedEndtime, 1L, 1000L, 1L);
-      System.out.println(result);
       assert result.get("ok").equals(true);
     }
 
@@ -131,7 +127,6 @@ public class TaskServiceTest {
       when(userClient.getUserInfos(anyList())).thenReturn(userObject);
 
       JSONObject result = taskService.searchTaskByPaging("test", pageable, formattedBegintime, formattedEndtime, 1L, 1000L, 1L);
-      System.out.println(result);
       assert result.get("ok").equals(true);
     }
 
@@ -149,7 +144,6 @@ public class TaskServiceTest {
       when(userClient.getUserInfos(anyList())).thenReturn(userObject);
 
       JSONObject result = taskService.searchTaskByPaging("test", pageable, formattedBegintime, formattedEndtime, 1L, 1000L, 1L);
-      System.out.println(result);
       assert result.get("ok").equals(false);
     }
 
@@ -196,7 +190,6 @@ public class TaskServiceTest {
       when(taskCommentDao.isLiked(anyLong(), anyLong())).thenReturn(true);
 
       JSONObject result = taskService.getTaskComments(1L, pageable, 1L);
-      System.out.println(result);
       assert result.get("ok").equals(true);
     }
 
@@ -493,7 +486,6 @@ public class TaskServiceTest {
       body.put("images", imageList);
       when(taskDao.publishTask(anyLong(),anyString(),anyString(),anyLong(), anyInt(), ArgumentMatchers.<List<String>>any())).thenReturn("任务发布成功！");
       JSONObject result = taskService.publishTask(1L, body);
-      System.out.println(result);
       assert result.get("ok").equals(true);
     }
 
@@ -702,7 +694,6 @@ public class TaskServiceTest {
 
       List<TaskAccess> taskAccessList = Collections.emptyList();
       Page<TaskAccess> taskAccessPage = new PageImpl<>(taskAccessList);
-      System.out.println(taskAccessPage);
       when(taskDao.getTaskAccessByTask(any(Task.class), any(Pageable.class))).thenReturn(taskAccessPage);
 
       JSONObject result = taskService.getTaskAccessorInfo(1L, 1L, pageable);
@@ -743,7 +734,6 @@ public class TaskServiceTest {
       newmessage.put("data", new ArrayList<>());
       when(userClient.getAccessorInfos(anyList())).thenReturn(newmessage);
       JSONObject result = taskService.getTaskAccessorInfo(1L, 1L, pageable);
-      System.out.println(result);
       assert result.get("ok").equals(true);
     }
 
