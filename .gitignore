@@ -9,6 +9,9 @@ logs/
 derby.log
 out/
 **/META-INF/
+jmeter/
+elasticsearch/
+kibana/
 
 ### STS ###
 .apt_generated

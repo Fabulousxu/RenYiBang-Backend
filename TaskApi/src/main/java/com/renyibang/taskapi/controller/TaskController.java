@@ -1,6 +1,7 @@
 package com.renyibang.taskapi.controller;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.renyibang.global.util.Response;
 import com.renyibang.taskapi.service.TaskService;
 import com.renyibang.taskapi.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -200,5 +201,10 @@ public class TaskController {
   public JSONObject getMyCollect(int pageSize, int pageIndex, @RequestHeader long userId) {
     if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
     return taskService.getMyCollect(PageRequest.of(pageIndex, pageSize), userId);
+  }
+
+  @GetMapping("/health")
+  public Response health() {
+    return Response.success();
   }
 }

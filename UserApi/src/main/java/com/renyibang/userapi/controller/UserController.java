@@ -4,9 +4,10 @@ import com.renyibang.global.dto.UserDTO;
 import com.renyibang.global.util.Response;
 import com.renyibang.userapi.dto.Update;
 import com.renyibang.userapi.service.UserService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -51,5 +52,10 @@ public class UserController {
   @GetMapping("/accessor/{userIds}")
   public Response getUserInfos_accessor(@PathVariable List<Long> userIds) {
     return userService.getUserInfos_accessor(userIds);
+  }
+
+  @GetMapping("/health")
+  public Response health() {
+    return Response.success();
   }
 }

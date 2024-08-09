@@ -28,4 +28,9 @@ public class ChatController {
       String chatId, String lastMessageId, int count, @RequestHeader("userId") long userId) {
     return chatService.getChatHistory(userId, chatId, lastMessageId, count);
   }
+
+  @GetMapping("/health")
+  public Response health() {
+    return Response.success();
+  }
 }

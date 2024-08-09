@@ -1,6 +1,7 @@
 package com.renyibang.serviceapi.controller;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.renyibang.global.util.Response;
 import com.renyibang.serviceapi.service.ServiceService;
 import com.renyibang.serviceapi.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -256,5 +257,10 @@ public class ServiceController {
     public JSONObject getMyCollect(int pageSize, int pageIndex, @RequestHeader long userId) {
         if (pageSize <= 0 || pageIndex < 0) return ResponseUtil.error("分页错误");
         return serviceService.getMyCollect(PageRequest.of(pageIndex, pageSize), userId);
+    }
+
+    @GetMapping("/health")
+    public Response health() {
+        return Response.success();
     }
 }
