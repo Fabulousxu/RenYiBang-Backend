@@ -17,12 +17,12 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     @Override
     Page<Service> findAll(Pageable pageable);
 
-    @Query("SELECT s FROM Service s WHERE " +
-            "(LOWER(s.title) LIKE LOWER(CONCAT('%', :searchText, '%')) OR " +
-            "LOWER(s.description) LIKE LOWER(CONCAT('%', :searchText, '%'))) AND " +
+    @Query(value = "SELECT * FROM service s WHERE " +
+            "(MATCH(s.title, s.description) AGAINST (:searchText IN BOOLEAN MODE)) AND " +
             "s.price BETWEEN :priceLow AND :priceHigh AND " +
-            "s.createdAt BETWEEN :beginDateTime AND :endDateTime AND " +
-            "s.status != :status")
+            "s.created_at BETWEEN :beginDateTime AND :endDateTime AND " +
+            "s.status != :status",
+            nativeQuery = true)
     Page<Service> searchServices(@Param("searchText") String searchText,
                            @Param("priceLow") long priceLow,
                            @Param("priceHigh") long priceHigh,
