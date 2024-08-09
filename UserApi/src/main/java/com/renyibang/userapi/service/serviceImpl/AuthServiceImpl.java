@@ -33,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
     user.setNickname(register.getNickname());
     user.setPhone(register.getPhone());
     user.setEmail(register.getEmail());
+    user.setIntro("");
     userRepository.save(user);
     Auth auth = new Auth();
     auth.setUserId(user.getUserId());
