@@ -6,9 +6,9 @@ fake = Faker()
 
 # Generate random service_message_like records
 service_message_like_records = []
-for _ in range(100000):
-    service_message_id = random.randint(1, 100000)  # Assuming service_message_id ranges from 1 to 100000
-    liker_id = random.randint(1, 100000)  # Assuming liker_id ranges from 1 to 100000
+for _ in range(10000):
+    service_message_id = random.randint(1, 10000)  # Assuming service_message_id ranges from 1 to 10000
+    liker_id = random.randint(1, 10000)  # Assuming liker_id ranges from 1 to 10000
 
     service_message_like_records.append(f"({service_message_id}, {liker_id})")
 

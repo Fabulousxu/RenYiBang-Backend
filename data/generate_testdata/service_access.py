@@ -6,9 +6,9 @@ fake = Faker()
 
 # Generate random service_access records
 service_access_records = []
-for _ in range(100000):
-    service_id = random.randint(1, 100000)  # Assuming service_id ranges from 1 to 100000
-    accessor_id = random.randint(1, 100000)  # Assuming accessor_id ranges from 1 to 100000
+for _ in range(10000):
+    service_id = random.randint(1, 10000)  # Assuming service_id ranges from 1 to 10000
+    accessor_id = random.randint(1, 10000)  # Assuming accessor_id ranges from 1 to 10000
     created_at = fake.date_time_between(start_date='-1y', end_date='now').strftime('%Y-%m-%d %H:%M:%S')
     status = random.randint(0, 2)  # Status ranges from 0 to 2
 

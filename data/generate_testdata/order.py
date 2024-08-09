@@ -6,16 +6,16 @@ fake = Faker()
 
 # Generate random order records
 order_records = []
-for _ in range(100000):
+for _ in range(10000):
     order_type = random.randint(0, 1)  # Order type: 0 (任务订单) or 1 (服务订单)
-    owner_id = random.randint(1, 100000)
-    accessor_id = random.randint(1, 100000)
+    owner_id = random.randint(1, 10000)
+    accessor_id = random.randint(1, 10000)
     # Ensure owner_id and accessor_id are not the same
     while accessor_id == owner_id:
-        accessor_id = random.randint(1, 100000)
+        accessor_id = random.randint(1, 10000)
     status = random.randint(0, 4)
     cost = random.randint(1, 10000) * 100  # Cost stored as 100 times the actual value
-    item_id = random.randint(1, 100000)
+    item_id = random.randint(1, 10000)
 
     order_records.append(f"({order_type}, {owner_id}, {accessor_id}, {status}, {cost}, {item_id})")
 

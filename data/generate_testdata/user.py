@@ -9,13 +9,13 @@ user_types = [0, 1, 2]  # 0:普通用户, 1:客服, 2:管理员
 
 # Generate random user records
 user_records = []
-for _ in range(100000):
+for _ in range(10000):
     user_type = random.choice(user_types)
     nickname = fake.user_name()[:16].replace('"', '""')  # Ensure nickname does not exceed 16 characters
     avatar = fake.image_url().replace('"', '""')
     intro = fake.text(max_nb_chars=255).replace('"', '""')  # Ensure intro does not exceed 255 characters
     rating = random.randint(0, 100)
-    balance = random.randint(0, 100000)  # Assuming balance ranges from 0 to 100,000
+    balance = random.randint(0, 10000)  # Assuming balance ranges from 0 to 100,000
     phone = fake.phone_number()[:14].replace('"', '""')  # Ensure phone does not exceed 14 characters
     email = fake.email().replace('"', '""')
     following = random.randint(0, 1000)

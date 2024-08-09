@@ -6,9 +6,9 @@ fake = Faker()
 
 # Generate random task_collect records
 task_collect_records = []
-for _ in range(100000):
-    task_id = random.randint(1, 100000)  # Assuming task_id ranges from 1 to 100000
-    collector_id = random.randint(1, 100000)  # Assuming collector_id ranges from 1 to 100000
+for _ in range(10000):
+    task_id = random.randint(1, 10000)  # Assuming task_id ranges from 1 to 10000
+    collector_id = random.randint(1, 10000)  # Assuming collector_id ranges from 1 to 10000
     created_at = fake.date_time_between(start_date='-1y', end_date='now').strftime('%Y-%m-%d %H:%M:%S')
 
     task_collect_records.append(f"({task_id}, {collector_id}, '{created_at}')")

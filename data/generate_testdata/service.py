@@ -6,8 +6,8 @@ fake = Faker()
 
 # Generate random service records
 service_records = []
-for _ in range(100000):
-    owner_id = random.randint(1, 100000)  # Assuming owner_id ranges from 1 to 100000
+for _ in range(10000):
+    owner_id = random.randint(1, 10000)  # Assuming owner_id ranges from 1 to 10000
     title = fake.sentence(nb_words=6)[:32].replace('"', '""')  # Ensure title does not exceed 32 characters
     images = " ".join([fake.image_url() for _ in range(random.randint(0, 3))]).replace('"', '""')
     description = fake.text(max_nb_chars=255).replace('"', '""')  # Ensure description does not exceed 255 characters

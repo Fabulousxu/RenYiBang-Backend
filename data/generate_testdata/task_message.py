@@ -6,9 +6,9 @@ fake = Faker()
 
 # Generate random task_message records
 task_message_records = []
-for _ in range(100000):
-    task_id = random.randint(1, 100000)  # Assuming task_id ranges from 1 to 100000
-    messager_id = random.randint(1, 100000)  # Assuming messager_id ranges from 1 to 100000
+for _ in range(10000):
+    task_id = random.randint(1, 10000)  # Assuming task_id ranges from 1 to 10000
+    messager_id = random.randint(1, 10000)  # Assuming messager_id ranges from 1 to 10000
     content = fake.text(max_nb_chars=255).replace('"', '""')  # Ensure content does not exceed 255 characters
     created_at = fake.date_time_between(start_date='-1y', end_date='now').strftime('%Y-%m-%d %H:%M:%S')
     liked_number = random.randint(0, 10000)
